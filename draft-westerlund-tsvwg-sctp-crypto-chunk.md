@@ -1,2 +1,2 @@
-docname: draft-westerlund-sctp-crypto-chunk-latest
+docname: draft-westerlund-tsvwg-sctp-crypto-chunk-latest
 title: SCTP Encryption Chunk

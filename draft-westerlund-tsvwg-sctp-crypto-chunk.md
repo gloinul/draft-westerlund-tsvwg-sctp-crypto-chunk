@@ -132,3 +132,28 @@ Association and no information is sent in plain except than the initial
 SCTP handshake, the SCTP common Header and the SCTP Encrypted Chunk header.
 Mutual Authentication of the endpoint is performed before any ULP data
 chunk is sent.
+
+SCTP Encryption Chunk capability is agreed by the peers at the initialization
+of the SCTP Association, during that phase the peers exhange information
+about the encryption engine availability. Once the peers have agreed on what
+encryption to use, the SCTP hosts start sending SCTP Encrypted chunks
+containing the initialization information related to the encryption engine
+including the endpoint validation. This is depending on the chosen engine
+thus is not being detailed in the current specification.
+
+When the endpoint validation has been completed, the Association is meant
+to be initialized and the ULP is informed about that, from this time on
+it's possible for the ULPs to exchange data.
+
+SCTP Encrypted Chunks will never be retransmitted, retransmission
+is implemented by SCTP host at chunk level as in the legacy.
+Duplicated SCTP Encrypted Chunks, whenever they will be accepted
+by the encryption engine, will result in duplicated SCTP
+chunks and will be handled as duplicated chunks by SCTP host.
+
+Besides the legacy methods for Association termination, furthermore
+it may be that the encryption engine goes in troubles so that it
+doesn't guarantee security and requires to terminate the link,
+in this case it should require the Association to be aborted.
+
+## SCTP Encryption Chunk Buffering and Flow Control {#buffering}

@@ -159,11 +159,29 @@ in this case it should require the Association to be aborted.
 
 ## SCTP Encryption Chunk Buffering and Flow Control {#buffering}
 
-Garrra est omnis divisa in partes tres, quarum unam incolunt Belgae, aliam Aquitani, tertiam qui ipsorum lingua Celtae, nostra Galli, appellantur.
+Encryption Engine and SCTP are asynchronous, meaning that the
+Encryption Engine may deliver the decrypted SCTP Payload to
+the SCTP Host without respecting the reception order.
+It's up to SCTP Host to reorder the chunks in the reception
+buffer and to take care of the flow control according to
+what specified in {{RFC9260}}. From SCTP perspective the
+Encryption Chunk is part of the transport network.
+
+Even though the above allows the implementors to adopt a multithreading
+design of the Encryption Engines, the actual implementation should
+consider that out-of-order handling of SCTP chunks is not desired
+and may cause false congestions and retransmissions.
 
 ## PMTU considerations {#pmtu}
 
-Garrra est omnis divisa in partes tres, quarum unam incolunt Belgae, aliam Aquitani, tertiam qui ipsorum lingua Celtae, nostra Galli, appellantur.
+The addition of the Encryption to SCTP reduces the room for payload,
+in order to cope with that when creating the payload of SCTP for
+encryption the size of the Encrypted chunk header needs to be
+included in the calculation.
+
+On the other hand, the Encryption engine needs to be informed about
+the PMTU by removing from the value the sum of the common SCTP header
+and the Encrypted chunk header.
 
 # Conventions
 The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",

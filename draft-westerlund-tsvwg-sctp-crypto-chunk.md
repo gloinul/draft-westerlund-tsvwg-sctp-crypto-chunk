@@ -161,6 +161,10 @@ in this case it should require the Association to be aborted.
 
 Garrra est omnis divisa in partes tres, quarum unam incolunt Belgae, aliam Aquitani, tertiam qui ipsorum lingua Celtae, nostra Galli, appellantur.
 
+## PMTU considerations {#pmtu}
+
+Garrra est omnis divisa in partes tres, quarum unam incolunt Belgae, aliam Aquitani, tertiam qui ipsorum lingua Celtae, nostra Galli, appellantur.
+
 # Conventions
 The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
    "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
@@ -378,3 +382,183 @@ the Encryption Engine SHOULD ask SCTP Host for terminating an Association
 when having an internal error or by detecting a security violation.
 The internal design of Encryption Engines and their capability is out of the
 scope of the current document.
+
+## Encrypted SCTP State Diagram
+
+~~~~~~~~~~~ aasvg
+                           -----          -------- (from any state)
+                         /       \      /receive ABORT      [ABORT]
+           receive INIT |         |    |--------------  or ----------
+   ---------------------|         v    v    delete TCB     send ABORT
+   generate State Cookie \    +---------+                  delete TCB
+           send INIT ACK   ---|  CLOSED |
+                              +---------+
+                                /      \
+                               /        \  [ASSOCIATE]
+                              |          |-----------------
+                              |          | create TCB
+                              |          | send INIT
+             receive valid    |          | start T1-init timer
+             COOKIE  ECHO     |          v
+         (1) -----------------|    +-----------+
+             create TCB       |    |COOKIE-WAIT| (2)
+             send COOKIE ACK  |    +-----------+
+                              |          |
+                              |          | receive INIT ACK
+                              |          |-------------------
+                              |          | send COOKIE ECHO
+                              |          | stop T1-init timer
+                              |          | start T1-cookie timer
+                              |          v
+                              |   +-------------+
+                              |   |COOKIE-ECHOED| (3)
+                              |   +-------------+
+                              |          |
+                              |          | receive COOKIE ACK
+                              |          |-------------------
+                              |          | stop T1-cookie timer
+                              v          v
+                           +-----------------+
+                           |  CRYPT PENDING  |
+                           +-----------------+
+                                    |
+                                    | [CRYPTO SETUP]
+                                    |-----------------
+                                    | send and receive
+                                    | encrypt engine hanshake
+                                    | by means of ENCRYPT chunks
+                                    | in case of error, send plain ABORT
+                                    |
+                                    v
+                           +-----------------+
+                           |    ENCRYPTED    |
+                           +-----------------+
+                                    |
+                                    | [ENDPOINT VALIDATION]
+                                    |------------------------
+                                    | send and receive
+                                    | EAUTH by means of
+                                    | ENCRYPT chunk
+                                    | in case of error, send plain ABORT
+                                    |
+                                    v
+                            +---------------+
+                            |  ESTABLISHED  | From this state on, only ENCRYPT chunks
+                            +---------------+ are sent as SCTP payload and chunks other
+                                    |         than ENCRYPT
+                                    |         are silently discarded
+                                    |
+                                    |
+                                    |
+                           /--------+--------\
+       [SHUTDOWN]         /                   \
+       -------------------|                   |
+       check outstanding  |                   |
+       DATA chunks        |                   |
+                          v                   |
+                 +----------------+           |
+                 |SHUTDOWN-PENDING|           | receive SHUTDOWN
+                 +----------------+           |------------------
+                                              | check outstanding
+                          |                   | DATA chunks
+   No more outstanding    |                   |
+   -----------------------|                   |
+   send SHUTDOWN          |                   |
+   start T2-shutdown timer|                   |
+                          v                   v
+                   +-------------+   +-----------------+
+               (4) |SHUTDOWN-SENT|   |SHUTDOWN-RECEIVED| (5,6)
+                   +-------------+   +-----------------+
+                          |  \                |
+   receive SHUTDOWN ACK   |   \               |
+   -----------------------|    \              |
+   stop T2-shutdown timer |     \             |
+   send SHUTDOWN COMPLETE |      \            |
+   delete TCB             |       \           |
+                          |        \          | No more outstanding
+                          |         \         |--------------------
+                          |          \        | send SHUTDOWN ACK
+   receive SHUTDOWN      -|-          \       | start T2-shutdown timer
+   --------------------/  | \----------\      |
+   send SHUTDOWN ACK      |             \     |
+   start T2-shutdown timer|              \    |
+                          |               \   |
+                          |                |  |
+                          |                v  v
+                          |          +-----------------+
+                          |          |SHUTDOWN-ACK-SENT| (7)
+                          |          +-----------------+
+                          |                   | (A)
+                          |                   |receive SHUTDOWN COMPLETE
+                          |                   |-------------------------
+                          |                   | stop T2-shutdown timer
+                          |                   | delete TCB
+                          |                   |
+                          |                   | (B)
+                          |                   | receive SHUTDOWN ACK
+                          |                   |-----------------------
+                          |                   | stop T2-shutdown timer
+                          |                   | send SHUTDOWN COMPLETE
+                          |                   | delete TCB
+                          |                   |
+                          \    +---------+    /
+                           \-->| CLOSED  |<--/
+                               +---------+
+~~~~~~~~~~~
+{: #sctp-encryption-state-diagram title="SCTP State Diagram with Encryption"}
+
+
+## Encrypted Data Chunk handling
+
+With reference to the State Diagram as shown in {{sctp-encryption-state-diagram}},
+the handling of Control Chunks, Data Chunks and Encrypted chunks follows the
+rules defined belows:
+
+- When the Association is in states CLOSED, COOKIE-WAIT, COOKIE-ECHOED and CRYPT PENDING,
+any Control Chunk is sent plain. No DATA chunks shall be sent in these states and DATA
+chunks received shall be silently discarded.
+
+- ENCRYPT chunks MAY be bundled with COOKIE-ECHO and COOKIE-ACK
+
+- When the Association is in states ENCRYPTED, ESTABLISHED, SHUTDOWN-PENDING, SHUTDOWN-SENT,
+SHUTDOWN-RECEIVED, SHUTDOWN-ACK-SENT any Control Chunk as well as Data chunks will be
+used for creating an SCTP payload that will be encrypted and the resul from encryption
+will be the payload of an ENCRYPT chunk that will be the only one being sent as payload
+of the SCTP packet.
+
+~~~~~~~~~~~ aasvg
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                         Common Header                         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                           Chunk #1                            |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                              ...                              |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                           Chunk #n                            |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+~~~~~~~~~~~
+{: #sctp-encryption-encrypt-chunk-states-1 title="SCTP packet before ENCRYPTED state"}
+
+The diagram shown in {{sctp-encryption-encrypt-chunk-states-1}} describes
+the structure of an SCTP packet being sent or received when the Association
+has not reached the ENCRYPTED state yet. In this case only Control
+Chunks or ENCRYPTED chunk can be handled.
+
+~~~~~~~~~~~ aasvg
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                         Common Header                         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                         ENCRYPT chunk                         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+~~~~~~~~~~~
+{: #sctp-encryption-encrypt-chunk-states-2 title="SCTP packet after ENCRYPTED state"}
+
+The diagram shown in {{sctp-encryption-encrypt-chunk-states-2}} describes
+the structure of an SCTP packet being sent after the ENCRYPTED state has been
+reached. Suck packets are built with the SCTP Common header and only one
+ENCRYPT chunk.
+

@@ -37,15 +37,20 @@ normative:
 
 
 --- abstract
-This document describes the a methos for addying encryption
-support for the Stream Control Transmission Protocol (SCTP).
 
-SCTP Encryption Chunk provides communications privacy for applications that
-use SCTP as their transport protocol and allows client/server
-applications to communicate in a way that is designed to prevent
-eavesdropping and detect tampering or message forgery.
+This document describes a method for adding encryption support to the
+Stream Control Transmission Protocol (SCTP). SCTP Encryption Chunk is
+intended to enable communications privacy for applications that use
+SCTP as their transport protocol and allows applications to
+communicate in a way that is designed to prevent eavesdropping and
+detect tampering or message forgery.
 
-Applications using SCTP Encryption Chunk can exploit all transport
+The crypto chunk defined here in is one half of a complete
+solution. Where a companion specification is required to define how
+the content of the crypto chunk is encrypted, authenticated and
+protected against replay, as well as how keymanagement is accomplised.
+
+Applications using SCTP Encryption Chunk can use all transport
 features provided by SCTP and its extensions.
 
 --- middle
@@ -57,51 +62,40 @@ features provided by SCTP and its extensions.
    This document defines a encryption chunk for the Stream Control
    Transmission Protocol (SCTP), as defined in {{RFC9260}}.
 
-   This specification provides mutual authentication of endpoints,
-   data confidentiality, data origin authentication, data integrity
-   protection, and data replay protection of user messages for
-   applications that use SCTP as their transport protocol.  Thus, it
-   allows client/server applications to communicate in a way that is
-   designed to give communications privacy and to prevent
-   eavesdropping and detect tampering or message forgery. SCTP Encryption Chunk
-   uses a guest encryption protocol for mutual authentication, integrity
-   protection and confidentiality of user messages as well as SCTP
-   Control chunks.
+   This specification defines the actual crypto chunk, how to enable
+   it usage, how it interact with the SCTP association establishment
+   to enable endpoint authentication, key-establishment and other
+   features of the seperate cipher specfication.
+
+   This specification is intended to be capable of enabling mutual
+   authentication of endpoints, data confidentiality, data origin
+   authentication, data integrity protection, and data replay
+   protection for SCTP packets after SCTP association has been
+   established. The exact properties will depend on the companion
+   cipher specification used with the crypto chunk.
 
    Applications using SCTP Encryption Chunk can use all transport
-   features provided by SCTP and its extensions. SCTP Encryption Chunk supports:
-
-   * preservation of message boundaries.
-
-   * a large number of unidirectional and bidirectional streams.
-
-   * ordered and unordered delivery of SCTP user messages.
-
-   * the partial reliability extension as defined in {{RFC3758}}.
-
-   * the dynamic address reconfiguration extension as defined in
-      {{RFC5061}}.
-
-   * User messages of any size.
-
-   The method described in this document poses no further requirements
-   on SCTP.
+   features provided by SCTP and its extensions. Due to its level of
+   intergration as discussed in next section it will provide its
+   security functions on all content of the SCTP packet, and will thus
+   not impact the potential to utilize any SCTP functionalities or
+   extensions.
 
 ## Protocol Overview
 
-SCTP Encryption Chunk protection is defined as a method for secure
-and confidential data transfer extensiont for SCTP.
-This is implemented inside the SCTP protocol, in a sublayer between the
-SCTP Header handling and the SCTP Chunk handling.
-Once an SCTP packet has been received and the SCTP Common Header has been
-validated, the SCTP Encrypted Chunk(s) are being sent to the chosen decryption
-engine that will return the plain SCTP payload containing the plain SCTP chunks,
-those chunks will be handled in the legacy SCTP protocol.
+SCTP Encryption Chunk is defined as a method for secure and
+confidential transfer for SCTP packets.  This is implemented inside
+the SCTP protocol, in a sublayer between the SCTP Header handling and
+the SCTP Chunk handling.  Once an SCTP packet has been received and
+the SCTP Common Header has been validated, the SCTP Encrypted Chunk(s)
+are being sent to the chosen decryption engine that will return the
+plain SCTP payload containing the plain SCTP chunks, those chunks will
+then be handled according to current SCTP protocol specification.
 
-On the outgoing direction, once SCTP stack has created the plain SCTP payload
-containing Control and/or Data chunks, that payload will be sent to the Encryption
-Engine for being encrypted and the encrypted data will be encapsulated in a
-SCTP Encrypted chunk.
+On the outgoing direction, once SCTP stack has created the plain SCTP
+payload containing Control and/or Data chunks, that payload will be
+sent to the Encryption Engine to be protected and the encrypted and
+integrity tagged data will be encapsulated in a SCTP Encrypted chunk.
 
 ~~~~~~~~~~~ aasvg
 +---------------------+
@@ -126,12 +120,12 @@ SCTP Encrypted chunk.
 {: #sctp-encryption-chunk-layering title="SCTP Encryption Chunk layering
 in regard to SCTP and upper layer protocol"}
 
-SCTP Encryption Chunk performs protection operations on the whole SCTP
-payload. Information protection is kept during the lifetime of the
-Association and no information is sent in plain except than the initial
-SCTP handshake, the SCTP common Header and the SCTP Encrypted Chunk header.
-Mutual Authentication of the endpoint is performed before any ULP data
-chunk is sent.
+SCTP Encryption Engine performs protection operations on the whole
+SCTP plain packet payload, i.e. all chunks after the SCTP common
+header. Information protection is kept during the lifetime of the
+Association and no information is sent in plain except than the
+initial SCTP handshake, the SCTP common Header and the SCTP Encrypted
+Chunk header.
 
 SCTP Encryption Chunk capability is agreed by the peers at the initialization
 of the SCTP Association, during that phase the peers exhange information
@@ -175,7 +169,8 @@ and may cause false congestions and retransmissions.
 
 The addition of the Encryption to SCTP reduces the room for payload,
 in order to cope with that when creating the payload of SCTP for
-encryption the size of the Encrypted chunk header needs to be
+encryption the size of the Encrypted chunk header and plain text
+expansion due to algorithm and any authentication tag needs to be
 included in the calculation.
 
 On the other hand, the Encryption engine needs to be informed about

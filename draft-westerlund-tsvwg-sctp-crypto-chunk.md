@@ -439,8 +439,10 @@ scope of the current document.
             |     |                 |          |
             |     |                 v          v
             |     |              +-----------------+
-            |     |              |  CRYPT PENDING  |
-            |     |              +-----------------+
+            |     |              |  CRYPT PENDING  | This state is
+            |     |              +-----------------+ reached when
+            |     |                       |          INIT/INIT-ACK has
+            |     |                       |          CRYPT option
             |     |                       |
             |     |                       | [CRYPTO SETUP]
             |     |                       |-----------------

@@ -33,7 +33,6 @@ informative:
 
 normative:
   RFC2119:
-  RFC2960:
   RFC9260:
 
 
@@ -435,37 +434,46 @@ scope of the current document.
                               |          | receive COOKIE ACK
                               |          |-------------------
                               |          | stop T1-cookie timer
-                              v          v
-                           +-----------------+
-                           |  CRYPT PENDING  |
-                           +-----------------+
-                                    |
-                                    | [CRYPTO SETUP]
-                                    |-----------------
-                                    | send and receive
-                                    | encrypt engine hanshake
-                                    | by means of ENCRYPT chunks
-                                    | in case of error, send plain ABORT
-                                    |
-                                    v
-                           +-----------------+
-                           |    ENCRYPTED    |
-                           +-----------------+
-                                    |
-                                    | [ENDPOINT VALIDATION]
-                                    |------------------------
-                                    | send and receive
-                                    | EAUTH by means of
-                                    | ENCRYPT chunk
-                                    | in case of error, send plain ABORT
-                                    |
-                                    v
+            +-----------------+-----+    |
+            |     +---------------- | ---+-----+
+            |     |                 |          |
+            |     |                 v          v
+            |     |              +-----------------+
+            |     |              |  CRYPT PENDING  |
+            |     |              +-----------------+
+            |     |                       |
+            |     |                       | [CRYPTO SETUP]
+            |     |                       |-----------------
+            |     |                       | send and receive
+            |     |                       | encrypt engine hanshake
+            |     |                       | by means of ENCRYPT chunks
+            |     |                       | in case of error
+            |     |                       | send plain ABORT
+            |     |                       v
+            |     |              +-----------------+
+            |     |              |    ENCRYPTED    |
+            |     |              +-----------------+
+            |     |                       |
+            |     |                       | [ENDPOINT VALIDATION]
+            |     |                       |------------------------
+            |     |                       | send and receive
+            |     |                       | EAUTH by means of
+            |     |                       | ENCRYPT chunk
+            |     |                       | in case of error
+            |     |                       | send plain ABORT
+            |     |                       v
+            |     |               +---------------+
+            |     |               |   VALIDATED   | From here on only
+            |     |               +---------------+ ENCRYPT chunks
+            |     |                       |         are sent as SCTP
+            |     |                       |         payload and chunks
+            |     +-----------------+     |         other than ENCRYPT
+            +-----------------+     |     |         are silently
+                              |     |     |         discarded
+                              v     v     v
                             +---------------+
-                            |  ESTABLISHED  | From this state on, only ENCRYPT chunks
-                            +---------------+ are sent as SCTP payload and chunks other
-                                    |         than ENCRYPT
-                                    |         are silently discarded
-                                    |
+                            |  ESTABLISHED  |
+                            +---------------+
                                     |
                                     |
                            /--------+--------\

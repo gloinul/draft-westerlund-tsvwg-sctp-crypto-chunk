@@ -181,6 +181,11 @@ On the other hand, the Encryption engine needs to be informed about
 the PMTU by removing from the value the sum of the common SCTP header
 and the Encrypted chunk header.
 
+From SCTP perspective, the maximum size of the encryption engine
+payload, if limited, has to be considered as well. If such limit
+exists, PMTU for SCTP has to be limited to the encryption engine
+largest payload value plus the SCTP Common Header.
+
 # Conventions
 The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
    "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and

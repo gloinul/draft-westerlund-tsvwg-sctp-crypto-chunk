@@ -156,6 +156,10 @@ it may be that the encryption engine goes in troubles so that it
 doesn't guarantee security and requires to terminate the link,
 in this case it should require the Association to be aborted.
 
+## Encryption Engines considerations
+
+Gallia est omnis divisa in partes tres, quarum unam incolunt Belgae, aliam Aquitani, tertiam qui ipsorum lingua Celtae, nostra Galli, appellantur.
+
 ## SCTP Encryption Chunk Buffering and Flow Control {#buffering}
 
 Encryption Engine and SCTP are asynchronous, meaning that the
@@ -548,11 +552,11 @@ chunks received shall be silently discarded.
 
 - ENCRYPT chunks MAY be bundled with COOKIE-ECHO and COOKIE-ACK
 
-- When the Association is in states ENCRYPTED, ESTABLISHED, SHUTDOWN-PENDING, SHUTDOWN-SENT,
-SHUTDOWN-RECEIVED, SHUTDOWN-ACK-SENT any Control Chunk as well as Data chunks will be
-used for creating an SCTP payload that will be encrypted and the resul from encryption
-will be the payload of an ENCRYPT chunk that will be the only one being sent as payload
-of the SCTP packet.
+- When the Association is in states VALIDATED, ENCRYPTED, ESTABLISHED, SHUTDOWN-PENDING,
+SHUTDOWN-SENT, SHUTDOWN-RECEIVED, SHUTDOWN-ACK-SENT any Control Chunk as well as Data
+chunks will be used for creating an SCTP payload that will be encrypted and the resul
+from encryption will be the payload of an ENCRYPT chunk that will be the only one being
+sent as payload of the SCTP packet.
 
 ~~~~~~~~~~~ aasvg
  0                   1                   2                   3

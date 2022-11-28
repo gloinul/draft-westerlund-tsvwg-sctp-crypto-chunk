@@ -107,10 +107,10 @@ integrity tagged data will be encapsulated in a SCTP Encrypted chunk.
 | SCTP Chunks Handler |
 |                     |
 +---------------------+ <- SCTP Plain Payload
-|                     |
 |  Encryption Engine  |
-|                     |
-+---------------------+ <- SCTP Encrypted Payload
+|             +-------------------------+
+|             | Encryption KEY Handler  |
++-------------+-------+-----------------+ <- SCTP Encrypted Payload
 |                     |
 | SCTP Header Handler |
 |                     |
@@ -152,7 +152,34 @@ in this case it should require the Association to be aborted.
 
 ## Encryption Engines considerations
 
-Gallia est omnis divisa in partes tres, quarum unam incolunt Belgae, aliam Aquitani, tertiam qui ipsorum lingua Celtae, nostra Galli, appellantur.
+The Encryption Engine, independently from the security characteristics,
+needs to be capable working on a unrealiable transport mechanism
+same as UDP and have own KEY handler capability.
+
+SCTP Crypto Chunk directly exploits the Encryption Engine by
+requesting encryption and decryption of a buffer, in particular
+the encrypted buffer shall never exceeds the SCTP payload size
+thus Encryption Engine shall be aware of the PMTU (see {{pmtu}}).
+
+KEY Handling of Encryption Engine SHOULD exploit SCTP Crypto Chunk
+for handshaking, in that case any packet being exhanged between
+Encryption Engine peers shall be tranported as payload of Encrypted
+chunk (see {{encrypt}}).
+
+KEY Handling MAY use other mechanism than what provided by SCTP
+Crypto Chunks, in any case the mechamism for KEY Handling MUST
+be specified in the Encryption Engine specification document for that
+specific Encryption Engine.
+
+Out-of-band communication between Encryption Engines MAY exploit
+the Flags byte provided by the ENCRYPT chunk header
+(see {{sctp-encryption-chunk-newchunk-crypt-struct}}).
+
+Details of the use of Flags, if different from what described
+in the current document, MUST be specified in the Encryption
+Engine specification document for that specific Encryption Engine.
+
+An example of Encryption Engine can be DTLS.
 
 ## SCTP Encryption Chunk Buffering and Flow Control {#buffering}
 
@@ -236,8 +263,9 @@ The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
    Length: 2 bytes (unsigned integer)
       This value holds the length of the Crypto Engines in bytes plus 8.
 
-   Crypto Engines: n bytes (unsigned integer)
+   Crypto Engines: n words (unsigned integer)
       This holds the list of crypto engines in order of preference.
+      Each crypto engine is specified by a 16bit word.
 
    Padding: 0, 1, 2, or 3 bytes (unsigned integer)
       If the length of the Crypto Engines is not a multiple of 4 bytes, the sender
@@ -250,7 +278,7 @@ The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
    This section defines the new chunk types that will be used to
    authenticate chunks.  Table 4 illustrates the new chunk type.
 
-##  Encrypted Chunk (ENCRYPT)
+##  Encrypted Chunk (ENCRYPT) {#encrypt}
 
 ~~~~~~~~~~~ aasvg
 +------------+-----------------------------+
@@ -302,18 +330,18 @@ The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
       aligned.  The Padding MUST NOT be longer than 3 bytes and it MUST
       be ignored by the receiver.
 
-##  Endpoint Authentication Chunk (EAUTH)
+##  Endpoint Authentication Chunk (EVALID)
 
 ~~~~~~~~~~~ aasvg
 +------------+-----------------------------------+
 | Chunk Type | Chunk Name                        |
 +------------+-----------------------------------+
-| 0x0x       |  Endpoint Authentication (EAUTH)  |
+| 0x0x       |  INIT Option Validation (EVALID)  |
 +------------+-----------------------------------+
 ~~~~~~~~~~~
-{: #sctp-encryption-chunk-newchunk-eauth title="EAUTH Chunk Type"}
+{: #sctp-encryption-chunk-newchunk-EVALID title="EVALID Chunk Type"}
 
-   It should be noted that the EAUTH-chunk format requires the receiver
+   It should be noted that the EVALID-chunk format requires the receiver
    to ignore the chunk if it is not understood and silently discard all
    chunks that follow.  This is accomplished (as described in {{RFC9260}}
    Section 3.2.) by the use of the upper bits of the chunk type.
@@ -333,7 +361,7 @@ The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
 |                               |           Padding             |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ~~~~~~~~~~~
-{: #sctp-encryption-chunk-newchunk-eauth-struct title="EAUTH Chunk Structure"}
+{: #sctp-encryption-chunk-newchunk-EVALID-struct title="EVALID Chunk Structure"}
 
   Type: 1 byte (unsigned integer)
       This value MUST be set to 0x80xx.
@@ -344,8 +372,9 @@ The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
    Length: 2 bytes (unsigned integer)
       This value holds the length of the Crypto Engines in bytes plus 8.
 
-   Crypto Engines: n bytes (unsigned integer)
+   Crypto Engines: n words (unsigned integer)
       This holds the list of crypto engines in order of preference.
+      Each crypto engine is specified by a 16bit word.
 
    Padding: 0, 1, 2, or 3 bytes (unsigned integer)
       If the length of the Crypto Engines is not a multiple of 4 bytes, the sender
@@ -384,14 +413,14 @@ Association is complete and from that time on only ENCRYPT chunks will be exchan
 Any other type of chunks will be silently discarded.
 
 After completion of Encrypted Association initialization, the Client SHOULD send
-to the Server an EAUTH Chunk (see {{sctp-encryption-chunk-newchunk-eauth}})
+to the Server an EVALID Chunk (see {{sctp-encryption-chunk-newchunk-EVALID}})
 containing the list of Encryption Engines previously sent in the CRYPT parameter
-of the INIT chunk. The Server receiving the EAUTH chunk will compare the Encryption
+of the INIT chunk. The Server receiving the EVALID chunk will compare the Encryption
 Engines list with the one previously received in the INIT chunk, if they will be
 exactly the same, with the same engine in the same position, it will reply to the
-Client with an EAUTH chunk containing the chose Encryption Engine, otherwise it
+Client with an EVALID chunk containing the chose Encryption Engine, otherwise it
 will reply with an ABORT chunk.
-When the Client will receive the EAUTH chunk, it will compare with the previous
+When the Client will receive the EVALID chunk, it will compare with the previous
 chosen Encryption Engine and in case of mismatch with the one received previously
 as CRYPT parameter in the INIT-ACK chunk, it will reply with ABORT, otherwise
 it will discard it.
@@ -406,136 +435,83 @@ scope of the current document.
 
 ## Encrypted SCTP State Diagram
 
+The {{sctp-encryption-state-diagram}} shows the changes versus the SCTP Association state
+machine as described in {{RFC9260}} section 4.
+
 ~~~~~~~~~~~ aasvg
-                           -----          -------- (from any state)
-                         /       \      /receive ABORT      [ABORT]
-           receive INIT |         |    |--------------  or ----------
-   ---------------------|         v    v    delete TCB     send ABORT
-   generate State Cookie \    +---------+                  delete TCB
-           send INIT ACK   ---|  CLOSED |
-                              +---------+
-                                /      \
-                               /        \  [ASSOCIATE]
-                              |          |-----------------
-                              |          | create TCB
-                              |          | send INIT
-             receive valid    |          | start T1-init timer
-             COOKIE  ECHO     |          v
-         (1) -----------------|    +-----------+
-             create TCB       |    |COOKIE-WAIT| (2)
-             send COOKIE ACK  |    +-----------+
-                              |          |
-                              |          | receive INIT ACK
-                              |          |-------------------
-                              |          | send COOKIE ECHO
-                              |          | stop T1-init timer
-                              |          | start T1-cookie timer
-                              |          v
-                              |   +-------------+
-                              |   |COOKIE-ECHOED| (3)
-                              |   +-------------+
-                              |          |
-                              |          | receive COOKIE ACK
-                              |          |-------------------
-                              |          | stop T1-cookie timer
-            +-----------------+-----+    |
-            |     +---------------- | ---+-----+
-            |     |                 |          |
-            |     |                 v          v
-            |     |              +-----------------+
-            |     |              |  CRYPT PENDING  | This state is
-            |     |              +-----------------+ reached when
-            |     |                       |          INIT/INIT-ACK has
-            |     |                       |          CRYPT option
-            |     |                       |
-            |     |                       | [CRYPTO SETUP]
-            |     |                       |-----------------
-            |     |                       | send and receive
-            |     |                       | encrypt engine hanshake
-            |     |                       | by means of ENCRYPT chunks
-            |     |                       | in case of error
-            |     |                       | send plain ABORT
-            |     |                       v
-            |     |              +-----------------+
-            |     |              |    ENCRYPTED    |
-            |     |              +-----------------+
-            |     |                       |
-            |     |                       | [ENDPOINT VALIDATION]
-            |     |                       |------------------------
-            |     |                       | send and receive
-            |     |                       | EAUTH by means of
-            |     |                       | ENCRYPT chunk
-            |     |                       | in case of error
-            |     |                       | send plain ABORT
-            |     |                       v
-            |     |               +---------------+
-            |     |               |   VALIDATED   | From here on only
-            |     |               +---------------+ ENCRYPT chunks
-            |     |                       |         are sent as SCTP
-            |     |                       |         payload and chunks
-            |     +-----------------+     |         other than ENCRYPT
-            +-----------------+     |     |         are silently
-                              |     |     |         discarded
-                              v     v     v
-                            +---------------+
-                            |  ESTABLISHED  |
-                            +---------------+
-                                    |
-                                    |
-                           /--------+--------\
-       [SHUTDOWN]         /                   \
-       -------------------|                   |
-       check outstanding  |                   |
-       DATA chunks        |                   |
-                          v                   |
-                 +----------------+           |
-                 |SHUTDOWN-PENDING|           | receive SHUTDOWN
-                 +----------------+           |------------------
-                                              | check outstanding
-                          |                   | DATA chunks
-   No more outstanding    |                   |
-   -----------------------|                   |
-   send SHUTDOWN          |                   |
-   start T2-shutdown timer|                   |
-                          v                   v
-                   +-------------+   +-----------------+
-               (4) |SHUTDOWN-SENT|   |SHUTDOWN-RECEIVED| (5,6)
-                   +-------------+   +-----------------+
-                          |  \                |
-   receive SHUTDOWN ACK   |   \               |
-   -----------------------|    \              |
-   stop T2-shutdown timer |     \             |
-   send SHUTDOWN COMPLETE |      \            |
-   delete TCB             |       \           |
-                          |        \          | No more outstanding
-                          |         \         |--------------------
-                          |          \        | send SHUTDOWN ACK
-   receive SHUTDOWN      -|-          \       | start T2-shutdown timer
-   --------------------/  | \----------\      |
-   send SHUTDOWN ACK      |             \     |
-   start T2-shutdown timer|              \    |
-                          |               \   |
-                          |                |  |
-                          |                v  v
-                          |          +-----------------+
-                          |          |SHUTDOWN-ACK-SENT| (7)
-                          |          +-----------------+
-                          |                   | (A)
-                          |                   |receive SHUTDOWN COMPLETE
-                          |                   |-------------------------
-                          |                   | stop T2-shutdown timer
-                          |                   | delete TCB
-                          |                   |
-                          |                   | (B)
-                          |                   | receive SHUTDOWN ACK
-                          |                   |-----------------------
-                          |                   | stop T2-shutdown timer
-                          |                   | send SHUTDOWN COMPLETE
-                          |                   | delete TCB
-                          |                   |
-                          \    +---------+    /
-                           \-->| CLOSED  |<--/
-                               +---------+
+                        -----          -------- (from any state)
+                      /       \      /receive ABORT      [ABORT]
+        receive INIT |         |    |--------------  or ----------
+---------------------|         v    v    delete TCB     send ABORT
+generate State Cookie \    +---------+                  delete TCB
+        send INIT ACK   ---|  CLOSED |
+                           +---------+
+                             /      \
+                            /        \  [ASSOCIATE]
+                           |          |-----------------
+                           |          | create TCB
+                           |          | send INIT
+          receive valid    |          | start T1-init timer
+          COOKIE  ECHO     |          v
+      (1) -----------------|    +-----------+
+          create TCB       |    |COOKIE-WAIT| (2)
+          send COOKIE ACK  |    +-----------+
+                           |          |
+                           |          | receive INIT ACK
+                           |          |-------------------
+                           |          | send COOKIE ECHO
+                           |          | stop T1-init timer
+                           |          | start T1-cookie timer
+                           |          v
+                           |   +-------------+
+                           |   |COOKIE-ECHOED| (3)
+                           |   +-------------+
+                           |          |
+                           |          | receive COOKIE ACK
+                           |          |-------------------
+                           |          | stop T1-cookie timer
+         +-----------------+-----+    |
+         |     +---------------- | ---+-----+
+         |     |                 |          |
+         |     |                 v          v
+         |     |              +-----------------+
+         |     |              |  CRYPT PENDING  | This state is
+         |     |              +-----------------+ reached when
+         |     |                       |          INIT/INIT-ACK has
+         |     |                       |          CRYPT option
+         |     |                       |
+         |     |                       | [CRYPTO SETUP]
+         |     |                       |-----------------
+         |     |                       | send and receive
+         |     |                       | encrypt engine hanshake
+         |     |                       | by means of ENCRYPT chunks
+         |     |                       | in case of error
+         |     |                       | send plain ABORT
+         |     |                       v
+         |     |              +-----------------+
+         |     |              |    ENCRYPTED    |
+         |     |              +-----------------+
+         |     |                       |
+         |     |                       | [ENDPOINT VALIDATION]
+         |     |                       |------------------------
+         |     |                       | send and receive
+         |     |                       | EVALID by means of
+         |     |                       | ENCRYPT chunk
+         |     |                       | in case of error
+         |     |                       | send plain ABORT
+         |     |                       v
+         |     |               +---------------+
+         |     |               |   VALIDATED   | From here on only
+         |     |               +---------------+ ENCRYPT chunks
+         |     |                       |         are sent as SCTP
+         |     |                       |         payload and chunks
+         |     +-----------------+     |         other than ENCRYPT
+         +-----------------+     |     |         are silently
+                           |     |     |         discarded
+                           v     v     v
+                         +---------------+
+                         |  ESTABLISHED  |
+                         +---------------+
 ~~~~~~~~~~~
 {: #sctp-encryption-state-diagram title="SCTP State Diagram with Encryption"}
 

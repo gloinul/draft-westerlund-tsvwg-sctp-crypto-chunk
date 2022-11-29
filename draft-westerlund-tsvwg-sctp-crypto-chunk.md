@@ -35,6 +35,9 @@ normative:
   RFC2119:
   RFC9260:
 
+  IANA-SCTP-PARAMETERS:
+    target: <http://www.iana.org/assignments/sctp-parameters>
+    title: Stream Control Transmission Protocol (SCTP) Parameters
 
 --- abstract
 
@@ -382,6 +385,22 @@ The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
       aligned.  The Padding MUST NOT be longer than 3 bytes and it MUST
       be ignored by the receiver.
 
+# New Error Causes
+
+Gallia est omnis divisa in partes tres, quarum unam incolunt Belgae, aliam Aquitani, tertiam qui ipsorum lingua Celtae, nostra Galli, appellantur.
+
+   This requires additional lines of the "CAUSE CODES" table in SCTP-
+   parameters {{IANA-SCTP-PARAMETERS}}:
+
+~~~~~~~~~~~ aasvg
+   VALUE            CAUSE CODE                               REFERENCE
+  ------           -----------------                        ----------
+   xxx (0xxxxx)     EKHANDSHAKE                              nnnn
+   xxx (0xxxxx)     EVALIDATE                                nnnn
+   xxx (0xxxxx)     ETMOVALIDATE                             nnnn
+~~~~~~~~~~~
+{: #sctp-encryption-new-error-causes title="New Error Causes"}
+
 # Procedures
 
 ## Establishment of an Encrypted Association
@@ -475,10 +494,10 @@ generate State Cookie \    +---------+                  delete TCB
          |     |                 |          |
          |     |                 v          v
          |     |              +-----------------+
-         |     |              |  CRYPT PENDING  | This state is
-         |     |              +-----------------+ reached when
-         |     |                       |          INIT/INIT-ACK has
-         |     |                       |          CRYPT option
+         |     |              |  CRYPT PENDING  | If INIT/INIT-ACK
+         |     |              +-----------------+ has CRYPT option
+         |     |                       |          start T-valid
+         |     |                       |          timer.
          |     |                       |
          |     |                       | [CRYPTO SETUP]
          |     |                       |-----------------
@@ -499,15 +518,9 @@ generate State Cookie \    +---------+                  delete TCB
          |     |                       | ENCRYPT chunk
          |     |                       | in case of error
          |     |                       | send plain ABORT
-         |     |                       v
-         |     |               +---------------+
-         |     |               |   VALIDATED   | From here on only
-         |     |               +---------------+ ENCRYPT chunks
-         |     |                       |         are sent as SCTP
-         |     |                       |         payload and chunks
-         |     +-----------------+     |         other than ENCRYPT
-         +-----------------+     |     |         are silently
-                           |     |     |         discarded
+         |     +-----------------+     |
+         +-----------------+     |     |
+                           |     |     |
                            v     v     v
                          +---------------+
                          |  ESTABLISHED  |
@@ -515,6 +528,66 @@ generate State Cookie \    +---------+                  delete TCB
 ~~~~~~~~~~~
 {: #sctp-encryption-state-diagram title="SCTP State Diagram with Encryption"}
 
+## New states
+
+This section describes details on the amendment to the SCTP Association Establishment
+state machine.
+
+### CRYPT PENDING {#crypt-pending-state}
+
+The presence of CRYPT option in INIT or INIT-ACK chunk makes the State Machine
+entering CRYPT PENDING state instead of ESTABLISHED.
+
+When entering CRYPT PENDING state, a T-valid timer is started that will
+cover the whole validation time including the inband KEY handling.
+It's up to the implementor to take care of the value for the timer
+also related to the time needed for KEY handshake of each Encryption
+Engine.
+
+If KEY handling is inband, the Encryption Engine will start the handshake
+with its peer and in case of failure or T-validation timeout,
+it will generate an ERROR chunk and an ABORT chunk. ERROR CAUSE will indicate
+EKHANDSHAKE meaning that an error has been happening during KEY handshake.
+When Handshake has been successfully completed, the Association state machine
+will enter ENCRYPTED state.
+
+If KEY handling is out-of-band, after starting T-valid timer the SCTP
+Association will enter ENCRYPTED state.
+
+### ENCRYPTED {#encrypted-state}
+
+The Association state machine can only reach ENCRYPTED state from CRYPT PENDING
+state (see {{crypt-pending-state}}). When entering into ENCRYPTED state
+the T-valid timer is running and the Encryption Engine has completed the
+KEY handshake so that encrypted data can be sent to the peer.
+
+From this time on, only ENCRYPT chunks can be sent to the remote peer and
+any other type of chunks coming from the remote peer will be silently discarded.
+
+In ENCRYPTED state the SCTP Endpoints MUST validate the INIT/INIT-ACK parameters,
+thus the Client will send an EVALID chunk that will contain exatly the same list
+as Crypto Engines as previously sent in CRYPT option of INIT chunk and in the same order.
+
+When the Server will receive EVALID, it will compare the list of Crypto Engines
+with the list received in the INIT chunk, if they are identical it will reply
+to the Client with an EVALID chunk containing the Crypto Engine previously
+sent as CRYPT option in INIT-ACK chunk , it will clean the T-valid timer and
+will move into ESTABLISHED state.
+If the lists of Crypto Engines doen't match, it will generate an ERROR chunk
+and an ABORT chunk. ERROR CAUSE will indicate EVALIDATE meaning that an error
+has been happening during VALIDATION of SCTP Endpoints.
+
+After sending EVALID, the Client will wait for the Server to reply with the
+EVALID confirmation. The Client will compare the Crypto Engine received from
+the Server, if the value is the same it will clean the T-valid timer and
+move into ESTABLISHED state.
+If the chosen Crypto Engines doen't match, it will generate an ERROR chunk
+and an ABORT chunk. ERROR CAUSE will indicate EVALIDATE meaning that an error
+has been happening during VALIDATION of SCTP Endpoints.
+
+If T-valid timer expires either at Client or Server, it will generate an ERROR chunk
+and an ABORT chunk. ERROR CAUSE will indicate ETMOVALIDATE meaning that a timeout error
+has been happening during VALIDATION of SCTP Endpoints.
 
 ## Encrypted Data Chunk handling
 
@@ -570,3 +643,10 @@ the structure of an SCTP packet being sent after the ENCRYPTED state has been
 reached. Suck packets are built with the SCTP Common header and only one
 ENCRYPT chunk.
 
+# IANA Considerations {#IANA-Consideration}
+
+Gallia est omnis divisa in partes tres, quarum unam incolunt Belgae, aliam Aquitani, tertiam qui ipsorum lingua Celtae, nostra Galli, appellantur.
+
+## Downgrade Attacks {#Downgrade-Attacks}
+
+Gallia est omnis divisa in partes tres, quarum unam incolunt Belgae, aliam Aquitani, tertiam qui ipsorum lingua Celtae, nostra Galli, appellantur.

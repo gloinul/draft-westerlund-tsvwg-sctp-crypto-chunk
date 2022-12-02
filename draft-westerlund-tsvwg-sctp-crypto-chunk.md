@@ -737,23 +737,31 @@ the lower transport layer.
    *  In the "Chunk Types" registry, IANA has to add  with a reference to this
       document.
 
+      -  Encrypted Chunk (ENCRYPT)
+      -  Endpoint Authentication Chunk (EVALID)
 
-Gallia est omnis divisa in partes tres, quarum unam incolunt Belgae, aliam Aquitani, tertiam qui ipsorum lingua Celtae, nostra Galli, appellantur.
+
+   *  In the "Chunk Parameter Types" registry, IANA has to add  with a reference to this
+      document.
+
+      - Encrypted Association (CRYPT)
+
+   *  In the "Chunk Flags" registry, IANA has to add  with a reference to this
+      document.
+
+      - To Be defined in the Encryption Engine specification documents
+
+   *  In the "Error Cause Codes" registry, IANA has to add  with a reference to this
+      document.
+
+      - Error during Enryption Chunk KEY Handshake EKHANDSHAKE
+      - Error in Encryption Chunk Endpoint Validation EVALIDATE
+      - Timeout during Encryption Chunk Validation ETMOVALIDATE
 
 ## Downgrade Attacks {#Downgrade-Attacks}
 
-Gallia est omnis divisa in partes tres, quarum unam incolunt Belgae, aliam Aquitani, tertiam qui ipsorum lingua Celtae, nostra Galli, appellantur.
+SCTP Encrypted Chunks provides a mechanism for preventing downgrade attacks
+that detects downgrading attempts and terminates the Association.
 
-
-# To be added
-
-Magnus Westerlund
-I haven't read the latest changes from you. Have you described in
-the Encryption chunk the basic selector part and make it clear that
-different SCTP association can have different engines.
-
-I also assume that you have text on the other information related
-to the SCTP packet that needs to be taken from the bottom part and
-moved to the SCTP Chunk handler in regards to the packet, i.e. things
-like source and destination IP and the total packet size.
-
+The Encryption Engine initial handshake is verified before the Association
+is set as ESTABLISHED, thus no user data are sent before validation.

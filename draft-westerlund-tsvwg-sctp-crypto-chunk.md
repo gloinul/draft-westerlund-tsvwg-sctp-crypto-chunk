@@ -411,58 +411,7 @@ additional lines of the "CAUSE CODES" table in SCTP-parameters
 ~~~~~~~~~~~
 {: #sctp-encryption-new-error-causes title="New Error Causes"}
 
-# Procedures
-
-## Establishment of an Encrypted Association
-
-An SCTP Endpoint acting as Client willing to create an Encrypted Association shall send
-to the remote peer an INIT chunk containing the CRYPT parameter
-(see {{sctp-encryption-chunk-newchunk-crypt}}) where the Crypto Engines
-lists all the supported encryption engines, given in order of preference
-(see {{sctp-encryption-chunk-init-options}}).
-
-As alternative, an SCTP Endpoint acting as Server willing to support only Encrypted
-Associations shall ignore any INIT chunk not containing the CRYPT parameter.
-
-An SCTP Endpoint acting as Server, when receiving an INIT chunk with CRYPT parameter,
-will search the list of Crypto Engines for a common choice and will reply with
-INIT-ACK containing the CRYPT parameter with the chosen Crypto Engine. When the
-Server cannot find a supported Crypto Engine, it will silently discard the INIT chunk.
-
-When Client and Server have agreed on an Encrypted Association by means of handshaking
-INIT/INIT-ACK with a common Encryption Engine, only Control Chunks and Encrypted Chunks
-will be accepted. Any Data chunk being sent on an Encrypted Association will be silently
-discarded.
-
-After completion of initial handshake, that is after COOKIE-ECHO and COOKIE-ACK,
-the Encryption Engine shall initialize itself by transferring its own data as Payload
-of the ENCRYPT chunk (see {{sctp-encryption-chunk-newchunk-crypt-struct}}).
-At completion of Encryption Engine initialization, the setup of the Encrypted
-Association is complete and from that time on only ENCRYPT chunks will be exchanged.
-Any other type of chunks will be silently discarded.
-
-After completion of Encrypted Association initialization, the Client SHOULD send
-to the Server an EVALID Chunk (see {{sctp-encryption-chunk-newchunk-EVALID}})
-containing the list of Encryption Engines previously sent in the CRYPT parameter
-of the INIT chunk. The Server receiving the EVALID chunk will compare the Encryption
-Engines list with the one previously received in the INIT chunk, if they will be
-exactly the same, with the same engine in the same position, it will reply to the
-Client with an EVALID chunk containing the chose Encryption Engine, otherwise it
-will reply with an ABORT chunk.
-When the Client will receive the EVALID chunk, it will compare with the previous
-chosen Encryption Engine and in case of mismatch with the one received previously
-as CRYPT parameter in the INIT-ACK chunk, it will reply with ABORT, otherwise
-it will discard it.
-
-## Termination of an Encrypted Association
-
-Besides the procedures for terminating an Association explained in {{RFC9260}},
-the Encryption Engine SHOULD ask SCTP Host for terminating an Association
-when having an internal error or by detecting a security violation.
-The internal design of Encryption Engines and their capability is out of the
-scope of the current document.
-
-## Encrypted SCTP State Diagram
+# Encrypted SCTP State Diagram
 
 The {{sctp-encryption-state-diagram}} shows the changes versus the SCTP Association state
 machine as described in {{RFC9260}} section 4.
@@ -598,6 +547,57 @@ has been happening during VALIDATION of SCTP Endpoints.
 If T-valid timer expires either at Client or Server, it will generate an ERROR chunk
 and an ABORT chunk. ERROR CAUSE will indicate ETMOVALIDATE meaning that a timeout error
 has been happening during VALIDATION of SCTP Endpoints.
+
+# Procedures
+
+## Establishment of an Encrypted Association
+
+An SCTP Endpoint acting as Client willing to create an Encrypted Association shall send
+to the remote peer an INIT chunk containing the CRYPT parameter
+(see {{sctp-encryption-chunk-newchunk-crypt}}) where the Crypto Engines
+lists all the supported encryption engines, given in order of preference
+(see {{sctp-encryption-chunk-init-options}}).
+
+As alternative, an SCTP Endpoint acting as Server willing to support only Encrypted
+Associations shall ignore any INIT chunk not containing the CRYPT parameter.
+
+An SCTP Endpoint acting as Server, when receiving an INIT chunk with CRYPT parameter,
+will search the list of Crypto Engines for a common choice and will reply with
+INIT-ACK containing the CRYPT parameter with the chosen Crypto Engine. When the
+Server cannot find a supported Crypto Engine, it will silently discard the INIT chunk.
+
+When Client and Server have agreed on an Encrypted Association by means of handshaking
+INIT/INIT-ACK with a common Encryption Engine, only Control Chunks and Encrypted Chunks
+will be accepted. Any Data chunk being sent on an Encrypted Association will be silently
+discarded.
+
+After completion of initial handshake, that is after COOKIE-ECHO and COOKIE-ACK,
+the Encryption Engine shall initialize itself by transferring its own data as Payload
+of the ENCRYPT chunk (see {{sctp-encryption-chunk-newchunk-crypt-struct}}).
+At completion of Encryption Engine initialization, the setup of the Encrypted
+Association is complete and from that time on only ENCRYPT chunks will be exchanged.
+Any other type of chunks will be silently discarded.
+
+After completion of Encrypted Association initialization, the Client SHOULD send
+to the Server an EVALID Chunk (see {{sctp-encryption-chunk-newchunk-EVALID}})
+containing the list of Encryption Engines previously sent in the CRYPT parameter
+of the INIT chunk. The Server receiving the EVALID chunk will compare the Encryption
+Engines list with the one previously received in the INIT chunk, if they will be
+exactly the same, with the same engine in the same position, it will reply to the
+Client with an EVALID chunk containing the chose Encryption Engine, otherwise it
+will reply with an ABORT chunk.
+When the Client will receive the EVALID chunk, it will compare with the previous
+chosen Encryption Engine and in case of mismatch with the one received previously
+as CRYPT parameter in the INIT-ACK chunk, it will reply with ABORT, otherwise
+it will discard it.
+
+## Termination of an Encrypted Association
+
+Besides the procedures for terminating an Association explained in {{RFC9260}},
+the Encryption Engine SHOULD ask SCTP Host for terminating an Association
+when having an internal error or by detecting a security violation.
+The internal design of Encryption Engines and their capability is out of the
+scope of the current document.
 
 ## Encrypted Data Chunk handling
 

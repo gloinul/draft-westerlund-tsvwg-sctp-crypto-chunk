@@ -247,7 +247,7 @@ parameter and continue processing if the parameter is not understood.
 This is accomplished (as described in {{RFC9260}}, Section 3.2.1.)
 by the use of the upper bits of the parameter type.
 
-## Encrypted Association (CRYPT)
+## Encrypted Association Parameter (CRYPT) {#crypt-parameter}
 
 This parameter is used to carry the list of proposed Ecnryption Engines
 and the chosen Encryption Engine during INIT/INIT-ACK handshake.
@@ -338,11 +338,12 @@ This chunk is used to hold the encrypted payload of a plain SCTP packet.
       aligned.  The Padding MUST NOT be longer than 3 bytes and it MUST
       be ignored by the receiver.
 
-##  Endpoint Authentication Chunk (EVALID)
+##  Encryption Validation Chunk (EVALID)
 
-This section defines the new chunk types that will be used to
-validate the Association using Encrypted Chunks.
-{{sctp-encryption-chunk-newchunk-EVALID}} illunstrates the new chunk type.
+This section defines the new chunk types that will be used to validate
+the negotiation of the encryption engine selected for Encryption
+Chunk.  {{sctp-encryption-chunk-newchunk-EVALID}} illunstrates the new
+chunk type.
 
 ~~~~~~~~~~~ aasvg
 +------------+-----------------------------------+
@@ -366,8 +367,8 @@ This chunk is used to hold the Encryption engines list.
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 | Type = 0x0x   |   Flags=0     |             Length            |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                                                               |
-\                            Payload                            /
+|                      Encryption Engines                       |
+\                                                               /
 /                                                               \
 |                               +-------------------------------+
 |                               |           Padding             |

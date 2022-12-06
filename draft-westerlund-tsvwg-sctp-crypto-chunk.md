@@ -406,6 +406,7 @@ additional lines of the "CAUSE CODES" table in SCTP-parameters
 ~~~~~~~~~~~ aasvg
    VALUE            CAUSE CODE                               REFERENCE
   ------           -----------------                        ----------
+   xxx (0xxxxx)     ENOCRYPT                                 nnnn
    xxx (0xxxxx)     EKHANDSHAKE                              nnnn
    xxx (0xxxxx)     EVALIDATE                                nnnn
    xxx (0xxxxx)     ETMOVALIDATE                             nnnn
@@ -560,7 +561,9 @@ lists all the supported encryption engines, given in order of preference
 (see {{sctp-encryption-chunk-init-options}}).
 
 As alternative, an SCTP Endpoint acting as Server willing to support only Encrypted
-Associations shall ignore any INIT chunk not containing the CRYPT parameter.
+Associations shall consider INIT chunk not containing the CRYPT parameter as an error,
+thus it will reply with an ERROR chunk with ENOCRYPT indicating that the mandatory
+CRYPT option is missing.
 
 An SCTP Endpoint acting as Server, when receiving an INIT chunk with CRYPT parameter,
 will search the list of Crypto Engines for a common choice and will reply with

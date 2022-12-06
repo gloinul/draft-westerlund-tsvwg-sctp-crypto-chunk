@@ -613,8 +613,6 @@ rules defined belows:
 any Control Chunk is sent plain. No DATA chunks shall be sent in these states and DATA
 chunks received shall be silently discarded.
 
-- ENCRYPT chunks MAY be bundled with COOKIE-ECHO and COOKIE-ACK
-
 - When the Association is in states ENCRYPTED and in general in a state different
 than CLOSED, COOKIE-WAIT, COOKIE-ECHOED and CRYPT PENDING, any Control Chunk as well as Data
 chunks will be used for creating an SCTP payload that will be encrypted
@@ -641,6 +639,7 @@ The diagram shown in {{sctp-encryption-encrypt-chunk-states-1}} describes
 the structure of an SCTP packet being sent or received when the Association
 has not reached the ENCRYPTED state yet. In this case only Control
 Chunks or ENCRYPT chunk can be handled.
+Only one ENCRYPT chunk can be sent in a SCTP packet.
 
 ~~~~~~~~~~~ aasvg
  0                   1                   2                   3
@@ -655,8 +654,8 @@ Chunks or ENCRYPT chunk can be handled.
 
 The diagram shown in {{sctp-encryption-encrypt-chunk-states-2}} describes
 the structure of an SCTP packet being sent after the ENCRYPTED state has been
-reached. Suck packets are built with the SCTP Common header and only one
-ENCRYPT chunk.
+reached. Suck packets are built with the SCTP Common header. Only one
+ENCRYPT chunk can be sent in a SCTP packet.
 
 ### Encrypted Data Chunk transmission
 
@@ -665,8 +664,7 @@ reached the CRYPT PENDING state, it MAY handle KEY handshake inband depending
 on how the specification for the chosen Encryption Engine as been defined.
 In such case, the Encryption Chunk Handler will receive plain Control Chunks
 from the SCTP Chunk Handler and ENCRYPT chunks from the Encryption Engine.
-During CRYPT PENDING state, plain Control chunks and ENCRYPT chunks MAY
-be bundled within the same SCTP packet.
+Plain Control chunks and ENCRYPT chunks CANNOT be bundled within the same SCTP packet.
 
 When the Association state machine (see {{sctp-encryption-state-diagram}}) has
 reached the ENCRYPTED state, the Encryption Chunk Handler will
@@ -694,7 +692,7 @@ In such case, the Encryption Chunk Handler will receive plain Control Chunks
 and ENCRYPT chunks from the SCTP Header Handler.
 ENCRYPT chunks will be forwarded to the Encryption Engine whilst plain
 Control chunks will be forwarded to SCTP Chunk Handler.
-During CRYPT PENDING state, plain Control chunks and ENCRYPT chunks MAY
+During CRYPT PENDING state, plain Control chunks and ENCRYPT chunks CANNOT
 be bundled within the same SCTP packet.
 
 When the Association state machine (see {{sctp-encryption-state-diagram}}) has

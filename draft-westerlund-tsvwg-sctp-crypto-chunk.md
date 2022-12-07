@@ -233,7 +233,7 @@ largest payload value plus the SCTP Common Header.
 
 # New Parameter Type
 
-This section defines the new parameter types that will be used to
+This section defines the new parameter type that will be used to
 negotiate the use of Encrypted Chunks during association setup.
 {{sctp-encryption-chunk-init-parameter}} illustrates the new parameter type.
 

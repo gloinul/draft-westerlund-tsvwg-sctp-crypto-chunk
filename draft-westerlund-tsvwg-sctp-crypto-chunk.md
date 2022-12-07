@@ -249,7 +249,7 @@ by the use of the upper bits of the parameter type.
 
 ## Encrypted Association Parameter (CRYPT) {#crypt-parameter}
 
-This parameter is used to carry the list of proposed Ecnryption Engines
+This parameter is used to carry the list of proposed Encryption Engines
 and the chosen Encryption Engine during INIT/INIT-ACK handshake.
 
 ~~~~~~~~~~~ aasvg
@@ -542,7 +542,7 @@ After sending EVALID, the Client will wait for the Server to reply with the
 EVALID confirmation. The Client will compare the Crypto Engine received from
 the Server, if the value is the same it will clean the T-valid timer and
 move into ESTABLISHED state.
-If the chosen Crypto Engines doen't match, it will generate an ERROR chunk
+If the chosen Crypto Engines don't match, it will generate an ERROR chunk
 and an ABORT chunk. ERROR CAUSE will indicate EVALIDATE meaning that an error
 has been happening during VALIDATION of SCTP Endpoints.
 

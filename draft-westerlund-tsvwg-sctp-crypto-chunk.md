@@ -50,7 +50,7 @@ detect tampering or message forgery.
 
 The crypto chunk defined here in is one half of a complete
 solution. Where a companion specification is required to define how
-the content of the crypto chunk is encrypted, authenticated and
+the content of the crypto chunk is encrypted, authenticated, and
 protected against replay, as well as how key management is accomplished.
 
 Applications using SCTP Encryption Chunk can use all transport
@@ -67,7 +67,7 @@ features provided by SCTP and its extensions.
 
    This specification defines the actual crypto chunk, how to enable
    it usage, how it interacts with the SCTP association establishment
-   to enable endpoint authentication, key-establishment and other
+   to enable endpoint authentication, key-establishment, and other
    features of the separate cipher specification.
 
    This specification is intended to be capable of enabling mutual
@@ -129,7 +129,7 @@ sent to the Encryption Engine to be protected and the encrypted and
 integrity tagged data will be encapsulated in a SCTP Encrypted chunk.
 
 SCTP Encryption Engine performs protection operations on the whole
-SCTP plain packet payload, i.e. all chunks after the SCTP common
+SCTP plain packet payload, i.e., all chunks after the SCTP common
 header. Information protection is kept during the lifetime of the
 Association and no information is sent in plain except than the
 initial SCTP handshake, the SCTP common Header and the SCTP Encrypted
@@ -161,7 +161,7 @@ in this case it should require the Association to be aborted.
 ## Encryption Engines Considerations {#engines}
 
 The Encryption Engine, independently from the security characteristics,
-needs to be capable working on a unreliable transport mechanism
+needs to be capable working on an unreliable transport mechanism
 same as UDP and have own KEY handler capability.
 
 SCTP Crypto Chunk directly exploits the Encryption Engine by
@@ -380,7 +380,7 @@ This chunk is used to hold the Encryption engines list.
       This value MUST be set to 0x80xx.
 
    Flags: 1 byte (unsigned integer)
-      SHOULD be set to zero on transmit and MUST be ignored on receipt..
+      SHOULD be set to zero on transmit and MUST be ignored on receipt.
 
    Length: 2 bytes (unsigned integer)
       This value holds the length of the Crypto Engines in bytes plus 8.
@@ -661,7 +661,7 @@ ENCRYPT chunk can be sent in a SCTP packet.
 
 When the Association state machine (see {{sctp-encryption-state-diagram}}) has
 reached the CRYPT PENDING state, it MAY handle KEY handshake inband depending
-on how the specification for the chosen Encryption Engine as been defined.
+on how the specification for the chosen Encryption Engine has been defined.
 In such case, the Encryption Chunk Handler will receive plain Control Chunks
 from the SCTP Chunk Handler and ENCRYPT chunks from the Encryption Engine.
 Plain Control chunks and ENCRYPT chunks CANNOT be bundled within the same SCTP packet.
@@ -687,7 +687,7 @@ may set the Flags (see {{sctp-encryption-chunk-newchunk-crypt-struct}}).
 
 When the Association state machine (see {{sctp-encryption-state-diagram}}) has
 reached the CRYPT PENDING state, it MAY handle KEY handshake inband depending
-on how the specification for the chosen Encryption Engine as been defined.
+on how the specification for the chosen Encryption Engine has been defined.
 In such case, the Encryption Chunk Handler will receive plain Control Chunks
 and ENCRYPT chunks from the SCTP Header Handler.
 ENCRYPT chunks will be forwarded to the Encryption Engine whilst plain
@@ -698,7 +698,7 @@ be bundled within the same SCTP packet.
 When the Association state machine (see {{sctp-encryption-state-diagram}}) has
 reached the ENCRYPTED state, the Encryption Chunk Handler will
 receive ENCRYPT Chunks from the SCTP Header Handler.
-Payload from ENCRYPT Chunks will be forwarder to the Encryption Engine
+Payload from ENCRYPT Chunks will be forwarded to the Encryption Engine
 in use for that specific Association
 for decryption, the Encryption Engine will return a plain SCTP Payload.
 The Plain SCTP Payload will be forwarded to SCTP Chunk Handler that

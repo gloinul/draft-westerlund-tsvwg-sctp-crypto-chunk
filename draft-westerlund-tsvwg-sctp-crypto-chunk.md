@@ -33,6 +33,7 @@ informative:
 
 normative:
   RFC2119:
+  RFC8174:
   RFC9260:
 
   IANA-SCTP-PARAMETERS:
@@ -222,10 +223,13 @@ exists, PMTU for SCTP has to be limited to the encryption engine
 largest payload value plus the SCTP Common Header.
 
 # Conventions
-The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
    "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
-   "OPTIONAL", when they appear in this document, are to be interpreted
-   as described in {{RFC2119}}.
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 {{RFC2119}} {{RFC8174}} when, and only when, they appear in all
+   capitals, as shown here.
 
 # New Parameter Types
 

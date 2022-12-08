@@ -33,6 +33,7 @@ informative:
 
 normative:
   RFC2119:
+  RFC8174:
   RFC9260:
 
   IANA-SCTP-PARAMETERS:
@@ -50,8 +51,8 @@ detect tampering or message forgery.
 
 The crypto chunk defined here in is one half of a complete
 solution. Where a companion specification is required to define how
-the content of the crypto chunk is encrypted, authenticated and
-protected against replay, as well as how keymanagement is accomplised.
+the content of the crypto chunk is encrypted, authenticated, and
+protected against replay, as well as how key management is accomplished.
 
 Applications using SCTP Encryption Chunk can use all transport
 features provided by SCTP and its extensions.
@@ -62,13 +63,13 @@ features provided by SCTP and its extensions.
 
 ## Overview
 
-   This document defines a encryption chunk for the Stream Control
+   This document defines an encryption chunk for the Stream Control
    Transmission Protocol (SCTP), as defined in {{RFC9260}}.
 
    This specification defines the actual crypto chunk, how to enable
-   its usage, how it interact with the SCTP association establishment
-   to enable endpoint authentication, key-establishment and other
-   features of the seperate cipher specfication.
+   it usage, how it interacts with the SCTP association establishment
+   to enable endpoint authentication, key-establishment, and other
+   features of the separate cipher specification.
 
    This specification is intended to be capable of enabling mutual
    authentication of endpoints, data confidentiality, data origin
@@ -79,7 +80,7 @@ features provided by SCTP and its extensions.
 
    Applications using SCTP Encryption Chunk can use all transport
    features provided by SCTP and its extensions. Due to its level of
-   intergration as discussed in next section it will provide its
+   integration as discussed in next section it will provide its
    security functions on all content of the SCTP packet, and will thus
    not impact the potential to utilize any SCTP functionalities or
    extensions.
@@ -129,14 +130,14 @@ sent to the Encryption Engine to be protected and the encrypted and
 integrity tagged data will be encapsulated in a SCTP Encrypted chunk.
 
 SCTP Encryption Engine performs protection operations on the whole
-SCTP plain packet payload, i.e. all chunks after the SCTP common
+SCTP plain packet payload, i.e., all chunks after the SCTP common
 header. Information protection is kept during the lifetime of the
 Association and no information is sent in plain except than the
 initial SCTP handshake, the SCTP common Header and the SCTP Encrypted
 Chunk header.
 
 SCTP Encryption Chunk capability is agreed by the peers at the initialization
-of the SCTP Association, during that phase the peers exhange information
+of the SCTP Association, during that phase the peers exchange information
 about the encryption engine availability. Once the peers have agreed on what
 encryption to use, the SCTP hosts start sending SCTP Encrypted chunks
 containing the initialization information related to the encryption engine
@@ -158,24 +159,24 @@ it may be that the encryption engine goes in troubles so that it
 doesn't guarantee security and requires to terminate the link,
 in this case it should require the Association to be aborted.
 
-## Encryption Engines considerations {#engines}
+## Encryption Engines Considerations {#engines}
 
 The Encryption Engine, independently from the security characteristics,
-needs to be capable working on a unrealiable transport mechanism
+needs to be capable working on an unreliable transport mechanism
 same as UDP and have own KEY handler capability.
 
 SCTP Crypto Chunk directly exploits the Encryption Engine by
 requesting encryption and decryption of a buffer, in particular
-the encrypted buffer shall never exceeds the SCTP payload size
+the encrypted buffer shall never exceed the SCTP payload size
 thus Encryption Engine shall be aware of the PMTU (see {{pmtu}}).
 
 KEY Handling of Encryption Engine SHOULD exploit SCTP Crypto Chunk
-for handshaking, in that case any packet being exhanged between
-Encryption Engine peers shall be tranported as payload of Encrypted
+for handshaking, in that case any packet being exchanged between
+Encryption Engine peers shall be transported as payload of Encrypted
 chunk (see {{encrypt}}).
 
 KEY Handling MAY use other mechanism than what provided by SCTP
-Crypto Chunks, in any case the mechamism for KEY Handling MUST
+Crypto Chunks, in any case the mechanism for KEY Handling MUST
 be specified in the Encryption Engine specification document for that
 specific Encryption Engine.
 
@@ -204,7 +205,7 @@ design of the Encryption Engines, the actual implementation should
 consider that out-of-order handling of SCTP chunks is not desired
 and may cause false congestions and retransmissions.
 
-## PMTU considerations {#pmtu}
+## PMTU Considerations {#pmtu}
 
 The addition of the Encryption to SCTP reduces the room for payload,
 in order to cope with that when creating the payload of SCTP for
@@ -222,16 +223,19 @@ exists, PMTU for SCTP has to be limited to the encryption engine
 largest payload value plus the SCTP Common Header.
 
 # Conventions
-The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
    "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
-   "OPTIONAL", when they appear in this document, are to be interpreted
-   as described in {{RFC2119}}.
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 {{RFC2119}} {{RFC8174}} when, and only when, they appear in all
+   capitals, as shown here.
 
-# New Parameter Types
+# New Parameter Type
 
-This section defines the new parameter types that will be used to
+This section defines the new parameter type that will be used to
 negotiate the use of Encrypted Chunks during association setup.
-{{sctp-encryption-chunk-init-parameter}} illunstrates the new parameter type.
+{{sctp-encryption-chunk-init-parameter}} illustrates the new parameter type.
 
 ~~~~~~~~~~~ aasvg
 +----------------+------------------------------------------------+
@@ -249,7 +253,7 @@ by the use of the upper bits of the parameter type.
 
 ## Encrypted Association Parameter (CRYPT) {#crypt-parameter}
 
-This parameter is used to carry the list of proposed Ecnryption Engines
+This parameter is used to carry the list of proposed Encryption Engines
 and the chosen Encryption Engine during INIT/INIT-ACK handshake.
 
 ~~~~~~~~~~~ aasvg
@@ -287,7 +291,7 @@ and the chosen Encryption Engine during INIT/INIT-ACK handshake.
 
 This section defines the new chunk types that will be used to
 transport encrypted SCTP payload.
-{{sctp-encryption-chunk-newchunk-crypt}} illunstrates the new chunk type.
+{{sctp-encryption-chunk-newchunk-crypt}} illustrates the new chunk type.
 
 ~~~~~~~~~~~ aasvg
 +------------+-----------------------------+
@@ -342,7 +346,7 @@ This chunk is used to hold the encrypted payload of a plain SCTP packet.
 
 This section defines the new chunk types that will be used to validate
 the negotiation of the encryption engine selected for Encryption
-Chunk.  {{sctp-encryption-chunk-newchunk-EVALID}} illunstrates the new
+Chunk.  {{sctp-encryption-chunk-newchunk-EVALID}} illustrates the new
 chunk type.
 
 ~~~~~~~~~~~ aasvg
@@ -380,7 +384,7 @@ This chunk is used to hold the Encryption engines list.
       This value MUST be set to 0x80xx.
 
    Flags: 1 byte (unsigned integer)
-      SHOULD be set to zero on transmit and MUST be ignored on receipt..
+      SHOULD be set to zero on transmit and MUST be ignored on receipt.
 
    Length: 2 bytes (unsigned integer)
       This value holds the length of the Crypto Engines in bytes plus 8.
@@ -503,7 +507,7 @@ generate State Cookie \    +---------+                  delete TCB
          |     |                       | [CRYPTO SETUP]
          |     |                       |-----------------
          |     |                       | send and receive
-         |     |                       | encrypt engine hanshake
+         |     |                       | encrypt engine handshake
          |     |                       | by means of ENCRYPT chunks
          |     |                       | in case of error
          |     |                       | send plain ABORT
@@ -566,7 +570,7 @@ From this time on, only ENCRYPT chunks can be sent to the remote peer and
 any other type of chunks coming from the remote peer will be silently discarded.
 
 In ENCRYPTED state the SCTP Endpoints MUST validate the INIT/INIT-ACK parameters,
-thus the Client will send an EVALID chunk that will contain exatly the same list
+thus the Client will send an EVALID chunk that will contain exactly the same list
 as Crypto Engines as previously sent in CRYPT option of INIT chunk and in the same order.
 
 When the Server will receive EVALID, it will compare the list of Crypto Engines
@@ -574,17 +578,17 @@ with the list received in the INIT chunk, if they are identical it will reply
 to the Client with an EVALID chunk containing the Crypto Engine previously
 sent as CRYPT option in INIT-ACK chunk , it will clean the T-valid timer and
 will move into ESTABLISHED state.
-If the lists of Crypto Engines doen't match, it will generate an ERROR chunk
-and an ABORT chunk.
-The ERROR handling follows what specified in {{evalidate}}.
+If the lists of Crypto Engines don't match, it will generate an ERROR chunk
+and an ABORT chunk. ERROR CAUSE will indicate EVALIDATE meaning that an error
+has been happening during VALIDATION of SCTP Endpoints.
 
 After sending EVALID, the Client will wait for the Server to reply with the
 EVALID confirmation. The Client will compare the Crypto Engine received from
 the Server, if the value is the same it will clean the T-valid timer and
 move into ESTABLISHED state.
-If the chosen Crypto Engines doen't match, it will generate an ERROR chunk
-and an ABORT chunk.
-The ERROR handling follows what specified in {{evalidate}}.
+If the chosen Crypto Engines don't match, it will generate an ERROR chunk
+and an ABORT chunk. ERROR CAUSE will indicate EVALIDATE meaning that an error
+has been happening during VALIDATION of SCTP Endpoints.
 
 If T-valid timer expires either at Client or Server, it will generate an ERROR chunk
 and an ABORT chunk.
@@ -644,11 +648,11 @@ when having an internal error or by detecting a security violation.
 The internal design of Encryption Engines and their capability is out of the
 scope of the current document.
 
-## Encrypted Data Chunk handling
+## Encrypted Data Chunk Handling
 
 With reference to the State Diagram as shown in {{sctp-encryption-state-diagram}},
 the handling of Control Chunks, Data Chunks and Encrypted chunks follows the
-rules defined belows:
+rules defined below:
 
 - When the Association is in states CLOSED, COOKIE-WAIT, COOKIE-ECHOED and CRYPT PENDING,
 any Control Chunk is sent plain. No DATA chunks shall be sent in these states and DATA
@@ -698,11 +702,11 @@ the structure of an SCTP packet being sent after the ENCRYPTED state has been
 reached. Suck packets are built with the SCTP Common header. Only one
 ENCRYPT chunk can be sent in a SCTP packet.
 
-### Encrypted Data Chunk transmission
+### Encrypted Data Chunk Transmission
 
 When the Association state machine (see {{sctp-encryption-state-diagram}}) has
 reached the CRYPT PENDING state, it MAY handle KEY handshake inband depending
-on how the specification for the chosen Encryption Engine as been defined.
+on how the specification for the chosen Encryption Engine has been defined.
 In such case, the Encryption Chunk Handler will receive plain Control Chunks
 from the SCTP Chunk Handler and ENCRYPT chunks from the Encryption Engine.
 Plain Control chunks and ENCRYPT chunks CANNOT be bundled within the same SCTP packet.
@@ -724,11 +728,11 @@ Depending on the specification for the chosen Encryption Engine,
 when forming the ENCRYPT chunk header the Encryption Chunk Handler
 may set the Flags (see {{sctp-encryption-chunk-newchunk-crypt-struct}}).
 
-### Encrypted Data Chunk reception
+### Encrypted Data Chunk Reception
 
 When the Association state machine (see {{sctp-encryption-state-diagram}}) has
 reached the CRYPT PENDING state, it MAY handle KEY handshake inband depending
-on how the specification for the chosen Encryption Engine as been defined.
+on how the specification for the chosen Encryption Engine has been defined.
 In such case, the Encryption Chunk Handler will receive plain Control Chunks
 and ENCRYPT chunks from the SCTP Header Handler.
 ENCRYPT chunks will be forwarded to the Encryption Engine whilst plain
@@ -739,7 +743,7 @@ be bundled within the same SCTP packet.
 When the Association state machine (see {{sctp-encryption-state-diagram}}) has
 reached the ENCRYPTED state, the Encryption Chunk Handler will
 receive ENCRYPT Chunks from the SCTP Header Handler.
-Payload from ENCRYPT Chunks will be forwarder to the Encryption Engine
+Payload from ENCRYPT Chunks will be forwarded to the Encryption Engine
 in use for that specific Association
 for decryption, the Encryption Engine will return a plain SCTP Payload.
 The Plain SCTP Payload will be forwarded to SCTP Chunk Handler that
@@ -754,7 +758,7 @@ according to that specification.
 ### SCTP Header Handler
 
 The SCTP Header Handler is responsible for correctness of the SCTP Header,
-it receives th SCTP Packet from the lower transport layer,
+it receives the SCTP Packet from the lower transport layer,
 discriminates among Associations and forwards the Payload and relevant
 data to the SCTP Encrypt Handler for handling.
 
@@ -774,7 +778,7 @@ the lower transport layer.
 
    *  through definition of additional cause codes within ERROR chunks,
 
-   IANA needs toe performe the following updates for the above five
+   IANA needs to perform the following updates for the above five
    registries:
 
    *  In the "Chunk Types" registry, IANA has to add  with a reference to this

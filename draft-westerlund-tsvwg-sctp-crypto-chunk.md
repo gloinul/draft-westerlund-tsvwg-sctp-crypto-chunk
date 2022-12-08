@@ -441,6 +441,19 @@ in such cases an ERROR chunk sill be sent with EENGINE cause
 It MAY be followed by an appropriate cause
 according to the Encryption Engine specification.
 
+## Non critical error in the Encryption Engine
+
+A non critical error in the Encryption Engine means that the
+Ecryption Engine is capable of recoverying without the need
+of the whole Association to be restarted.
+
+From SCTP perspective, a non critical error will be perceived
+as a temporary problem in the transport and will be handled
+with retransmissions and SACKS according to {{RFC9260}}.
+
+When the Encryption Engine will experience a non critical error,
+no ERROR chunks shall be sent.
+
 ## New Error Causes {#new_errors}
 
 This section lists the new error cause that are to be used.

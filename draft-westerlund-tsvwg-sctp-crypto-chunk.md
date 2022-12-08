@@ -66,7 +66,7 @@ features provided by SCTP and its extensions.
    Transmission Protocol (SCTP), as defined in {{RFC9260}}.
 
    This specification defines the actual crypto chunk, how to enable
-   it usage, how it interact with the SCTP association establishment
+   its usage, how it interact with the SCTP association establishment
    to enable endpoint authentication, key-establishment and other
    features of the seperate cipher specfication.
 
@@ -395,19 +395,59 @@ This chunk is used to hold the Encryption engines list.
       aligned.  The Padding MUST NOT be longer than 3 bytes and it MUST
       be ignored by the receiver.
 
-# New Error Causes
+# Error Handling {#error_handling}
 
-This section defines a set of new error cause that will be sent if there
-are issues preventing the Encrypted Chunk Association to be established.
-They are listed in {{sctp-encryption-new-error-causes}} and require
-additional lines of the "CAUSE CODES" table in SCTP-parameters
-{{IANA-SCTP-PARAMETERS}}:
+There are addition reasons for the Association to misbehave, this specification
+introduces a new set of causes that are to be used when SCTP Host detects
+a faulty condition. The special case is when the error is detected by the
+Encryption Engine that may provide additional information.
+
+## Mandatory CRYPT option missing {#enocrypt}
+
+When an SCTP host will receive an INIT chunk that doesn't contain the
+CRYPT option towards an SCTP Endpoint that only accepts SCTP Crypto
+protected Association, it will reply with an ERROR chunk containing
+the informations 7 Invalid Mandatory Parameter (see {{RFC9260}}  section 3.3.10.7) and ENOCRYPT
+(specified in {{sctp-encryption-new-error-causes}}).
+
+## Error during KEY handshake {#ekeyhandshake}
+
+If the encryption engine specifies that KEY handling is implemented inband
+it may happen that the procedure has errors. In such case an ERROR chunk
+will be sent with EENGINE cause (specified in {{sctp-encryption-new-error-causes}}).
+It MAY be followed by an appropriate cause
+according to the Encryption Engine specification.
+
+## Error in Crypto Engines validation {#evalidate}
+
+Whenever an error occur in Crypto Engine Validation (see {encrypted-state}),
+SCTP Host will send an ERROR chunk with EVALIDATE cause
+(specified in {{sctp-encryption-new-error-causes}}).
+
+## Timeout during KEY handshake or validation {#etmovalidate}
+
+Whenever a T-valit timeout occurs, the SCTP Host will send an ERROR
+chunk with ETMOVALIDATE cause (specified in {{sctp-encryption-new-error-causes}}).
+
+## Error from Encryption Engine {#eengine}
+
+Encryption Engine MAY inform SCTP Host about errors,
+in such cases an ERROR chunk sill be sent with EENGINE cause
+(specified in {{sctp-encryption-new-error-causes}}).
+It MAY be followed by an appropriate cause
+according to the Encryption Engine specification.
+
+## New Error Causes {#new_errors}
+
+This section lists the new error cause that are to be used.
+They require additional lines of the "CAUSE CODES" table in
+SCTP-parameters {{IANA-SCTP-PARAMETERS}}:
 
 ~~~~~~~~~~~ aasvg
    VALUE            CAUSE CODE                               REFERENCE
   ------           -----------------                        ----------
    xxx (0xxxxx)     ENOCRYPT                                 nnnn
-   xxx (0xxxxx)     EKHANDSHAKE                              nnnn
+   xxx (0xxxxx)     EENGINE                                  nnnn
    xxx (0xxxxx)     EVALIDATE                                nnnn
    xxx (0xxxxx)     ETMOVALIDATE                             nnnn
 ~~~~~~~~~~~
@@ -507,8 +547,8 @@ Engine.
 
 If KEY handling is inband, the Encryption Engine will start the handshake
 with its peer and in case of failure or T-validation timeout,
-it will generate an ERROR chunk and an ABORT chunk. ERROR CAUSE will indicate
-EKHANDSHAKE meaning that an error has been happening during KEY handshake.
+it will generate an ERROR chunk and an ABORT chunk.
+The ERROR handling follows what specified in {{ekeyhandshake}}.
 When Handshake has been successfully completed, the Association state machine
 will enter ENCRYPTED state.
 
@@ -535,20 +575,21 @@ to the Client with an EVALID chunk containing the Crypto Engine previously
 sent as CRYPT option in INIT-ACK chunk , it will clean the T-valid timer and
 will move into ESTABLISHED state.
 If the lists of Crypto Engines doen't match, it will generate an ERROR chunk
-and an ABORT chunk. ERROR CAUSE will indicate EVALIDATE meaning that an error
-has been happening during VALIDATION of SCTP Endpoints.
+and an ABORT chunk.
+The ERROR handling follows what specified in {{evalidate}}.
 
 After sending EVALID, the Client will wait for the Server to reply with the
 EVALID confirmation. The Client will compare the Crypto Engine received from
 the Server, if the value is the same it will clean the T-valid timer and
 move into ESTABLISHED state.
 If the chosen Crypto Engines doen't match, it will generate an ERROR chunk
-and an ABORT chunk. ERROR CAUSE will indicate EVALIDATE meaning that an error
-has been happening during VALIDATION of SCTP Endpoints.
+and an ABORT chunk.
+The ERROR handling follows what specified in {{evalidate}}.
 
 If T-valid timer expires either at Client or Server, it will generate an ERROR chunk
-and an ABORT chunk. ERROR CAUSE will indicate ETMOVALIDATE meaning that a timeout error
-has been happening during VALIDATION of SCTP Endpoints.
+and an ABORT chunk.
+The ERROR handling follows what specified in {{etmovalidate}}.
+
 
 # Procedures
 
@@ -562,8 +603,8 @@ lists all the supported encryption engines, given in order of preference
 
 As alternative, an SCTP Endpoint acting as Server willing to support only Encrypted
 Associations shall consider INIT chunk not containing the CRYPT parameter as an error,
-thus it will reply with an ERROR chunk with ENOCRYPT indicating that the mandatory
-CRYPT option is missing.
+thus it will reply with an ERROR chunk according to what specified in {{enocrypt}}
+indicating that the mandatory CRYPT option is missing.
 
 An SCTP Endpoint acting as Server, when receiving an INIT chunk with CRYPT parameter,
 will search the list of Crypto Engines for a common choice and will reply with
@@ -756,7 +797,7 @@ the lower transport layer.
    *  In the "Error Cause Codes" registry, IANA has to add  with a reference to this
       document.
 
-      - Error during Enryption Chunk KEY Handshake EKHANDSHAKE
+      - Error in encryption engine EENGINE
       - Error in Encryption Chunk Endpoint Validation EVALIDATE
       - Timeout during Encryption Chunk Validation ETMOVALIDATE
 

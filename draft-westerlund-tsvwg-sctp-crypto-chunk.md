@@ -230,7 +230,7 @@ congestion window CWND (see {{RFC9260}} section 7.2).
 
 It may happen that Encryption Engine discards packets due
 to internal checks or because it has detectes a malicious
-attempt. 
+attempt.
 
 In no cases Encryption Engine must interfere with the congestion
 control mechanims, this basically means that the congestion control

@@ -452,7 +452,10 @@ as a temporary problem in the transport and will be handled
 with retransmissions and SACKS according to {{RFC9260}}.
 
 When the Encryption Engine will experience a non critical error,
-no ERROR chunks shall be sent.
+no ERROR chunks shall be sent. The way non critical errors
+are handled and how the Encryption Engine will recover from
+these errors is being described in the Encryption Engine
+specifications.ZZ
 
 ## New Error Causes {#new_errors}
 

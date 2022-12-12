@@ -215,7 +215,10 @@ included in the calculation.
 
 On the other hand, the Encryption engine needs to be informed about
 the PMTU by removing from the value the sum of the common SCTP header
-and the Encrypted chunk header.
+and the Encrypted chunk header. That implies that SCTP can propagate
+the computed PMTU at run time specifically. The way Encryption
+Engine provides the primitive for PMTU communication shall
+be part of the relative specification.
 
 From SCTP perspective, the maximum size of the encryption engine
 payload, if limited, has to be considered as well. If such limit
@@ -235,6 +238,13 @@ attempt.
 In no cases Encryption Engine must interfere with the congestion
 control mechanims, this basically means that the congestion control
 is exactly the same as how specified in {{RFC9260}}.
+
+## ICMP considerations
+
+Encryption Engine shouldn't take decisions based on ICMP, thus ICMP
+messages shouldn't be forwarded to the Encryption Engine and the
+overall ICMP handling shall be limited to SCTP as specified in
+{{RFC9260}} section 10.
 
 # Conventions
 

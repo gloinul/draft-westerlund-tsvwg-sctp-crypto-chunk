@@ -239,7 +239,7 @@ In no cases Encryption Engine must interfere with the congestion
 control mechanims, this basically means that the congestion control
 is exactly the same as how specified in {{RFC9260}}.
 
-## ICMP considerations
+## ICMP considerations {#icmp}
 
 Encryption Engine shouldn't take decisions based on ICMP, thus ICMP
 messages shouldn't be forwarded to the Encryption Engine and the
@@ -255,7 +255,7 @@ overall ICMP handling shall be limited to SCTP as specified in
    BCP 14 {{RFC2119}} {{RFC8174}} when, and only when, they appear in all
    capitals, as shown here.
 
-# New Parameter Type
+# New Parameter Type {#new-parameter-type}
 
 This section defines the new parameter type that will be used to
 negotiate the use of Encrypted Chunks during association setup.
@@ -309,7 +309,7 @@ and the chosen Encryption Engine during INIT/INIT-ACK handshake.
       aligned.  The Padding MUST NOT be longer than 3 bytes and it MUST
       be ignored by the receiver.
 
-# New Chunk Type
+# New Chunk Types {#new-chunk-types}
 
 ##  Encrypted Chunk (ENCRYPT) {#encrypt}
 
@@ -366,7 +366,7 @@ This chunk is used to hold the encrypted payload of a plain SCTP packet.
       aligned.  The Padding MUST NOT be longer than 3 bytes and it MUST
       be ignored by the receiver.
 
-##  Encryption Validation Chunk (EVALID)
+##  Encryption Validation Chunk (EVALID) {#evalid}
 
 This section defines the new chunk types that will be used to validate
 the negotiation of the encryption engine selected for Encryption
@@ -425,8 +425,7 @@ This chunk is used to hold the Encryption engines list.
 
 # Error Handling {#error_handling}
 
-There are addition reasons for the Association to misbehave, this specification
-introduces a new set of causes that are to be used when SCTP Host detects
+This specification introduces a new set of causes that are to be used when SCTP Host detects
 a faulty condition. The special case is when the error is detected by the
 Encryption Engine that may provide additional information.
 
@@ -465,7 +464,7 @@ in such cases an ERROR chunk sill be sent with EENGINE cause
 It MAY be followed by an appropriate cause
 according to the Encryption Engine specification.
 
-## Non critical error in the Encryption Engine
+## Non critical error in the Encryption Engine {#non-critical-errors}
 
 A non critical error in the Encryption Engine means that the
 Ecryption Engine is capable of recoverying without the need
@@ -479,7 +478,7 @@ When the Encryption Engine will experience a non critical error,
 no ERROR chunks shall be sent. The way non critical errors
 are handled and how the Encryption Engine will recover from
 these errors is being described in the Encryption Engine
-specifications.ZZ
+specifications.
 
 ## New Error Causes {#new_errors}
 
@@ -497,7 +496,7 @@ SCTP-parameters {{IANA-SCTP-PARAMETERS}}:
 ~~~~~~~~~~~
 {: #sctp-encryption-new-error-causes title="New Error Causes"}
 
-# Encrypted SCTP State Diagram
+# Encrypted SCTP State Diagram {#state-diagram}
 
 The {{sctp-encryption-state-diagram}} shows the changes versus the SCTP Association state
 machine as described in {{RFC9260}} section 4.
@@ -573,7 +572,7 @@ generate State Cookie \    +---------+                  delete TCB
 ~~~~~~~~~~~
 {: #sctp-encryption-state-diagram title="SCTP State Diagram with Encryption"}
 
-## New states
+## New states {#new-states}
 
 This section describes details on the amendment to the SCTP Association Establishment
 state machine.
@@ -635,9 +634,9 @@ and an ABORT chunk.
 The ERROR handling follows what specified in {{etmovalidate}}.
 
 
-# Procedures
+# Procedures {#procedures}
 
-## Establishment of an Encrypted Association
+## Establishment of an Encrypted Association {#establishment-procedure}
 
 An SCTP Endpoint acting as Client willing to create an Encrypted Association shall send
 to the remote peer an INIT chunk containing the CRYPT parameter
@@ -680,7 +679,7 @@ chosen Encryption Engine and in case of mismatch with the one received previousl
 as CRYPT parameter in the INIT-ACK chunk, it will reply with ABORT, otherwise
 it will discard it.
 
-## Termination of an Encrypted Association
+## Termination of an Encrypted Association {#termination-procedure}
 
 Besides the procedures for terminating an Association explained in {{RFC9260}},
 the Encryption Engine SHOULD ask SCTP Host for terminating an Association
@@ -688,7 +687,7 @@ when having an internal error or by detecting a security violation.
 The internal design of Encryption Engines and their capability is out of the
 scope of the current document.
 
-## Encrypted Data Chunk Handling
+# Encrypted Data Chunk Handling {#encrypted-data-handling}
 
 With reference to the State Diagram as shown in {{sctp-encryption-state-diagram}},
 the handling of Control Chunks, Data Chunks and Encrypted chunks follows the
@@ -742,7 +741,7 @@ the structure of an SCTP packet being sent after the ENCRYPTED state has been
 reached. Suck packets are built with the SCTP Common header. Only one
 ENCRYPT chunk can be sent in a SCTP packet.
 
-### Encrypted Data Chunk Transmission
+## Encrypted Data Chunk Transmission {#data-sending}
 
 When the Association state machine (see {{sctp-encryption-state-diagram}}) has
 reached the CRYPT PENDING state, it MAY handle KEY handshake inband depending
@@ -768,7 +767,7 @@ Depending on the specification for the chosen Encryption Engine,
 when forming the ENCRYPT chunk header the Encryption Chunk Handler
 may set the Flags (see {{sctp-encryption-chunk-newchunk-crypt-struct}}).
 
-### Encrypted Data Chunk Reception
+## Encrypted Data Chunk Reception {#data-receiving}
 
 When the Association state machine (see {{sctp-encryption-state-diagram}}) has
 reached the CRYPT PENDING state, it MAY handle KEY handshake inband depending

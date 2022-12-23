@@ -767,6 +767,9 @@ Depending on the specification for the chosen Encryption Engine,
 when forming the ENCRYPT chunk header the Encryption Chunk Handler
 may set the Flags (see {{sctp-encryption-chunk-newchunk-crypt-struct}}).
 
+An SCTP packet containing an SCTP Crypto Chunk SHALL be delivered
+without delay and SCTP bundling is NOT PERMITTED.
+
 ## Encrypted Data Chunk Reception {#data-receiving}
 
 When the Association state machine (see {{sctp-encryption-state-diagram}}) has

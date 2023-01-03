@@ -517,7 +517,7 @@ generate State Cookie \    +---------+                  delete TCB
           COOKIE  ECHO     |          v
       (1) -----------------|    +-----------+
           create TCB       |    |COOKIE-WAIT| (2)
-          send COOKIE ACK  |    +-----------+
+          send COOKIE ACK  |    +-----+-----+
                            |          |
                            |          | receive INIT ACK
                            |          |-------------------
@@ -527,18 +527,18 @@ generate State Cookie \    +---------+                  delete TCB
                            |          v
                            |   +-------------+
                            |   |COOKIE-ECHOED| (3)
-                           |   +-------------+
+                           |   +------+------+
                            |          |
                            |          | receive COOKIE ACK
                            |          |-------------------
                            |          | stop T1-cookie timer
          +-----------------+-----+    |
-         |     +---------------- | ---+-----+
+         |     +-----------------(----+-----+
          |     |                 |          |
          |     |                 v          v
          |     |              +-----------------+
          |     |              |  CRYPT PENDING  | If INIT/INIT-ACK
-         |     |              +-----------------+ has CRYPT option
+         |     |              +--------+--------+ has CRYPT option
          |     |                       |          start T-valid
          |     |                       |          timer.
          |     |                       |
@@ -552,7 +552,7 @@ generate State Cookie \    +---------+                  delete TCB
          |     |                       v
          |     |              +-----------------+
          |     |              |    ENCRYPTED    |
-         |     |              +-----------------+
+         |     |              +--------+--------+
          |     |                       |
          |     |                       | [ENDPOINT VALIDATION]
          |     |                       |------------------------

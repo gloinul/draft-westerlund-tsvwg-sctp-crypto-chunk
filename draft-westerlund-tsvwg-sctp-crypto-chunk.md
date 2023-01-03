@@ -501,13 +501,13 @@ The {{sctp-encryption-state-diagram}} shows the changes versus the SCTP Associat
 machine as described in {{RFC9260}} section 4.
 
 ~~~~~~~~~~~ aasvg
-                        -----          -------- (from any state)
-                      /       \      /receive ABORT      [ABORT]
-        receive INIT |         |    |--------------  or ----------
----------------------|         v    v    delete TCB     send ABORT
-generate State Cookie \    +---------+                  delete TCB
-        send INIT ACK   ---|  CLOSED |
-                           +---------+
+                                   .-------- (from any state)
+                       .-----.    |   
+         receive INIT |       |   |    receive ABORT      [ABORT]
+--------------------- |       v   v    --------------  or ----------
+generate State Cookie |    +---------+ delete TCB         send ABORT
+        send INIT ACK  '---+  CLOSED |                    delete TCB
+                           +--+----+-+
                              /      \
                             /        \  [ASSOCIATE]
                            |          |-----------------
@@ -533,7 +533,7 @@ generate State Cookie \    +---------+                  delete TCB
                            |          |-------------------
                            |          | stop T1-cookie timer
          +-----------------+-----+    |
-         |     +-----------------(----+-----+
+         |     +-----------------)----+-----+
          |     |                 |          |
          |     |                 v          v
          |     |              +-----------------+

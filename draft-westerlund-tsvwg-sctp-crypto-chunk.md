@@ -99,22 +99,21 @@ then be handled according to current SCTP protocol specification.
 ~~~~~~~~~~~ aasvg
 +---------------------+
 |                     |
-|        ULP          |
+|         ULP         |
 |                     |
-+---------------------+ <- User Level Messages
++---------------------+ <-- User Level Messages
 |                     |
 | SCTP Chunks Handler |
 |                     |
-+-------------+-------+-----------------+ <- SCTP Plain Payload
++-------------+-------+-----------------+ <-- SCTP Plain Payload
 |  Encryption |    Encryption Engine    |
 |    Chunk    +-------------------------+
 |   Handler   | Encryption KEY Handler  |
-+-------------+-------+-----------------+ <- SCTP Encrypted Payload
++-------------+-------+-----------------+ <-- SCTP Encrypted Payload
 |                     |
 | SCTP Header Handler |
 |                     |
 +---------------------+
-
 ~~~~~~~~~~~
 {: #sctp-encryption-chunk-layering title="SCTP Encryption Chunk layering
 in regard to SCTP and upper layer protocol"}
@@ -321,7 +320,7 @@ transport encrypted SCTP payload.
 +------------+-----------------------------+
 | Chunk Type | Chunk Name                  |
 +------------+-----------------------------+
-| 0x0x       |  Encrypted Chunk (ENCRYPT)  |
+| 0x0x       | Encrypted Chunk (ENCRYPT)   |
 +------------+-----------------------------+
 ~~~~~~~~~~~
 {: #sctp-encryption-chunk-newchunk-crypt title="ENCRYPT Chunk Type"}
@@ -340,8 +339,8 @@ This chunk is used to hold the encrypted payload of a plain SCTP packet.
 | Type = 0x0x   |   Flags=0     |             Length            |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                                                               |
-\                            Payload                            /
-/                                                               \
+|                            Payload                            |
+|                                                               |
 |                               +-------------------------------+
 |                               |           Padding             |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -377,7 +376,7 @@ chunk type.
 +------------+-----------------------------------+
 | Chunk Type | Chunk Name                        |
 +------------+-----------------------------------+
-| 0x0x       |  INIT Option Validation (EVALID)  |
+| 0x0x       | INIT Option Validation (EVALID)   |
 +------------+-----------------------------------+
 ~~~~~~~~~~~
 {: #sctp-encryption-chunk-newchunk-EVALID title="EVALID Chunk Type"}
@@ -396,8 +395,8 @@ This chunk is used to hold the Encryption engines list.
 | Type = 0x0x   |   Flags=0     |             Length            |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                      Encryption Engines                       |
-\                                                               /
-/                                                               \
+|                                                               |
+|                                                               |
 |                               +-------------------------------+
 |                               |           Padding             |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -712,7 +711,7 @@ SCTP packet to be sent.
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                           Chunk #1                            |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                              ...                              |
+|                            . . .                              |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                           Chunk #n                            |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+

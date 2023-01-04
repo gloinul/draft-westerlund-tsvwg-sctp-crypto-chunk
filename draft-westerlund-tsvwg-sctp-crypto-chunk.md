@@ -224,7 +224,7 @@ payload, if limited, has to be considered as well. If such limit
 exists, PMTU for SCTP has to be limited to the encryption engine
 largest payload value plus the SCTP Common Header.
 
-## Congestion Control considerations {#congestion}
+## Congestion Control Considerations {#congestion}
 
 The SCTP mechanism for handling congestion control does depend
 on successfull data transfer for enlarging or reducing the
@@ -238,7 +238,7 @@ In no cases Encryption Engine must interfere with the congestion
 control mechanims, this basically means that the congestion control
 is exactly the same as how specified in {{RFC9260}}.
 
-## ICMP considerations {#icmp}
+## ICMP Considerations {#icmp}
 
 Encryption Engine shouldn't take decisions based on ICMP, thus ICMP
 messages shouldn't be forwarded to the Encryption Engine and the
@@ -428,7 +428,7 @@ This specification introduces a new set of causes that are to be used when SCTP 
 a faulty condition. The special case is when the error is detected by the
 Encryption Engine that may provide additional information.
 
-## Mandatory CRYPT option missing {#enocrypt}
+## Mandatory CRYPT Option Missing {#enocrypt}
 
 When an SCTP host will receive an INIT chunk that doesn't contain the
 CRYPT option towards an SCTP Endpoint that only accepts SCTP Crypto
@@ -436,7 +436,7 @@ protected Association, it will reply with an ERROR chunk containing
 the informations 7 Invalid Mandatory Parameter (see {{RFC9260}}  section 3.3.10.7) and ENOCRYPT
 (specified in {{sctp-encryption-new-error-causes}}).
 
-## Error during KEY handshake {#ekeyhandshake}
+## Error During KEY Handshake {#ekeyhandshake}
 
 If the encryption engine specifies that KEY handling is implemented inband
 it may happen that the procedure has errors. In such case an ERROR chunk
@@ -444,13 +444,13 @@ will be sent with EENGINE cause (specified in {{sctp-encryption-new-error-causes
 It MAY be followed by an appropriate cause
 according to the Encryption Engine specification.
 
-## Error in Crypto Engines validation {#evalidate}
+## Error in Crypto Engines Validation {#evalidate}
 
 Whenever an error occur in Crypto Engine Validation (see {encrypted-state}),
 SCTP Host will send an ERROR chunk with EVALIDATE cause
 (specified in {{sctp-encryption-new-error-causes}}).
 
-## Timeout during KEY handshake or validation {#etmovalidate}
+## Timeout During KEY Handshake or Validation {#etmovalidate}
 
 Whenever a T-valit timeout occurs, the SCTP Host will send an ERROR
 chunk with ETMOVALIDATE cause (specified in {{sctp-encryption-new-error-causes}}).
@@ -463,7 +463,7 @@ in such cases an ERROR chunk sill be sent with EENGINE cause
 It MAY be followed by an appropriate cause
 according to the Encryption Engine specification.
 
-## Non critical error in the Encryption Engine {#non-critical-errors}
+## Noncritical Error in the Encryption Engine {#non-critical-errors}
 
 A non critical error in the Encryption Engine means that the
 Ecryption Engine is capable of recoverying without the need
@@ -571,7 +571,7 @@ generate State Cookie |    +---------+ delete TCB         send ABORT
 ~~~~~~~~~~~
 {: #sctp-encryption-state-diagram title="SCTP State Diagram with Encryption"}
 
-## New states {#new-states}
+## New States {#new-states}
 
 This section describes details on the amendment to the SCTP Association Establishment
 state machine.

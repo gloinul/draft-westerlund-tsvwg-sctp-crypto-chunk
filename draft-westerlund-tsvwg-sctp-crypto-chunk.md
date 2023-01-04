@@ -486,12 +486,12 @@ They require additional lines of the "CAUSE CODES" table in
 SCTP-parameters {{IANA-SCTP-PARAMETERS}}:
 
 ~~~~~~~~~~~ aasvg
-   VALUE            CAUSE CODE                               REFERENCE
-  ------           -----------------                        ----------
-   xxx (0xxxxx)     ENOCRYPT                                 nnnn
-   xxx (0xxxxx)     EENGINE                                  nnnn
-   xxx (0xxxxx)     EVALIDATE                                nnnn
-   xxx (0xxxxx)     ETMOVALIDATE                             nnnn
+VALUE            CAUSE CODE                               REFERENCE
+------           -----------------                        ----------
+xxx (0xxxxx)     ENOCRYPT                                 nnnn
+xxx (0xxxxx)     EENGINE                                  nnnn
+xxx (0xxxxx)     EVALIDATE                                nnnn
+xxx (0xxxxx)     ETMOVALIDATE                             nnnn
 ~~~~~~~~~~~
 {: #sctp-encryption-new-error-causes title="New Error Causes"}
 

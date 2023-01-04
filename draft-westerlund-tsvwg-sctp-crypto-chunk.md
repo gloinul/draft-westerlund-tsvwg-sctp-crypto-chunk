@@ -227,15 +227,15 @@ largest payload value plus the SCTP Common Header.
 ## Congestion Control Considerations {#congestion}
 
 The SCTP mechanism for handling congestion control does depend
-on successfull data transfer for enlarging or reducing the
+on successful data transfer for enlarging or reducing the
 congestion window CWND (see {{RFC9260}} section 7.2).
 
 It may happen that Encryption Engine discards packets due
-to internal checks or because it has detectes a malicious
+to internal checks or because it has detected a malicious
 attempt.
 
 In no cases Encryption Engine must interfere with the congestion
-control mechanims, this basically means that the congestion control
+control mechanism, this basically means that the congestion control
 is exactly the same as how specified in {{RFC9260}}.
 
 ## ICMP Considerations {#icmp}

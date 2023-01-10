@@ -502,7 +502,7 @@ machine as described in {{RFC9260}} section 4.
 
 ~~~~~~~~~~~ aasvg
                                    .-------- (from any state)
-                       .-----.    |   
+                       .-----.    |
          receive INIT |       |   |    receive ABORT      [ABORT]
 --------------------- |       v   v    --------------  or ----------
 generate State Cookie |    +---------+ delete TCB         send ABORT

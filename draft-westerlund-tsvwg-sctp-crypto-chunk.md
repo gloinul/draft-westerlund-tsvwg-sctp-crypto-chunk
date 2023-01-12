@@ -299,7 +299,7 @@ and the chosen Encryption Engine during INIT/INIT-ACK handshake.
 {: #sctp-encryption-chunk-init-options title="CRYPT Options"}
 
    Type: 2 byte (unsigned integer)
-      This value MUST be set to 0x80xx. (Value too be assigned by IANA)
+      This value MUST be set to 0x80xx.
 
    Length: 2 bytes (unsigned integer) This value holds the length of
       the Crypto Engines field in bytes plus 4.
@@ -313,6 +313,10 @@ and the chosen Encryption Engine during INIT/INIT-ACK handshake.
       MUST pad the chunk with all zero bytes to make the chunk 32-bit
       aligned.  The Padding MUST NOT be longer than 3 bytes and it MUST
       be ignored by the receiver.
+
+RFC-Editor Note: Please replace 0x08xx with the actual parameter type
+value assigned by IANA and then remove this note.
+
 
 # New Chunk Types {#new-chunk-types}
 
@@ -330,6 +334,9 @@ transport encrypted SCTP payload.
 +------------+-----------------------------+
 ~~~~~~~~~~~
 {: #sctp-encryption-chunk-newchunk-crypt title="ENCRYPT Chunk Type"}
+
+RFC-Editor Note: Please replace 0x0x with the actual chunk type value
+assigned by IANA and then remove this note.
 
 It should be noted that the ENCRYPT-chunk format requires the receiver
 to ignore the chunk if it is not understood and silently discard all

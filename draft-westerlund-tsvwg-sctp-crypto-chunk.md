@@ -74,7 +74,7 @@ features provided by SCTP and its extensions.
    This specification is intended to be capable of enabling mutual
    authentication of endpoints, data confidentiality, data origin
    authentication, data integrity protection, and data replay
-   protection for SCTP packets after SCTP association has been
+   protection for SCTP packets after the SCTP association has been
    established. The exact properties will depend on the companion
    cipher specification used with the crypto chunk.
 
@@ -89,12 +89,13 @@ features provided by SCTP and its extensions.
 
 SCTP Encryption Chunk is defined as a method for secure and
 confidential transfer for SCTP packets.  This is implemented inside
-the SCTP protocol, in a sublayer between the SCTP Header handling and
-the SCTP Chunk handling.  Once an SCTP packet has been received and
-the SCTP Common Header has been validated, the SCTP Encrypted Chunk(s)
-are being sent to the chosen decryption engine that will return the
-plain SCTP payload containing the plain SCTP chunks, those chunks will
-then be handled according to current SCTP protocol specification.
+the SCTP protocol, in a sublayer between the SCTP Common Header
+handling and the SCTP Chunk handling.  Once an SCTP packet has been
+received and the SCTP Common Header has been used to identify the SCTP
+association, the SCTP Encrypted Chunk are being sent to the chosen
+decryption engine that will return the SCTP payload containing the
+plain text SCTP chunks, those chunks will then be handled according to
+current SCTP protocol specification.
 
 ~~~~~~~~~~~ aasvg
 +---------------------+
@@ -118,14 +119,14 @@ then be handled according to current SCTP protocol specification.
 {: #sctp-encryption-chunk-layering title="SCTP Encryption Chunk layering
 in regard to SCTP and upper layer protocol"}
 
-SCTP Encryption Chunk is defined on per Association. Different Associations
-within the same SCTP Endpoint may use or not the SCTP Encryption Chunk
-and different Associations exploiting SCTP Encryption Chunks may use
-different Encryption Engines.
+SCTP Encryption Chunk is defined on per SCTP association. Different associations
+within the same SCTP endpoint may use or not the SCTP encryption chunk
+and different associations exploiting SCTP encryption chunks may use
+different encryption engines.
 
 On the outgoing direction, once SCTP stack has created the plain SCTP
-payload containing Control and/or Data chunks, that payload will be
-sent to the Encryption Engine to be protected and the encrypted and
+packet payload containing Control and/or Data chunks, that payload will be
+sent to the encryption engine to be protected and the encrypted and
 integrity tagged data will be encapsulated in a SCTP Encrypted chunk.
 
 SCTP Encryption Engine performs protection operations on the whole
@@ -147,11 +148,12 @@ When the endpoint validation has been completed, the Association is meant
 to be initialized and the ULP is informed about that, from this time on
 it's possible for the ULPs to exchange data.
 
-SCTP Encrypted Chunks will never be retransmitted, retransmission
-is implemented by SCTP host at chunk level as in the legacy.
-Duplicated SCTP Encrypted Chunks, whenever they will be accepted
-by the encryption engine, will result in duplicated SCTP
-chunks and will be handled as duplicated chunks by SCTP host.
+SCTP Encrypted Chunks will never be retransmitted, retransmission is
+implemented by SCTP host at chunk level as in the legacy.  Duplicated
+SCTP Encrypted Chunks, whenever they will be accepted by the
+encryption engine, will result in duplicated SCTP chunks and will be
+handled as duplicated chunks by SCTP host the same way a duplicated
+SCTP packet with those SCTP chunks would have been.
 
 Besides the legacy methods for Association termination, furthermore
 it may be that the encryption engine goes in troubles so that it
@@ -219,10 +221,11 @@ the computed PMTU at run time specifically. The way Encryption
 Engine provides the primitive for PMTU communication shall
 be part of the relative specification.
 
-From SCTP perspective, the maximum size of the encryption engine
-payload, if limited, has to be considered as well. If such limit
-exists, PMTU for SCTP has to be limited to the encryption engine
-largest payload value plus the SCTP Common Header.
+From SCTP perspective, if there is a maximum size of plain text data
+that can be protected by the encryption engine that must be
+communicated to SCTP. As such a limit will limit the PMTU for SCTP to
+the maximums plain text plus encryption chunk and algorithm overhead
+plus the SCTP Common Header.
 
 ## Congestion Control Considerations {#congestion}
 
@@ -240,10 +243,13 @@ is exactly the same as how specified in {{RFC9260}}.
 
 ## ICMP Considerations {#icmp}
 
-Encryption Engine shouldn't take decisions based on ICMP, thus ICMP
-messages shouldn't be forwarded to the Encryption Engine and the
-overall ICMP handling shall be limited to SCTP as specified in
-{{RFC9260}} section 10.
+SCTP implementation will be responsible for handling ICMP messages and
+their validation as specified in {{RFC9260}} section 10. This include
+for SCTP packets sent by the encryption engines key-management
+function. However, valid ICMP errors or information may indirectly be
+provided to the encryption engine, such as an update to PMTU values
+based on packet to big ICMP messages.
+
 
 # Conventions
 
@@ -292,17 +298,17 @@ and the chosen Encryption Engine during INIT/INIT-ACK handshake.
 ~~~~~~~~~~~
 {: #sctp-encryption-chunk-init-options title="CRYPT Options"}
 
-   Type: 1 byte (unsigned integer)
-      This value MUST be set to 0x80xx.
+   Type: 2 byte (unsigned integer)
+      This value MUST be set to 0x80xx. (Value too be assigned by IANA)
 
-   Length: 2 bytes (unsigned integer)
-      This value holds the length of the Crypto Engines in bytes plus 8.
+   Length: 2 bytes (unsigned integer) This value holds the length of
+      the Crypto Engines field in bytes plus 4.
 
-   Encryption Engines: n words (unsigned integer)
+   Encryption Engines: n 16-bit words (unsigned integer)
       This holds the list of Encryption engines in order of preference.
-      Each Encryption engine is specified by a 16bit word.
+      Each Encryption engine is specified by a 16-bit word.
 
-   Padding: 0, 1, 2, or 3 bytes (unsigned integer)
+   Padding: 0, or 2 bytes (unsigned integer)
       If the length of the Crypto Engines is not a multiple of 4 bytes, the sender
       MUST pad the chunk with all zero bytes to make the chunk 32-bit
       aligned.  The Padding MUST NOT be longer than 3 bytes and it MUST

@@ -349,7 +349,7 @@ This chunk is used to hold the encrypted payload of a plain SCTP packet.
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-| Type = 0x0x   |   Flags=0     |             Length            |
+| Type = 0x0x   |   Flags       |             Length            |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                                                               |
 |                            Payload                            |
@@ -367,7 +367,7 @@ This chunk is used to hold the encrypted payload of a plain SCTP packet.
       This is used by the Encryption Engine and ignored by SCTP.
 
    Length: 2 bytes (unsigned integer)
-      This value holds the length of the Payload in bytes plus 8.
+      This value holds the length of the Payload in bytes plus 4.
 
    Payload: n bytes (unsigned integer)
       This holds the encrypted data.
@@ -405,7 +405,7 @@ This chunk is used to hold the Encryption engines list.
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-| Type = 0x0x   |   Flags=0     |             Length            |
+| Type = 0xXX   |   Flags=0     |             Length            |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                      Encryption Engines                       |
 |                                                               |
@@ -417,23 +417,28 @@ This chunk is used to hold the Encryption engines list.
 {: #sctp-encryption-chunk-newchunk-EVALID-struct title="EVALID Chunk Structure"}
 
   Type: 1 byte (unsigned integer)
-      This value MUST be set to 0x80xx.
+      This value MUST be set to 0xXX.
 
    Flags: 1 byte (unsigned integer)
       SHOULD be set to zero on transmit and MUST be ignored on receipt.
 
    Length: 2 bytes (unsigned integer)
-      This value holds the length of the Crypto Engines in bytes plus 8.
+      This value holds the length of the Crypto Engines field in bytes plus 4.
 
-   Encryption Engines: n words (unsigned integer)
-      This holds the list of Encryption engines in order of preference.
-      Each Encryption engine is specified by a 16bit word.
+   Encryption Engines: n words (unsigned integer) This holds the list
+      of Encryption engines in order of preference.  Each Encryption
+      engine is specified by a 16-bit word. This field MUST be
+      identical to the content of the CRYPT parameter ({{crypt-parameter}}) Encryption
+      Engines field that the endpoint sent in the handshake.
 
-   Padding: 0, 1, 2, or 3 bytes (unsigned integer)
+   Padding: 0, or 2 bytes (unsigned integer)
       If the length of the Crypto Engines is not a multiple of 4 bytes, the sender
       MUST pad the chunk with all zero bytes to make the chunk 32-bit
       aligned.  The Padding MUST NOT be longer than 3 bytes and it MUST
       be ignored by the receiver.
+
+RFC-Editor Note: Please replace 0xXX with the actual chunk type value
+assigned by IANA and then remove this note.
 
 # Error Handling {#error_handling}
 
@@ -446,7 +451,8 @@ Encryption Engine that may provide additional information.
 When an SCTP host will receive an INIT chunk that doesn't contain the
 CRYPT option towards an SCTP Endpoint that only accepts SCTP Crypto
 protected Association, it will reply with an ERROR chunk containing
-the informations 7 Invalid Mandatory Parameter (see {{RFC9260}}  section 3.3.10.7) and ENOCRYPT
+the Cause Code Invalid Mandatory Parameter (7) (see {{RFC9260}}
+section 3.3.10.7) and ENOCRYPT in the Cause-Specific Information field
 (specified in {{sctp-encryption-new-error-causes}}).
 
 ## Error During KEY Handshake {#ekeyhandshake}

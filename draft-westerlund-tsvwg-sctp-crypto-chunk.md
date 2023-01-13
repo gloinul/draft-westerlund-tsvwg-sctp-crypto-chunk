@@ -880,10 +880,13 @@ as defined by {{RFC8126}}.
 
   In the Stream Control Transmission Protocol (SCTP) Parameters
   group's "Chunk Types" registry, IANA is requested to add with a
-  reference to this document two new entries. The registry at time of writing was available at https://www.iana.org/assignments/sctp-parameters/sctp-parameters.xhtml#sctp-parameters-2
+  reference to this document two new entries. The registry at time of
+  writing was available at:
+  https://www.iana.org/assignments/sctp-parameters/sctp-parameters.xhtml#sctp-parameters-1
+
 
 ~~~~~~~~~~~ aasvg
-ID Value    Chunk Parameter Type 	        Reference
+ID Value    Chunk Type 	                        Reference
 ---------   ---------------------               ---------
 TBA1	    Crypto Chunk (CRYPTO)               RFC-To-Be
 TBA2        Endpoint Validation Chunk (EVALID)  RFC-To-Be
@@ -893,19 +896,37 @@ TBA2        Endpoint Validation Chunk (EVALID)  RFC-To-Be
 
 ## SCTP Chunk Parameter Types
 
-   *  In the "Chunk Parameter Types" registry, IANA has to add  with a reference to this
-      document.
+  In the Stream Control Transmission Protocol (SCTP) Parameters
+  group's "Chunk Parameter Types" registry, IANA is requested to add
+  with a reference to this document the below entries. The registry at
+  time of writing was available at:
+  https://www.iana.org/assignments/sctp-parameters/sctp-parameters.xhtml#sctp-parameters-2
 
-      - Encrypted Association (CRYPT)
+~~~~~~~~~~~ aasvg
+ID Value    Chunk Parameter Type                Reference
+---------   ---------------------               ---------
+TBA3	    Encrypted Association (CRYPT)       RFC-To-Be
+~~~~~~~~~~~
+{: #iana-chunk-parameter-types title="New Chunk Type Parameters Registered"}
+
 
 ## SCTP Error Cause Codes
 
-   *  In the "Error Cause Codes" registry, IANA has to add  with a reference to this
-      document.
+   In the Stream Control Transmission Protocol (SCTP) Parameters
+   group's "Error Cause Codes" registry, IANA is requested to add with
+   a reference to this document the below entries. The registry at time of
+   writing was available at:
+   https://www.iana.org/assignments/sctp-parameters/sctp-parameters.xhtml#sctp-parameters-24
 
-      - Error in encryption engine EENGINE
-      - Error in Encryption Chunk Endpoint Validation EVALIDATE
-      - Timeout during Encryption Chunk Validation ETMOVALIDATE
+~~~~~~~~~~~ aasvg
+ID Value    Error Cause Codes                           Reference
+---------   ---------------------                       ---------
+TBA4	    Protection Engine Error                     RFC-To-Be
+TBA5        Crypto Chunk Endpoint Validation Failure    RFC-To-Be
+TBA6        Timeout during Crypto Chunk Validation      RFC-To-Be
+~~~~~~~~~~~
+{: #iana-error-cause-codes title="Error Cause Codes Parameters Registered"}
+
 
 # Security Considerations {#Security-Considerations}
 

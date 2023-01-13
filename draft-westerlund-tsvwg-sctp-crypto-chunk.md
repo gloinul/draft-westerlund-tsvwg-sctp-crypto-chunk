@@ -446,30 +446,30 @@ This specification introduces a new set of causes that are to be used when SCTP 
 a faulty condition. The special case is when the error is detected by the
 Encryption Engine that may provide additional information.
 
-## Mandatory CRYPT Option Missing {#enocrypt}
+## Mandatory CRYPT Option Missing (ENOCRYPT) {#enocrypt}
 
-When an SCTP host will receive an INIT chunk that doesn't contain the
-CRYPT option towards an SCTP Endpoint that only accepts SCTP Crypto
-protected Association, it will reply with an ERROR chunk containing
-the Cause Code Invalid Mandatory Parameter (7) (see {{RFC9260}}
-section 3.3.10.7) and ENOCRYPT in the Cause-Specific Information field
-(specified in {{sctp-encryption-new-error-causes}}).
+When an SCTP host sends an INIT chunk that doesn't contain the CRYPT
+option towards an SCTP Endpoint that only accepts SCTP Crypto
+protected Association, it will raise an ENOCRYPT error. In other words
+reply with an ERROR chunk containing the Cause Code Invalid Mandatory
+Parameter (7) (see {{RFC9260}} section 3.3.10.7) and ENOCRYPT in the
+Cause-Specific Information field.
 
-## Error During KEY Handshake {#ekeyhandshake}
+## Error During KEY Handshake (EENGINE) {#ekeyhandshake}
 
 If the encryption engine specifies that KEY handling is implemented inband
 it may happen that the procedure has errors. In such case an ERROR chunk
 will be sent with EENGINE cause (specified in {{sctp-encryption-new-error-causes}}).
-It MAY be followed by an appropriate cause
+The error MAY contain a Cause-Specific Information with an appropriate cause
 according to the Encryption Engine specification.
 
-## Error in Crypto Engines Validation {#evalidate}
+## Error in Crypto Engines Validation (EVALIDATE) {#evalidate}
 
 Whenever an error occur in Crypto Engine Validation (see {encrypted-state}),
 SCTP Host will send an ERROR chunk with EVALIDATE cause
 (specified in {{sctp-encryption-new-error-causes}}).
 
-## Timeout During KEY Handshake or Validation {#etmovalidate}
+## Timeout During KEY Handshake or Validation (ETMOVALIDATE) {#etmovalidate}
 
 Whenever a T-valit timeout occurs, the SCTP Host will send an ERROR
 chunk with ETMOVALIDATE cause (specified in {{sctp-encryption-new-error-causes}}).
@@ -493,7 +493,7 @@ as a temporary problem in the transport and will be handled
 with retransmissions and SACKS according to {{RFC9260}}.
 
 When the Encryption Engine will experience a non critical error,
-no ERROR chunks shall be sent. The way non critical errors
+an ERROR chunks SHALL NOT be sent. This way non critical errors
 are handled and how the Encryption Engine will recover from
 these errors is being described in the Encryption Engine
 specifications.
@@ -623,25 +623,29 @@ state (see {{crypt-pending-state}}). When entering into ENCRYPTED state
 the T-valid timer is running and the Encryption Engine has completed the
 KEY handshake so that encrypted data can be sent to the peer.
 
-From this time on, only ENCRYPT chunks can be sent to the remote peer and
-any other type of chunks coming from the remote peer will be silently discarded.
+From this time on, only ENCRYPT chunks can be sent to the remote peer
+and any other type of plain text SCTP chunks coming from the remote peer
+will be silently discarded.
 
-In ENCRYPTED state the SCTP Endpoints MUST validate the INIT/INIT-ACK parameters,
-thus the Client will send an EVALID chunk that will contain exactly the same list
-as Crypto Engines as previously sent in CRYPT option of INIT chunk and in the same order.
+In ENCRYPTED state the association initiating SCTP Endpoint (Client)
+MUST validate the INIT sent CRYPT parameter, thus the Client will send
+an EVALID chunk that will contain exactly the same list of Encryption
+Engines as previously sent in CRYPT option of INIT chunk and in the
+same order.
 
-When the Server will receive EVALID, it will compare the list of Crypto Engines
-with the list received in the INIT chunk, if they are identical it will reply
-to the Client with an EVALID chunk containing the Crypto Engine previously
-sent as CRYPT option in INIT-ACK chunk , it will clean the T-valid timer and
-will move into ESTABLISHED state.
+When the Server will receive EVALID, it will compare the list of
+Crypto Engines with the list received in the INIT chunk, if they are
+identical it will reply to the Client with an EVALID chunk containing
+the Crypto Engine previously sent as CRYPT option in INIT-ACK chunk,
+it will clear the T-valid timer and will move into ESTABLISHED state.
+
 If the lists of Crypto Engines don't match, it will generate an ERROR chunk
 and an ABORT chunk. ERROR CAUSE will indicate EVALIDATE meaning that an error
 has been happening during VALIDATION of SCTP Endpoints.
 
 After sending EVALID, the Client will wait for the Server to reply with the
 EVALID confirmation. The Client will compare the Crypto Engine received from
-the Server, if the value is the same it will clean the T-valid timer and
+the Server, if the value is the same it will clear the T-valid timer and
 move into ESTABLISHED state.
 If the chosen Crypto Engines don't match, it will generate an ERROR chunk
 and an ABORT chunk. ERROR CAUSE will indicate EVALIDATE meaning that an error
@@ -679,12 +683,12 @@ discarded.
 
 After completion of initial handshake, that is after COOKIE-ECHO and COOKIE-ACK,
 the Encryption Engine shall initialize itself by transferring its own data as Payload
-of the ENCRYPT chunk (see {{sctp-encryption-chunk-newchunk-crypt-struct}}).
+of the ENCRYPT chunk (see {{sctp-encryption-chunk-newchunk-crypt-struct}}) if necessary.
 At completion of Encryption Engine initialization, the setup of the Encrypted
 Association is complete and from that time on only ENCRYPT chunks will be exchanged.
-Any other type of chunks will be silently discarded.
+Any other type of plain text chunks will be silently discarded.
 
-After completion of Encrypted Association initialization, the Client SHOULD send
+After completion of Encrypted Association initialization, the Client MUST send
 to the Server an EVALID Chunk (see {{sctp-encryption-chunk-newchunk-EVALID}})
 containing the list of Encryption Engines previously sent in the CRYPT parameter
 of the INIT chunk. The Server receiving the EVALID chunk will compare the Encryption
@@ -711,16 +715,18 @@ With reference to the State Diagram as shown in {{sctp-encryption-state-diagram}
 the handling of Control Chunks, Data Chunks and Encrypted chunks follows the
 rules defined below:
 
-- When the Association is in states CLOSED, COOKIE-WAIT, COOKIE-ECHOED and CRYPT PENDING,
-any Control Chunk is sent plain. No DATA chunks shall be sent in these states and DATA
-chunks received shall be silently discarded.
+- When the Association is in states CLOSED, COOKIE-WAIT, COOKIE-ECHOED
+and CRYPT PENDING, any Control Chunk is sent plain. No DATA chunks
+shall be sent in these states and DATA chunks received shall be
+silently discarded.
 
-- When the Association is in states ENCRYPTED and in general in a state different
-than CLOSED, COOKIE-WAIT, COOKIE-ECHOED and CRYPT PENDING, any Control Chunk as well as Data
-chunks will be used for creating an SCTP payload that will be encrypted
-by the Encryption Engine and the result from that encryption will be the
-used as payload of an ENCRYPT chunk that will be the only chunk of the
-SCTP packet to be sent.
+- When the Association is in states ENCRYPTED and in general in a
+state different than CLOSED, COOKIE-WAIT, COOKIE-ECHOED and CRYPT
+PENDING, any Control Chunk as well as Data chunks will be used to
+create an SCTP payload that will be encrypted by the Encryption Engine
+and the result from that encryption will be the used as payload of an
+ENCRYPT chunk that will be the only chunk of the SCTP packet to be
+sent.
 
 ~~~~~~~~~~~ aasvg
  0                   1                   2                   3
@@ -785,7 +791,7 @@ Depending on the specification for the chosen Encryption Engine,
 when forming the ENCRYPT chunk header the Encryption Chunk Handler
 may set the Flags (see {{sctp-encryption-chunk-newchunk-crypt-struct}}).
 
-An SCTP packet containing an SCTP Crypto Chunk SHALL be delivered
+An SCTP packet containing an SCTP ENCRYPT Chunk SHALL be delivered
 without delay and SCTP bundling is NOT PERMITTED.
 
 ## Encrypted Data Chunk Reception {#data-receiving}

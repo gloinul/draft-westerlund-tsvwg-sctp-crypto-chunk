@@ -854,22 +854,53 @@ the lower transport layer.
       -  Endpoint Authentication Chunk (EVALID)
 
 
-   *  In the "Chunk Parameter Types" registry, IANA has to add  with a reference to this
-      document.
+New entries are registered following the Specification Required policy
+as defined by {{RFC8126}}.
+
+
+## SCTP Chunk Types
+
+
+  In the Stream Control Transmission Protocol (SCTP) Parameters
+  group's "Chunk Types" registry, IANA is requested to add with a
+  reference to this document two new entries. The registry at time of
+  writing was available at:
+  https://www.iana.org/assignments/sctp-parameters/sctp-parameters.xhtml#sctp-parameters-1
+
+
+~~~~~~~~~~~ aasvg
+ID Value    Chunk Type 	                        Reference
+---------   ---------------------               ---------
+TBA1	    Crypto Chunk (CRYPTO)               RFC-To-Be
+TBA2        Endpoint Validation Chunk (EVALID)  RFC-To-Be
+~~~~~~~~~~~
+{: #iana-chunk-types title="New Chunk Types Registered"}
+
+
+## SCTP Chunk Parameter Types
+
+  In the Stream Control Transmission Protocol (SCTP) Parameters
+  group's "Chunk Parameter Types" registry, IANA is requested to add
+  with a reference to this document the below entries. The registry at
+  time of writing was available at:
+  https://www.iana.org/assignments/sctp-parameters/sctp-parameters.xhtml#sctp-parameters-2
 
       - Encrypted Association (CRYPT)
 
-   *  In the "Chunk Flags" registry, IANA has to add  with a reference to this
-      document.
-
-      - To Be defined in the Protection Engine specification documents
+## SCTP Error Cause Codes
 
    *  In the "Error Cause Codes" registry, IANA has to add  with a reference to this
       document.
 
-      - Error in Protection Engine EENGINE
-      - Error in Crypto Chunk Endpoint Validation EVALIDATE
-      - Timeout during Crypto Chunk Validation ETMOVALIDATE
+~~~~~~~~~~~ aasvg
+ID Value    Error Cause Codes                           Reference
+---------   ---------------------                       ---------
+TBA4	    Protection Engine Error                     RFC-To-Be
+TBA5        Crypto Chunk Endpoint Validation Failure    RFC-To-Be
+TBA6        Timeout during Crypto Chunk Validation      RFC-To-Be
+~~~~~~~~~~~
+{: #iana-error-cause-codes title="Error Cause Codes Parameters Registered"}
+
 
 ## Downgrade Attacks {#Downgrade-Attacks}
 

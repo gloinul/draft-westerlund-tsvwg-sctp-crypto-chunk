@@ -33,6 +33,7 @@ informative:
 
 normative:
   RFC2119:
+  RFC8126:
   RFC8174:
   RFC9260:
 

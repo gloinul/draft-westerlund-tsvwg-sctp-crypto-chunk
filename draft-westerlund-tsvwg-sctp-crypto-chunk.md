@@ -834,25 +834,41 @@ the lower transport layer.
 
 # IANA Considerations {#IANA-Consideration}
 
-   This document defines four registries that IANA maintains:
+   This document defines one new registry that IANA maintains for the
+   protection engine identifiers. It also adds registry entries into
+   several other registries in the Stream Control Transmission
+   Protocol (SCTP) Parameters group:
 
-   *  through definition of additional chunk types,
+   *  Two new SCTP Chunk Types
 
-   *  through definition of additional chunk flags,
+   *  One new SCTP Chunk Parameter Type
 
-   *  through definition of additional parameter types,
+   *  Four new SCTP Error Cause Codes
 
-   *  through definition of additional cause codes within ERROR chunks,
 
-   IANA needs to perform the following updates for the above five
-   registries:
+## Protection Engine Identifier Registry
 
-   *  In the "Chunk Types" registry, IANA has to add  with a reference to this
-      document.
+IANA is requested to create a new registry called "Crypto Chunk
+Protection Engine Identifiers". This registry is part of the Stream
+Control Transmission Protocol (SCTP) Parameters grouping.
 
-      -  Encrypted Chunk (ENCRYPT)
-      -  Endpoint Authentication Chunk (EVALID)
+The purpose of this registry is to enable identification of different
+protection engines used by the Crypto Chunk when performing the SCTP
+handshake and negotiating support. Entries in the registry requires a
+Protection Engine name, a reference to the specification for the
+protection engine and a contact. Each entry will be assigned by IANA a
+unique 16-bit unsigned integer identifer for their protection
+engine. Values 0-65534 are available for assignement. Value 65535 is
+reserved for future extension. The proposed general form of the
+registry is depicted below in {{iana-protection-engine-identifier}}.
 
+~~~~~~~~~~~ aasvg
+ID Value         Name                      REFERENCE      Contact
+---------        -----------------         ----------     -------
+0-65534          Available for Assignment
+65535            Reserved                  RFC-To-Be      Authors
+~~~~~~~~~~~
+{: #iana-protection-engine-identifier title="Protection Engine Identifier Registry"}
 
 New entries are registered following the Specification Required policy
 as defined by {{RFC8126}}.
@@ -885,12 +901,21 @@ TBA2        Endpoint Validation Chunk (EVALID)  RFC-To-Be
   time of writing was available at:
   https://www.iana.org/assignments/sctp-parameters/sctp-parameters.xhtml#sctp-parameters-2
 
-      - Encrypted Association (CRYPT)
+~~~~~~~~~~~ aasvg
+ID Value    Chunk Parameter Type                Reference
+---------   ---------------------               ---------
+TBA3	    Encrypted Association (CRYPT)       RFC-To-Be
+~~~~~~~~~~~
+{: #iana-chunk-parameter-types title="New Chunk Type Parameters Registered"}
+
 
 ## SCTP Error Cause Codes
 
-   *  In the "Error Cause Codes" registry, IANA has to add  with a reference to this
-      document.
+   In the Stream Control Transmission Protocol (SCTP) Parameters
+   group's "Error Cause Codes" registry, IANA is requested to add with
+   a reference to this document the below entries. The registry at time of
+   writing was available at:
+   https://www.iana.org/assignments/sctp-parameters/sctp-parameters.xhtml#sctp-parameters-24
 
 ~~~~~~~~~~~ aasvg
 ID Value    Error Cause Codes                           Reference
@@ -902,10 +927,13 @@ TBA6        Timeout during Crypto Chunk Validation      RFC-To-Be
 {: #iana-error-cause-codes title="Error Cause Codes Parameters Registered"}
 
 
+# Security Considerations {#Security-Considerations}
+
+
 ## Downgrade Attacks {#Downgrade-Attacks}
 
 SCTP Encrypted Chunks provides a mechanism for preventing downgrade attacks
 that detects downgrading attempts and terminates the Association.
 
-The Protection Engine initial handshake is verified before the Association
+The Encryption Engine initial handshake is verified before the Association
 is set as ESTABLISHED, thus no user data are sent before validation.

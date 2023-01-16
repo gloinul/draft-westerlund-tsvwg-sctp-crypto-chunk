@@ -18,7 +18,7 @@ author:
 -
    ins:  M. Westerlund
    name: Magnus Westerlund
-   org: Ericsson 
+   org: Ericsson
    email: magnus.westerlund@ericsson.com
 -
    ins: J. Preuß Mattsson
@@ -111,11 +111,11 @@ the Upper Layer Protocol (ULP).
 |                     |
 | SCTP Chunks Handler |
 |                     |
-+-------------+-------+---------------+ <-- SCTP Unprotected Payload
-|   CRYPTO    |   Protection Engine   |
-|    Chunk    +-----------------------+
-|   Handler   |    Key Management     |
-+-------------+-------+---------------+ <-- SCTP Protected Payload
++---------------------+    +--------------------+ <-- SCTP Unprotected Payload
+|        CRYPTO       +--->| Protection Engine  |
+|        Chunk        |    +--------------------+
+|       Handler       |<---+   Key Management   |
++---------------------+    +--------------------+ <-- SCTP Protected Payload
 |                     |
 | SCTP Header Handler |
 |                     |
@@ -899,7 +899,7 @@ https://www.iana.org/assignments/sctp-parameters/sctp-parameters.xhtml#sctp-para
 # Security Considerations {#Security-Considerations}
 
 All the security and privacy considerations of the security protocol
-used as the protection engine applies. 
+used as the protection engine applies.
 
 ## Privacy Considerations
 

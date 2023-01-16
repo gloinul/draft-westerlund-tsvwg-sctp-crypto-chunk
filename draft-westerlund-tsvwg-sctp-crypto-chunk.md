@@ -90,15 +90,17 @@ features provided by SCTP and its extensions.
 
 ## Protocol Overview {#protocol-overview}
 
-The CRYPTO Chunk is defined as a method for secure and
+The CRYPTO chunk is defined as a method for secure and
 confidential transfer for SCTP packets.  This is implemented inside
 the SCTP protocol, in a sublayer between the SCTP common header
 handling and the SCTP chunk handling.  Once an SCTP packet has been
 received and the SCTP common header has been used to identify the SCTP
 association, the CRYPTO chunk is sent to the chosen
 protection engine that will return the SCTP payload containing the
-plain text SCTP chunks, those chunks will then be handled according to
-current SCTP protocol specification.
+unprotected SCTP chunks, those chunks will then be handled according to
+current SCTP protocol specification. {{sctp-Crypto-chunk-layering}}
+illustrates the CRYPTO chunk layering in regard to SCTP and
+the Upper Layer Protocol (ULP).
 
 ~~~~~~~~~~~ aasvg
 +---------------------+
@@ -109,35 +111,33 @@ current SCTP protocol specification.
 |                     |
 | SCTP Chunks Handler |
 |                     |
-+-------------+-------+-----------------+ <-- SCTP Plain Payload
-|   CRYPTO    |    Protection Engine    |
-|    Chunk    +-------------------------+
-|   Handler   |     Key Management      |
-+-------------+-------+-----------------+ <-- SCTP Encrypted Payload
++-------------+-------+---------------+ <-- SCTP Unprotected Payload
+|   CRYPTO    |   Protection Engine   |
+|    Chunk    +-----------------------+
+|   Handler   |    Key Management     |
++-------------+-------+---------------+ <-- SCTP Protected Payload
 |                     |
 | SCTP Header Handler |
 |                     |
 +---------------------+
 ~~~~~~~~~~~
 {: #sctp-Crypto-chunk-layering title="CRYPTO chunk layering
-in regard to SCTP and upper layer protocol" artwork-align="center"}
+in regard to SCTP and ULP" artwork-align="center"}
 
 Use of the CRYPTO chunk is defined per SCTP association and a
-SCTP association uses a single Protection Engine. Different associations
+SCTP association uses a single protection engine. Different associations
 within the same SCTP endpoint may use or not use the CRYPTO chunk,
-and different associations may use different Protection Engines.
+and different associations may use different protection engines.
 
-On the outgoing direction, once SCTP stack has created the plain SCTP
-packet payload containing Control and/or Data chunks, that payload will be
-sent to the Protection Engine to be protected and the encrypted and
-integrity tagged data will be encapsulated in a SCTP Encrypted chunk.
+On the outgoing direction, once the SCTP stack has created the unprotected SCTP
+packet payload containing control and/or DATA chunks, that payload will be
+sent to the protection engine to be protected. The format of the protected payload depends on the protection engine but the unprotected payload will typically be encrypted and integrity tagged before being encapsulated in a CRYPTO chunk.
 
-SCTP Protection Engine performs protection operations on the whole
-SCTP plain packet payload, i.e., all chunks after the SCTP common
+The SCTP protection rngine performs protection operations on the whole
+unprotected SCTP packet payload, i.e., all chunks after the SCTP common
 header. Information protection is kept during the lifetime of the
-Association and no information is sent in plain except than the
-initial SCTP handshake, the SCTP common Header and the SCTP Encrypted
-Chunk header.
+Association and no information is sent unprotected except than the
+initial SCTP handshake, the SCTP common Header, the SCTP CRYPTO chunk header, and the SHUTDOWN-COMPLETE chunk.
 
 SCTP Crypto Chunk capability is agreed by the peers at the initialization
 of the SCTP Association, during that phase the peers exchange information
@@ -147,19 +147,19 @@ containing the initialization information related to the Protection Engine
 including the endpoint validation. This is depending on the chosen Protection Engine
 thus is not being detailed in the current specification.
 
-When the endpoint validation has been completed, the Association is meant
+When the endpoint authentication has been completed, the asssociation is meant
 to be initialized and the ULP is informed about that, from this time on
 it's possible for the ULPs to exchange data.
 
-SCTP Encrypted Chunks will never be retransmitted, retransmission is
+CRYPTO chunks will never be retransmitted, retransmission is
 implemented by SCTP host at chunk level as in the legacy.  Duplicated
-SCTP Encrypted Chunks, whenever they will be accepted by the
-Protection Engine, will result in duplicated SCTP chunks and will be
+CRYPTO chunks, whenever they will be accepted by the
+protection engine, will result in duplicated SCTP chunks and will be
 handled as duplicated chunks by SCTP host the same way a duplicated
 SCTP packet with those SCTP chunks would have been.
 
 Besides the legacy methods for association termination, furthermore
-it may be that the Protection Engine goes in troubles so that it
+it may be that the protection engine goes in troubles so that it
 doesn't guarantee security and requires terminating the link,
 in this case it should require the association to be aborted.
 

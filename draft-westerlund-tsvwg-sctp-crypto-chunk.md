@@ -101,17 +101,18 @@ current SCTP protocol specification.
 ~~~~~~~~~~~ aasvg
 +---------------------+
 |                     |
-|         ULP         |
+|        ULP          |
 |                     |
-+---------------------+ <-- User Level Messages
++---------------------+ <- User Level Messages
 |                     |
 | SCTP Chunks Handler |
 |                     |
-+-------------+-------+-----------------+ <-- SCTP Plain Payload
-|  Crypto |    Protection Engine    |
-|    Chunk    +-------------------------+
-|   Handler   | Crypto KEY Handler  |
-+-------------+-------+-----------------+ <-- SCTP Encrypted Payload
++---------------------+ <- SCTP Plain Payload
+|    Crypto Chunk     |  +--------------------+
+|      Handler        |<-| Protection Engine  |
+|                     |->| Crypto KEY Handler |
+|                     |  +--------------------+
++---------------------+ <- SCTP Encrypted Payload
 |                     |
 | SCTP Header Handler |
 |                     |

@@ -18,7 +18,7 @@ author:
 -
    ins:  M. Westerlund
    name: Magnus Westerlund
-   org: Ericsson
+   org: Ericsson 
    email: magnus.westerlund@ericsson.com
 -
    ins: J. Preuß Mattsson
@@ -54,7 +54,7 @@ detect tampering or message forgery.
 
 The CRYPTO chunk defined here in is one half of a complete
 solution. Where a companion specification is required to define how
-the content of the crypto chunk is encrypted, authenticated, and
+the content of the CRYPTO chunk is encrypted, authenticated, and
 protected against replay, as well as how key management is accomplished.
 
 Applications using SCTP CRYPTO chunk can use all transport
@@ -112,7 +112,7 @@ current SCTP protocol specification.
 +-------------+-------+-----------------+ <-- SCTP Plain Payload
 |   CRYPTO    |    Protection Engine    |
 |    Chunk    +-------------------------+
-|   Handler   |    Crypto KEY Handler   |
+|   Handler   |     Key Management      |
 +-------------+-------+-----------------+ <-- SCTP Encrypted Payload
 |                     |
 | SCTP Header Handler |
@@ -897,11 +897,21 @@ https://www.iana.org/assignments/sctp-parameters/sctp-parameters.xhtml#sctp-para
 
 # Security Considerations {#Security-Considerations}
 
+All the security and privacy considerations of the security protocol
+used as the protection engine applies. 
+
+## Privacy Considerations
+
+Using a security protocol in the SCTP CRYPTO chunk might lower the
+privacy properties of the security protocol as the SCTP
+Verification Tag is an unique identifier for the association.
 
 ## Downgrade Attacks {#Downgrade-Attacks}
 
 The CRYPTO chunk provides a mechanism for preventing downgrade attacks
-that detects downgrading attempts and terminates the association.
+that detects downgrading attempts between protection engines and terminates
+the association. The chosen protection engine is the same as if the peers
+had been communicating in the absence of an attacker.
 
 The protection engine initial handshake is verified before the association
 is set as ESTABLISHED, thus no user data are sent before validation.

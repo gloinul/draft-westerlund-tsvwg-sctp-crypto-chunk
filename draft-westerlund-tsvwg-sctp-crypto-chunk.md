@@ -816,7 +816,8 @@ the lower transport layer.
 
 # IANA Considerations {#IANA-Consideration}
 
-This document defines one new registry that IANA maintains for the
+This document defines one new registry in the Stream Control Transmission
+Protocol (SCTP) Parameters group that IANA maintains for the
 protection engine identifiers. It also adds registry entries into
 several other registries in the Stream Control Transmission
 Protocol (SCTP) Parameters group:
@@ -838,7 +839,7 @@ The purpose of this registry is to enable identification of different
 protection engines used by the CRYPTO chunk when performing the SCTP
 handshake and negotiating support. Entries in the registry requires a
 protection engine name, a reference to the specification for the
-protection engine and a contact. Each entry will be assigned by IANA a
+protection engine, and a contact. Each entry will be assigned by IANA a
 unique 16-bit unsigned integer identifier for their protection
 engine. Values 0-65534 are available for assignment. Value 65535 is
 reserved for future extension. The proposed general form of the
@@ -856,9 +857,9 @@ as defined by {{RFC8126}}.
 ## SCTP Chunk Types
 
 In the Stream Control Transmission Protocol (SCTP) Parameters
-group's "Chunk Types" registry, IANA is requested to add with a
-reference to this document two new entries. The registry at time of
-writing was available at:
+group's "Chunk Types" registry, IANA is requested to add the
+two new entries depicted below in in {{iana-chunk-types}} with a
+reference to this document. The registry at time of writing was available at:
 https://www.iana.org/assignments/sctp-parameters/sctp-parameters.xhtml#sctp-parameters-1
 
 | ID Value | Chunk Type | Reference |
@@ -870,9 +871,9 @@ https://www.iana.org/assignments/sctp-parameters/sctp-parameters.xhtml#sctp-para
 ## SCTP Chunk Parameter Types
 
 In the Stream Control Transmission Protocol (SCTP) Parameters
-group's "Chunk Parameter Types" registry, IANA is requested to add
-with a reference to this document the below entries. The registry at
-time of writing was available at:
+group's "Chunk Parameter Types" registry, IANA is requested to add the
+new entry depicted below in in {{iana-chunk-parameter-types}} with a
+reference to this document. The registry at time of writing was available at:
 https://www.iana.org/assignments/sctp-parameters/sctp-parameters.xhtml#sctp-parameters-2
 
 | ID Value | Chunk Parameter Type | Reference |
@@ -883,9 +884,9 @@ https://www.iana.org/assignments/sctp-parameters/sctp-parameters.xhtml#sctp-para
 ## SCTP Error Cause Codes
 
 In the Stream Control Transmission Protocol (SCTP) Parameters
-group's "Error Cause Codes" registry, IANA is requested to add with
-a reference to this document the below entries. The registry at time of
-writing was available at:
+group's "Error Cause Codes" registry, IANA is requested to add the
+three new entries depicted below in in {{iana-error-cause-codes}} with a
+reference to this document. The registry at time of writing was available at:
 https://www.iana.org/assignments/sctp-parameters/sctp-parameters.xhtml#sctp-parameters-24
 
 | ID Value | Error Cause Codes | Reference |

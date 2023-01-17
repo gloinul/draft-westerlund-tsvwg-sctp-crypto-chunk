@@ -164,13 +164,6 @@ engine, will result in duplicated SCTP chunks and will be handled as
 duplicated chunks by SCTP host in the same way a duplicated SCTP packet
 with those SCTP chunks would have been.
 
-Besides the legacy methods for association termination, furthermore
-it may be that the protection engine goes in troubles so that it
-doesn't guarantee security and requires terminating the link,
-in this case it shall cause the association to be aborted by
-dropping the data processing so that the association will experience
-a link break.
-
 
 ## Protection Engines Considerations {#protection-engines}
 
@@ -183,6 +176,10 @@ requesting encryption and decryption of a buffer, in particular the
 encrypted buffer shall never exceed the SCTP payload size thus
 Protection Engine shall be aware of the PMTU (see {{pmtu}}).
 
+A Protection Engine may use KEYs, in this case the KEY Management
+part of the Protection Engine is the set of data and procedures
+that take care of KEY distribution, verification and update.
+
 KEY Management of Protection Engine SHOULD exploit SCTP Crypto Chunk for
 handshaking, in that case any packet being exchanged between
 Protection Engine peers shall be transported as payload of Encrypted
@@ -190,7 +187,7 @@ chunk (see {{crypto-chunk}}).
 
 KEY Management MAY use other mechanism than what provided by SCTP Crypto
 Chunks, in any case the mechanism for KEY Management MUST be specified
-in the Cypher Specification document for that specific
+in the Cipher Specification document for that specific
 Protection Engine.
 
 Out-of-band communication between Protection Engines MAY exploit the
@@ -198,7 +195,7 @@ Flags byte provided by the ENCRYPT chunk header (see
 {{sctp-Crypto-chunk-newchunk-crypt-struct}}).
 
 Details of the use of Flags, if different from what described in the
-current document, MUST be specified in the Cypher Specification
+current document, MUST be specified in the Cipher Specification
 document for that specific Protection Engine.
 
 An example of Protection Engine can be DTLS.
@@ -231,7 +228,7 @@ the PMTU by removing from the value the sum of the common SCTP header
 and the Encrypted chunk header. This implies that SCTP can propagate
 the computed PMTU at run time specifically. The way Protection Engine
 provides the primitive for PMTU communication shall be part of the
-Cypher Specification.
+Cipher Specification.
 
 From SCTP perspective, if there is a maximum size of plain text data
 that can be protected by the Protection Engine that must be
@@ -248,9 +245,10 @@ window CWND (see {{RFC9260}} section 7.2).
 It may happen that Protection Engine discards packets due to internal
 checks or because it has detected a malicious attempt.
 
-In no cases Protection Engine must interfere with the congestion
-control mechanism, this basically means that the congestion control is
-exactly the same as how specified in {{RFC9260}}.
+The Protection Engine shall not interfere with the SCTP congestion
+control mechanism, this basically means that from SCTP perspective
+the congestion control is exactly the same as how specified
+in {{RFC9260}}.
 
 ## ICMP Considerations {#icmp}
 
@@ -468,7 +466,7 @@ inband it may happen that the procedure has errors. In such case an
 ERROR chunk will be sent with ECRYPTO cause code (specified in
 {{sctp-Crypto-new-error-causes}}) and additional Cause-Specific
 EHANDSHAKE. The error MAY contain furher Cause-Specific Informations
-according to the Cypher Specification.
+according to the Cipher Specification.
 
 ## Error in Protection Engines Validation (EVALIDATE) {#evalidate}
 
@@ -493,7 +491,7 @@ Cause-Specific code to use is EVALIDATE.
 ## Critical Error from Protection Engine {#eengine}
 
 Protection Engine MAY inform local SCTP Host about errors,
-in such case it's to be defined in the Cypher Secification document.
+in such case it's to be defined in the Cipher Secification document.
 When an Error in the Protection Engine compromises the
 protection mechanism, the Protection Engine shall stop processing
 data in such a way that the local SCTP Host will not be able sending
@@ -516,7 +514,7 @@ with retransmissions and SACKS according to {{RFC9260}}.
 When the Protection Engine will experience a non-critical error,
 an ERROR chunks SHALL NOT be sent. This way non-critical errors
 are handled and how the Protection Engine will recover from
-these errors is being described in the Cypher Specifications.
+these errors is being described in the Cipher Specifications.
 
 ## New Error Causes {#new_errors}
 
@@ -633,7 +631,7 @@ the timer also related to the time needed for KEY handshake of each
 Protection Engine.
 
 If KEY handling is in-band, the Protection Engine will start the
-handshake with its peer and in case of failure or T-validation
+handshake with its peer and in case of failure or T-valid
 timeout, it will generate an ERROR chunk and an ABORT chunk.  The
 ERROR handling follows what specified in {{ekeyhandshake}}.  When
 Handshake has been successfully completed, the Association state
@@ -684,6 +682,14 @@ If T-valid timer expires either at Client or Server, it will generate
 an ERROR chunk and an ABORT chunk.  The ERROR handling follows what
 specified in {{etmout}}.
 
+### Consideration on T-valid
+
+The timer T-Valid supervises initializations that depend on how
+the handshake is specified for the Protection Engine and also on
+the characteristics of the transport network.
+This specification recommends a default value of 30 seconds for
+T-valid. This value is supersed by what recommended in the
+Cipher Specification for each Protection Engine.
 
 # Procedures {#procedures}
 
@@ -705,8 +711,8 @@ An SCTP Endpoint acting as Server, when receiving an INIT chunk with
 CRYPT parameter, will search the list of Protection Engines for a
 common choice and will reply with INIT-ACK containing the CRYPT
 parameter with the chosen Protection Engine. When the Server cannot
-find a supported Protection Engine, it will silently discard the INIT
-chunk.
+find a supported Protection Engine, it will reply with ABORT and
+ERROR according to {{eprotlist}}.
 
 When Client and Server have agreed on an Encrypted Association by
 means of handshaking INIT/INIT-ACK with a common Protection Engine,
@@ -741,9 +747,10 @@ it will discard it.
 ## Termination of an Encrypted Association {#termination-procedure}
 
 Besides the procedures for terminating an Association explained in
-{{RFC9260}}, the Protection Engine SHOULD ask SCTP Host for
+{{RFC9260}}, the Protection Engine SHALL ask SCTP Host for
 terminating an Association when having an internal error or by
-detecting a security violation.  The internal design of Protection
+detecting a security violation, using the procedure described
+in {{eengine}}.  The internal design of Protection
 Engines and their capability is out of the scope of the current
 document.
 
@@ -857,6 +864,8 @@ receiving the ENCRYPT chunk header the Crypto Chunk Handler may handle
 the Flags (see {{sctp-Crypto-chunk-newchunk-crypt-struct}}) according
 to that specification.
 
+Meta data belonging to the SCTP packet received SHALL be tied to the
+relevant chunks and forwarded transparently to the SCTP Host.
 
 ### SCTP Header Handler
 
@@ -882,7 +891,7 @@ several other registries in the Stream Control Transmission Protocol
 
 *  One new SCTP Chunk Parameter Type
 
-*  Four new SCTP Error Cause Codes
+*  Two new SCTP Error Cause Codes
 
 
 ## Protection Engine Identifier Registry
@@ -949,8 +958,7 @@ https://www.iana.org/assignments/sctp-parameters/sctp-parameters.xhtml#sctp-para
 
 | ID Value | Error Cause Codes | Reference |
 | TBA8 | Protection Engine Error | RFC-To-Be |
-| TBA9 | Crypto Chunk Endpoint Validation Failure | RFC-To-Be |
-| TBA10 | Timeout during Crypto Chunk Validation | RFC-To-Be |
+| TBA9 | Crypto Chunk Parameter Missing | RFC-To-Be |
 {: #iana-error-cause-codes title="Error Cause Codes Parameters Registered" cols="r l l"}
 
 

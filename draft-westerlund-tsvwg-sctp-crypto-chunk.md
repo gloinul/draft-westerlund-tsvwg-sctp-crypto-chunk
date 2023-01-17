@@ -108,17 +108,17 @@ the Upper Layer Protocol (ULP).
 |        ULP          |
 |                     |
 +---------------------+ <- User Level Messages
-|                     |
-| SCTP Chunks Handler |
-|                     |
-+---------------------+    +--------------------+ <-- SCTP Unprotected Payload
+|                     |  +-- SCTP Unprotected Payload
+| SCTP Chunks Handler | /
+|                     |/
++---------------------+    +--------------------+
 |        CRYPTO       +--->| Protection Engine  |
 |        Chunk        |    +--------------------+
 |       Handler       |<---+   Key Management   |
-+---------------------+    +--------------------+ <-- SCTP Protected Payload
-|                     |
-| SCTP Header Handler |
-|                     |
++---------------------+    +--------------------+
+|                     |\
+| SCTP Header Handler | \
+|                     |  +-- SCTP Protected Payload
 +---------------------+
 ~~~~~~~~~~~
 {: #sctp-Crypto-chunk-layering title="CRYPTO chunk layering
@@ -131,13 +131,17 @@ and different associations may use different protection engines.
 
 On the outgoing direction, once the SCTP stack has created the unprotected SCTP
 packet payload containing control and/or DATA chunks, that payload will be
-sent to the protection engine to be protected. The format of the protected payload depends on the protection engine but the unprotected payload will typically be encrypted and integrity tagged before being encapsulated in a CRYPTO chunk.
+sent to the protection engine to be protected. The format of the
+protected payload depends on the protection engine but the unprotected
+payload will typically be encrypted and integrity tagged before being
+encapsulated in a CRYPTO chunk.
 
 The SCTP protection rngine performs protection operations on the whole
 unprotected SCTP packet payload, i.e., all chunks after the SCTP common
 header. Information protection is kept during the lifetime of the
 Association and no information is sent unprotected except than the
-initial SCTP handshake, the SCTP common Header, the SCTP CRYPTO chunk header, and the SHUTDOWN-COMPLETE chunk.
+initial SCTP handshake, the SCTP common Header, the SCTP CRYPTO chunk
+header, and the SHUTDOWN-COMPLETE chunk.
 
 SCTP Crypto Chunk capability is agreed by the peers at the initialization
 of the SCTP Association, during that phase the peers exchange information

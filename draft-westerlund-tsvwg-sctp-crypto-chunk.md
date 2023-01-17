@@ -444,43 +444,64 @@ used when SCTP endpoint detects a faulty condition. The special case is
 when the error is detected by the protection engine that may provide
 additional information.
 
-## Mandatory CRYPT Option Missing (ENOCRYPT) {#enocrypt}
+## Mandatory CRYPT Option Missing (ENOCRYPTO) {#enocrypto}
 
 When a client SCTP endpoint sends an INIT chunk that doesn't contain the
 protected association parameter towards an SCTP endpoint that only
 accepts protected associations, the server endpoint will raise an
-ENOCRYPT error. In other words reply with an ERROR chunk containing
-the cause code 'invalid mandatory parameter' (7) (see {{RFC9260}}
-section 3.3.10.7) and ENOCRYPT in the Cause-Specific Information field.
+ENOCRYPTO error. In other words reply with an ERROR chunk containing
+the cause code 'Missing Mandatory Parameter' (2) (see {{RFC9260}}
+section 3.3.10.7) and ENOCRYPTO in the Cause-Specific Information field.
 
-## Error During KEY Handshake (EENGINE) {#ekeyhandshake}
+## Error in the Protection Engine List (EPROTLIST) {#eprotlist}
+
+If list of Protection Engines contained in the INIT signal doesn't
+contain at least an entry that fits the list of Protection Engines
+at the server, the server will reply with an ERROR chunk with ECRYPTO
+cause code (specified in {{sctp-Crypto-new-error-causes}}) and additional
+Cause-Specific EPROTLIST.
+
+## Error During KEY Handshake (EHANDSHAKE) {#ekeyhandshake}
 
 If the Protection Engine specifies that KEY handling is implemented
 inband it may happen that the procedure has errors. In such case an
-ERROR chunk will be sent with EENGINE cause (specified in
-{{sctp-Crypto-new-error-causes}}).  The error MAY contain a
-Cause-Specific Information with an appropriate cause according to the
-Cypher Specification.
+ERROR chunk will be sent with ECRYPTO cause code (specified in
+{{sctp-Crypto-new-error-causes}}) and additional Cause-Specific
+EHANDSHAKE. The error MAY contain furher Cause-Specific Informations
+according to the Cypher Specification.
 
 ## Error in Protection Engines Validation (EVALIDATE) {#evalidate}
 
-Whenever an error occurs in Protection Engine Validation (see
-{encrypted-state}), SCTP Host will send an ERROR chunk with EVALIDATE
-cause (specified in {{sctp-Crypto-new-error-causes}}).
+An error may occur during Protection Engine Validation (see
+{encrypted-state}).
+In such case an ERROR chunk will be sent with ECRYPTO cause code
+(specified in {{sctp-Crypto-new-error-causes}}) and additional
+Cause-Specific EVALIDATE.
 
-## Timeout During KEY Handshake or Validation (ETMOVALIDATE) {#etmovalidate}
+## Timeout During KEY Handshake or Validation (ETMOUT) {#etmout}
 
-Whenever a T-valit timeout occurs, the SCTP Host will send an ERROR
-chunk with ETMOVALIDATE cause (specified in
-{{sctp-Crypto-new-error-causes}}).
+Whenever a T-valid timeout occurs, the SCTP Host will send an ERROR
+chunk with ETMOUT cause (specified in
+{{sctp-Crypto-new-error-causes}}). Depending on the state, and
+additional Cause-Specific code will be added.
+If the Protection Engine specifies that KEY handling is implemented
+inband and the T-valid timeout occurs during the handshake
+the Cause-Specific code to use is EHANDSHAKE.
+If the T-valid timeout occurs during the Validation, the
+Cause-Specific code to use is EVALIDATE.
 
-## Error from Protection Engine {#eengine}
+## Critical Error from Protection Engine {#eengine}
 
-Protection Engine MAY inform SCTP Host about errors,
-in such cases an ERROR chunk sill be sent with EENGINE cause
-(specified in {{sctp-Crypto-new-error-causes}}).
-It MAY be followed by an appropriate cause
-according to the Protection Engine specification.
+Protection Engine MAY inform local SCTP Host about errors,
+in such case it's to be defined in the Cypher Secification document.
+When an Error in the Protection Engine compromises the
+protection mechanism, the Protection Engine shall stop processing
+data in such a way that the local SCTP Host will not be able sending
+or receiving any chunk for the specified Association.
+This will cause the Association to be closed by legacy
+timer based mechanism. Since the Association protection is
+compromised no further data will be sent and the remote peer
+will also experience timeout on the Association.
 
 ## Non-critical Error in the Protection Engine {#non-critical-errors}
 
@@ -495,8 +516,7 @@ with retransmissions and SACKS according to {{RFC9260}}.
 When the Protection Engine will experience a non-critical error,
 an ERROR chunks SHALL NOT be sent. This way non-critical errors
 are handled and how the Protection Engine will recover from
-these errors is being described in the Protection Engine
-specifications.
+these errors is being described in the Cypher Specifications.
 
 ## New Error Causes {#new_errors}
 
@@ -505,11 +525,20 @@ They require additional lines of the "Error Cause Codes" table in
 SCTP-parameters {{IANA-SCTP-PARAMETERS}}:
 
 | Value | Cause Code | Reference |
-| TBA1 | ENOCRYPT | RFC-To-Be |
-| TBA2 | EENGINE | RFC-To-Be |
-| TBA3 | EVALIDATE | RFC-To-Be |
-| TBA4 | ETMOVALIDATE | RFC-To-Be |
+| TBA1 | ENOCRYPTO | RFC-To-Be |
+| TBA2 | ECRYPTO | RFC-To-Be |
 {: #sctp-Crypto-new-error-causes title="New Error Causes" cols="r l l"}
+
+The following {{sctp-Crypto-new-local-error-causes}} defines the error
+causes that don't need IANA specificaion as they are subordinate to
+ECRYPTO.
+
+| Value | Cause Code | Reference |
+| TBA3 | EHANDSHAKE | RFC-To-Be |
+| TBA4 | EVALIDATE | RFC-To-Be |
+| TBA5 | ETMOUT | RFC-To-Be |
+{: #sctp-Crypto-new-local-error-causes title="New Local Error Causes" cols="r l l"}
+
 
 # Encrypted SCTP State Diagram {#state-diagram}
 
@@ -653,7 +682,7 @@ an error has been happening during VALIDATION of SCTP Endpoints.
 
 If T-valid timer expires either at Client or Server, it will generate
 an ERROR chunk and an ABORT chunk.  The ERROR handling follows what
-specified in {{etmovalidate}}.
+specified in {{etmout}}.
 
 
 # Procedures {#procedures}
@@ -669,7 +698,7 @@ in order of preference (see {{sctp-Crypto-chunk-init-options}}).
 As alternative, an SCTP Endpoint acting as Server willing to support
 only Encrypted Associations shall consider INIT chunk not containing
 the CRYPT parameter as an error, thus it will reply with an ERROR
-chunk according to what specified in {{enocrypt}} indicating that the
+chunk according to what specified in {{enocrypto}} indicating that the
 mandatory CRYPT option is missing.
 
 An SCTP Endpoint acting as Server, when receiving an INIT chunk with

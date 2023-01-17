@@ -65,8 +65,6 @@ features provided by SCTP and its extensions.
 
 # Introduction {#introduction}
 
-## Overview
-
    This document defines a CRYPTO chunk for the Stream Control
    Transmission Protocol (SCTP), as defined in {{RFC9260}}.
 
@@ -89,6 +87,8 @@ features provided by SCTP and its extensions.
    not impact the potential to utilize any SCTP functionalities or
    extensions.
 
+# Overview
+
 ## Protocol Overview {#protocol-overview}
 
 The CRYPTO chunk is defined as a method for secure and confidential
@@ -108,8 +108,8 @@ chunk layering in regard to SCTP and the Upper Layer Protocol (ULP).
 |        ULP          |
 |                     |
 +---------------------+ <- User Level Messages
-|                     |  +-- SCTP Unprotected Payload
-| SCTP Chunks Handler | /
+|                     |
+| SCTP Chunks Handler | +-- SCTP Unprotected Payload
 |                     |/
 +---------------------+    +--------------------+
 |        CRYPTO       +--->| Protection Engine  |
@@ -117,8 +117,8 @@ chunk layering in regard to SCTP and the Upper Layer Protocol (ULP).
 |       Handler       |<---+   Key Management   |
 +---------------------+    +--------------------+
 |                     |\
-| SCTP Header Handler | \
-|                     |  +-- SCTP Protected Payload
+| SCTP Header Handler | +-- SCTP Protected Payload
+|                     |
 +---------------------+
 ~~~~~~~~~~~
 {: #sctp-Crypto-chunk-layering title="CRYPTO chunk layering
@@ -137,12 +137,12 @@ protection engine but the unprotected payload will typically be
 encrypted and integrity tagged before being encapsulated in a CRYPTO
 chunk.
 
-The SCTP protection rngine performs protection operations on the whole
+The SCTP protection engine performs protection operations on the whole
 unprotected SCTP packet payload, i.e., all chunks after the SCTP
 common header. Information protection is kept during the lifetime of
 the Association and no information is sent unprotected except than the
 initial SCTP handshake, the SCTP common Header, the SCTP CRYPTO chunk
-header, and the SHUTDOWN-COMPLETE chunk.
+header and the SHUTDOWN-COMPLETE chunk.
 
 SCTP Crypto Chunk capability is agreed by the peers at the
 initialization of the SCTP Association, during that phase the peers
@@ -161,13 +161,15 @@ CRYPTO chunks will never be retransmitted, retransmission is
 implemented by SCTP host at chunk level as in the legacy.  Duplicated
 CRYPTO chunks, whenever they will be accepted by the protection
 engine, will result in duplicated SCTP chunks and will be handled as
-duplicated chunks by SCTP host the same way a duplicated SCTP packet
+duplicated chunks by SCTP host in the same way a duplicated SCTP packet
 with those SCTP chunks would have been.
 
 Besides the legacy methods for association termination, furthermore
 it may be that the protection engine goes in troubles so that it
 doesn't guarantee security and requires terminating the link,
-in this case it should require the association to be aborted.
+in this case it shall cause the association to be aborted by
+dropping the data processing so that the association will experience
+a link break.
 
 
 ## Protection Engines Considerations {#protection-engines}
@@ -181,14 +183,14 @@ requesting encryption and decryption of a buffer, in particular the
 encrypted buffer shall never exceed the SCTP payload size thus
 Protection Engine shall be aware of the PMTU (see {{pmtu}}).
 
-KEY Handling of Protection Engine SHOULD exploit SCTP Crypto Chunk for
+KEY Management of Protection Engine SHOULD exploit SCTP Crypto Chunk for
 handshaking, in that case any packet being exchanged between
 Protection Engine peers shall be transported as payload of Encrypted
-chunk (see {{encrypt}}).
+chunk (see {{crypto-chunk}}).
 
-KEY Handling MAY use other mechanism than what provided by SCTP Crypto
-Chunks, in any case the mechanism for KEY Handling MUST be specified
-in the Protection Engine specification document for that specific
+KEY Management MAY use other mechanism than what provided by SCTP Crypto
+Chunks, in any case the mechanism for KEY Management MUST be specified
+in the Cypher Specification document for that specific
 Protection Engine.
 
 Out-of-band communication between Protection Engines MAY exploit the
@@ -196,8 +198,8 @@ Flags byte provided by the ENCRYPT chunk header (see
 {{sctp-Crypto-chunk-newchunk-crypt-struct}}).
 
 Details of the use of Flags, if different from what described in the
-current document, MUST be specified in the Protection Engine
-specification document for that specific Protection Engine.
+current document, MUST be specified in the Cypher Specification
+document for that specific Protection Engine.
 
 An example of Protection Engine can be DTLS.
 
@@ -226,10 +228,10 @@ included in the calculation.
 
 On the other hand, the Protection Engine needs to be informed about
 the PMTU by removing from the value the sum of the common SCTP header
-and the Encrypted chunk header. That implies that SCTP can propagate
+and the Encrypted chunk header. This implies that SCTP can propagate
 the computed PMTU at run time specifically. The way Protection Engine
 provides the primitive for PMTU communication shall be part of the
-relative specification.
+Cypher Specification.
 
 From SCTP perspective, if there is a maximum size of plain text data
 that can be protected by the Protection Engine that must be
@@ -253,7 +255,7 @@ exactly the same as how specified in {{RFC9260}}.
 ## ICMP Considerations {#icmp}
 
 SCTP implementation will be responsible for handling ICMP messages and
-their validation as specified in {{RFC9260}} Section 10. This include
+their validation as specified in {{RFC9260}} Section 10. This includes
 for SCTP packets sent by the protection engines key management
 function. However, valid ICMP errors or information may indirectly be
 provided to the protection engine, such as an update to PMTU values
@@ -322,25 +324,26 @@ value assigned by IANA and then remove this note.
 
 # New Chunk Types {#new-chunk-types}
 
-##  CRYPTO Chunk {#encrypt}
+##  CRYPTO Chunk {#crypto-chunk}
 
 This section defines the new chunk type that will be used to
-transport encrypted SCTP payload.
+transport protected SCTP payload.
 {{sctp-Crypto-chunk-newchunk-crypt}} illustrates the new chunk type.
 
 | Chunk Type | Chunk Name |
 | 0x0x | CRYPTO Chunk |
-{: #sctp-Crypto-chunk-newchunk-crypt title="ENCRYPT Chunk Type" cols="r l"}
+{: #sctp-Crypto-chunk-newchunk-crypt title="CRYPTO Chunk Type" cols="r l"}
 
 RFC-Editor Note: Please replace 0x0x with the actual chunk type value
 assigned by IANA and then remove this note.
 
 It should be noted that the CRYPTO chunk format requires the receiver
 to ignore the chunk if it is not understood and silently discard all
-chunks that follow.  This is accomplished (as described in {{RFC9260}}
-Section 3.2.) by the use of the upper bits of the chunk type.
+chunks that follow in the same SCP packet.  This is accomplished
+(as described in {{RFC9260}} Section 3.2.) by the use of the upper
+bits of the chunk type.
 
-This chunk is used to hold the encrypted payload of a plain SCTP packet.
+The CRYPTO chunk is used to hold the protected payload of a plain SCTP packet.
 
 ~~~~~~~~~~~ aasvg
  0                   1                   2                   3
@@ -355,7 +358,7 @@ This chunk is used to hold the encrypted payload of a plain SCTP packet.
 |                               |           Padding             |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ~~~~~~~~~~~
-{: #sctp-Crypto-chunk-newchunk-crypt-struct title="ENCRYPT Chunk Structure" artwork-align="center"}
+{: #sctp-Crypto-chunk-newchunk-crypt-struct title="CRYPTO Chunk Structure" artwork-align="center"}
 
    Type: 1 byte (unsigned integer)
       This value MUST be set to 0x0x for all CRYPTO chunks.
@@ -375,23 +378,24 @@ This chunk is used to hold the encrypted payload of a plain SCTP packet.
       aligned.  The Padding MUST NOT be longer than 3 bytes and it MUST
       be ignored by the receiver.
 
-##  INIT Option Validation Chunk (EVALID) {#evalid}
+##  INIT Option Validation Chunk (EVALID) {#evalid-chunk}
 
 This section defines the new chunk types that will be used to validate
 the negotiation of the protection engine selected for CRYPTO
-Chunk.  {{sctp-Crypto-chunk-newchunk-EVALID}} illustrates the new
+Chunk.  {{sctp-Crypto-chunk-newchunk-evalid-chunk}} illustrates the new
 chunk type.
 
 | Chunk Type | Chunk Name |
 | 0x0x | INIT Option Validation (EVALID) |
-{: #sctp-Crypto-chunk-newchunk-EVALID title="EVALID Chunk Type" cols="r l"}
+{: #sctp-Crypto-chunk-newchunk-evalid-chunk title="EVALID Chunk Type" cols="r l"}
 
 It should be noted that the EVALID chunk format requires the receiver
 to ignore the chunk if it is not understood and silently discard all
-chunks that follow.  This is accomplished (as described in {{RFC9260}}
-Section 3.2.) by the use of the upper bits of the chunk type.
+chunks that follow in the same SCP packet.  This is accomplished
+(as described in {{RFC9260}} Section 3.2.) by the use of the
+upper bits of the chunk type.
 
-This chunk is used to hold the protection engines list.
+The EVALID chunk is used to hold the protection engines list.
 
 ~~~~~~~~~~~ aasvg
  0                   1                   2                   3
@@ -442,12 +446,12 @@ additional information.
 
 ## Mandatory CRYPT Option Missing (ENOCRYPT) {#enocrypt}
 
-When an SCTP endpoint sends an INIT chunk that doesn't contain the
+When a client SCTP endpoint sends an INIT chunk that doesn't contain the
 protected association parameter towards an SCTP endpoint that only
-accepts protected associations, it will raise an ENOCRYPT error. In
-other words reply with an ERROR chunk containing the cause code
-'invalid mandatory parameter' (7) (see {{RFC9260}} section 3.3.10.7)
-and ENOCRYPT in the Cause-Specific Information field.
+accepts protected associations, the server endpoint will raise an
+ENOCRYPT error. In other words reply with an ERROR chunk containing
+the cause code 'invalid mandatory parameter' (7) (see {{RFC9260}}
+section 3.3.10.7) and ENOCRYPT in the Cause-Specific Information field.
 
 ## Error During KEY Handshake (EENGINE) {#ekeyhandshake}
 
@@ -456,7 +460,7 @@ inband it may happen that the procedure has errors. In such case an
 ERROR chunk will be sent with EENGINE cause (specified in
 {{sctp-Crypto-new-error-causes}}).  The error MAY contain a
 Cause-Specific Information with an appropriate cause according to the
-Protection Engine specification.
+Cypher Specification.
 
 ## Error in Protection Engines Validation (EVALIDATE) {#evalidate}
 
@@ -692,7 +696,7 @@ silently discarded.
 
 After completion of Encrypted Association initialization, the Client
 MUST send to the Server an EVALID Chunk (see
-{{sctp-Crypto-chunk-newchunk-EVALID}}) containing the list of
+{{sctp-Crypto-chunk-newchunk-evalid-chunk}}) containing the list of
 Protection Engines previously sent in the CRYPT parameter of the INIT
 chunk. The Server receiving the EVALID chunk will compare the
 Protection Engines list with the one previously received in the INIT

@@ -140,12 +140,12 @@ chunk.
 The SCTP protection engine performs protection operations on the whole
 unprotected SCTP packet payload, i.e., all chunks after the SCTP
 common header. Information protection is kept during the lifetime of
-the Association and no information is sent unprotected except than the
+the association and no information is sent unprotected except than the
 initial SCTP handshake, the SCTP common Header, the SCTP CRYPTO chunk
 header and the SHUTDOWN-COMPLETE chunk.
 
 SCTP CRYPTO chunk capability is agreed by the peers at the
-initialization of the SCTP Association, during that phase the peers
+initialization of the SCTP association, during that phase the peers
 exchange information about the protection engine availability. Once
 the peers have agreed on what protection to use, the SCTP hosts start
 sending SCTP Encrypted chunks containing the initialization
@@ -558,7 +558,7 @@ ECRYPTO.
 # Encrypted SCTP State Diagram {#state-diagram}
 
 The {{sctp-Crypto-state-diagram}} shows the changes versus the SCTP
-Association state machine as described in {{RFC9260}} section 4.
+association state machine as described in {{RFC9260}} section 4.
 
 ~~~~~~~~~~~ aasvg
                                    .-------- (from any state)
@@ -634,7 +634,7 @@ generate State Cookie |    +---------+ delete TCB         send ABORT
 ## New States {#new-states}
 
 This section describes details on the amendment to the SCTP
-Association Establishment state machine.
+association Establishment state machine.
 
 ### CRYPT PENDING {#crypt-pending-state}
 
@@ -651,15 +651,15 @@ If KEY handling is in-band, the protection engine will start the
 handshake with its peer and in case of failure or T-valid
 timeout, it will generate an ERROR chunk and an ABORT chunk.  The
 ERROR handling follows what specified in {{ekeyhandshake}}.  When
-Handshake has been successfully completed, the Association state
+Handshake has been successfully completed, the association state
 machine will enter ENCRYPTED state.
 
 If KEY handling is out-of-band, after starting T-valid timer the SCTP
-Association will enter ENCRYPTED state.
+association will enter ENCRYPTED state.
 
 ### ENCRYPTED {#encrypted-state}
 
-The Association state machine can only reach ENCRYPTED state from
+The association state machine can only reach ENCRYPTED state from
 CRYPT PENDING state (see {{crypt-pending-state}}). When entering into
 ENCRYPTED state the T-valid timer is running and the protection engine
 has completed the KEY handshake so that encrypted data can be sent to
@@ -713,13 +713,13 @@ Cipher Specification for each Protection Engine.
 ## Establishment of an Encrypted Association {#establishment-procedure}
 
 An SCTP Endpoint acting as Client willing to create an Encrypted
-Association shall send to the remote peer an INIT chunk containing the
+association shall send to the remote peer an INIT chunk containing the
 CRYPT parameter (see {{sctp-Crypto-chunk-newchunk-crypt}}) where the
 Protection Engines lists all the supported Protection Engines, given
 in order of preference (see {{sctp-Crypto-chunk-init-options}}).
 
 As alternative, an SCTP Endpoint acting as Server willing to support
-only Encrypted Associations shall consider INIT chunk not containing
+only Encrypted associations shall consider INIT chunk not containing
 the PROTECTED parameter as an error, thus it will reply with an ERROR
 chunk according to what specified in {{enoprotected}} indicating that the
 mandatory CRYPT option is missing.
@@ -731,10 +731,10 @@ parameter with the chosen Protection Engine. When the Server cannot
 find a supported Protection Engine, it will reply with ABORT and
 ERROR according to {{eprotlist}}.
 
-When Client and Server have agreed on an Encrypted Association by
+When Client and Server have agreed on an Encrypted association by
 means of handshaking INIT/INIT-ACK with a common Protection Engine,
 only Control chunks and Encrypted chunks will be accepted. Any Data
-chunk being sent on an Encrypted Association will be silently
+chunk being sent on an Encrypted association will be silently
 discarded.
 
 After completion of initial handshake, that is after COOKIE-ECHO and
@@ -742,11 +742,11 @@ COOKIE-ACK, the Protection Engine shall initialize itself by
 transferring its own data as Payload of the ENCRYPT chunk (see
 {{sctp-Crypto-chunk-newchunk-crypt-struct}}) if necessary.  At
 completion of Protection Engine initialization, the setup of the
-Encrypted Association is complete and from that time on only ENCRYPT
+Encrypted association is complete and from that time on only ENCRYPT
 chunks will be exchanged.  Any other type of plain text chunks will be
 silently discarded.
 
-After completion of Encrypted Association initialization, the Client
+After completion of Encrypted association initialization, the Client
 MUST send to the Server a PVALID chunk (see
 {{sctp-Crypto-chunk-newchunk-pvalid-chunk}}) containing the list of
 Protection Engines previously sent in the CRYPT parameter of the INIT
@@ -763,9 +763,9 @@ it will discard it.
 
 ## Termination of an Encrypted Association {#termination-procedure}
 
-Besides the procedures for terminating an Association explained in
+Besides the procedures for terminating an association explained in
 {{RFC9260}}, the Protection Engine SHALL ask SCTP Host for
-terminating an Association when having an internal error or by
+terminating an association when having an internal error or by
 detecting a security violation, using the procedure described
 in {{eengine}}.  The internal design of Protection
 Engines and their capability is out of the scope of the current
@@ -777,12 +777,12 @@ With reference to the State Diagram as shown in
 {{sctp-Crypto-state-diagram}}, the handling of Control chunks, Data
 chunks and Encrypted chunks follows the rules defined below:
 
-- When the Association is in states CLOSED, COOKIE-WAIT, COOKIE-ECHOED
+- When the association is in states CLOSED, COOKIE-WAIT, COOKIE-ECHOED
 and CRYPT PENDING, any Control chunk is sent plain. No DATA chunks
 shall be sent in these states and DATA chunks received shall be
 silently discarded.
 
-- When the Association is in states ENCRYPTED and in general in a
+- When the association is in states ENCRYPTED and in general in a
 state different than CLOSED, COOKIE-WAIT, COOKIE-ECHOED and CRYPT
 PENDING, any Control chunk as well as Data chunks will be used to
 create an SCTP payload that will be encrypted by the Protection Engine
@@ -807,7 +807,7 @@ sent.
 
 The diagram shown in {{sctp-Crypto-encrypt-chunk-states-1}} describes
 the structure of an SCTP packet being sent or received when the
-Association has not reached the ENCRYPTED state yet. In this case only
+association has not reached the ENCRYPTED state yet. In this case only
 Control chunks or ENCRYPT chunk can be handled.  Only one ENCRYPT
 chunk can be sent in a SCTP packet.
 
@@ -829,7 +829,7 @@ header. Only one CRYPTO chunk can be sent in a SCTP packet.
 
 ## Encrypted Data Chunk Transmission {#data-sending}
 
-When the Association state machine (see {{sctp-Crypto-state-diagram}})
+When the association state machine (see {{sctp-Crypto-state-diagram}})
 has reached the CRYPT PENDING state, it MAY handle KEY handshake
 inband depending on how the specification for the chosen Protection
 Engine has been defined.  In such case, the CRYPTO chunk Handler will
@@ -837,14 +837,14 @@ receive plain Control chunks from the SCTP chunk Handler and ENCRYPT
 chunks from the Protection Engine.  Plain Control chunks and ENCRYPT
 chunks CANNOT be bundled within the same SCTP packet.
 
-When the Association state machine (see {{sctp-Crypto-state-diagram}})
+When the association state machine (see {{sctp-Crypto-state-diagram}})
 has reached the ENCRYPTED state, the CRYPTO chunk Handler will receive
 Control chunks and Data chunks from the SCTP chunk Handler as a
 complete SCTP Payload with maximum size limited by PMTU reduced by the
 dimension of the SCTP common header and the ENCRYPT chunk header.
 
 That plain payload will be sent to the Protection Engine in use for
-that specific Association, the Protection Engine will return an
+that specific association, the Protection Engine will return an
 encrypted payload with maximum size PMTU reduced by the dimension of
 the SCTP common header and the ENCRYPT chunk header.
 
@@ -857,7 +857,7 @@ without delay and SCTP bundling is NOT PERMITTED.
 
 ## Encrypted Data Chunk Reception {#data-receiving}
 
-When the Association state machine (see {{sctp-Crypto-state-diagram}})
+When the association state machine (see {{sctp-Crypto-state-diagram}})
 has reached the CRYPT PENDING state, it MAY handle KEY handshake
 inband depending on how the specification for the chosen Protection
 Engine has been defined.  In such case, the CRYPTO chunk Handler will
@@ -867,11 +867,11 @@ whilst plain Control chunks will be forwarded to SCTP Chunk Handler.
 During CRYPT PENDING state, plain Control chunks and ENCRYPT chunks
 CANNOT be bundled within the same SCTP packet.
 
-When the Association state machine (see {{sctp-Crypto-state-diagram}})
+When the association state machine (see {{sctp-Crypto-state-diagram}})
 has reached the ENCRYPTED state, the CRYPTO Chunk Handler will receive
 ENCRYPT chunks from the SCTP Header Handler.  Payload from ENCRYPT
 chunks will be forwarded to the Protection Engine in use for that
-specific Association for decryption, the Protection Engine will return
+specific association for decryption, the Protection Engine will return
 a plain SCTP Payload.  The Plain SCTP Payload will be forwarded to
 SCTP Chunk Handler that will split it in separated chunks and will
 handle them according to {{RFC9260}}.

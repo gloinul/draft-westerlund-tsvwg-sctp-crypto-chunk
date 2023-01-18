@@ -273,7 +273,7 @@ association setup. {{sctp-Crypto-chunk-init-parameter}} illustrates
 the new parameter type.
 
 | Parameter Type | Parameter Name |
-| 0x80xx | Protected Association (CRYPT) |
+| 0x80xx | Protected Association (PROTECTED) |
 {: #sctp-Crypto-chunk-init-parameter title="New INIT Parameter" cols="r l"}
 
 Note that the parameter format requires the receiver to ignore the
@@ -376,24 +376,24 @@ The CRYPTO chunk is used to hold the protected payload of a plain SCTP packet.
       aligned.  The Padding MUST NOT be longer than 3 bytes and it MUST
       be ignored by the receiver.
 
-##  INIT Option Validation Chunk (EVALID) {#evalid-chunk}
+##  INIT Option Validation Chunk (PVALID ) {#pvalid-chunk}
 
 This section defines the new chunk types that will be used to validate
 the negotiation of the protection engine selected for CRYPTO
-Chunk.  {{sctp-Crypto-chunk-newchunk-evalid-chunk}} illustrates the new
+Chunk.  {{sctp-Crypto-chunk-newchunk-pvalid-chunk}} illustrates the new
 chunk type.
 
 | Chunk Type | Chunk Name |
-| 0x0x | INIT Option Validation (EVALID) |
-{: #sctp-Crypto-chunk-newchunk-evalid-chunk title="EVALID Chunk Type" cols="r l"}
+| 0x0x | INIT Option Validation (PVALID ) |
+{: #sctp-Crypto-chunk-newchunk-pvalid-chunk title="PVALID Chunk Type" cols="r l"}
 
-It should be noted that the EVALID chunk format requires the receiver
+It should be noted that the PVALID chunk format requires the receiver
 to ignore the chunk if it is not understood and silently discard all
 chunks that follow in the same SCP packet.  This is accomplished
 (as described in {{RFC9260}} Section 3.2.) by the use of the
 upper bits of the chunk type.
 
-The EVALID chunk is used to hold the protection engines list.
+The PVALID chunk is used to hold the protection engines list.
 
 ~~~~~~~~~~~ aasvg
  0                   1                   2                   3
@@ -408,7 +408,7 @@ The EVALID chunk is used to hold the protection engines list.
 |                               |           Padding             |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ~~~~~~~~~~~
-{: #sctp-Crypto-chunk-newchunk-EVALID-struct title="EVALID Chunk Structure" artwork-align="center"}
+{: #sctp-Crypto-chunk-newchunk-PVALID -struct title="PVALID Chunk Structure" artwork-align="center"}
 
   Type: 1 byte (unsigned integer)
       This value MUST be set to 0xXX.
@@ -442,14 +442,32 @@ used when SCTP endpoint detects a faulty condition. The special case is
 when the error is detected by the protection engine that may provide
 additional information.
 
-## Mandatory CRYPT Option Missing (ENOCRYPTO) {#enocrypto}
+## Mandatory PROTECTED Option Missing (ENOPROTECTED) {#enoprotected}
 
 When a client SCTP endpoint sends an INIT chunk that doesn't contain the
-protected association parameter towards an SCTP endpoint that only
-accepts protected associations, the server endpoint will raise an
-ENOCRYPTO error. In other words reply with an ERROR chunk containing
+PROTECTED association parameter towards an SCTP endpoint that only
+accepts protected associations, the server endpoint will raise a
+Missing Mandatory Parameter error. The ERROR chunk will contain
 the cause code 'Missing Mandatory Parameter' (2) (see {{RFC9260}}
-section 3.3.10.7) and ENOCRYPTO in the Cause-Specific Information field.
+section 3.3.10.7) and PROTECTED in the missing param Information field.
+
+~~~~~~~~~~~ aasvg
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|        Cause Code = 2         |         Cause Length          |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                 Number of missing params = N                  |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|            PROTECTED          |     Missing Param Type #2     |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|    Missing Param Type #N-1    |     Missing Param Type #N     |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+~~~~~~~~~~~
+{: #sctp-Crypto-init-chunk-missing-protected title="ERROR Missing PROTECTED Paramater" artwork-align="center"}
+
+Cause Length is equal to the number of missing parameters N + 8 * 2
+according to {{RFC9260}}, section 3.3.10.2.
 
 ## Error in the Protection Engine List (EPROTLIST) {#eprotlist}
 
@@ -523,8 +541,7 @@ They require additional lines of the "Error Cause Codes" table in
 SCTP-parameters {{IANA-SCTP-PARAMETERS}}:
 
 | Value | Cause Code | Reference |
-| TBA1 | ENOCRYPTO | RFC-To-Be |
-| TBA2 | ECRYPTO | RFC-To-Be |
+| TBA1 | ECRYPTO | RFC-To-Be |
 {: #sctp-Crypto-new-error-causes title="New Error Causes" cols="r l l"}
 
 The following {{sctp-Crypto-new-local-error-causes}} defines the error
@@ -532,9 +549,9 @@ causes that don't need IANA specificaion as they are subordinate to
 ECRYPTO.
 
 | Value | Cause Code | Reference |
-| TBA3 | EHANDSHAKE | RFC-To-Be |
-| TBA4 | EVALIDATE | RFC-To-Be |
-| TBA5 | ETMOUT | RFC-To-Be |
+| TBA2 | EHANDSHAKE | RFC-To-Be |
+| TBA3 | EVALIDATE | RFC-To-Be |
+| TBA4 | ETMOUT | RFC-To-Be |
 {: #sctp-Crypto-new-local-error-causes title="New Local Error Causes" cols="r l l"}
 
 
@@ -600,7 +617,7 @@ generate State Cookie |    +---------+ delete TCB         send ABORT
          |     |                       | [ENDPOINT VALIDATION]
          |     |                       |------------------------
          |     |                       | send and receive
-         |     |                       | EVALID by means of
+         |     |                       | PVALID by means of
          |     |                       | ENCRYPT chunk
          |     |                       | in case of error
          |     |                       | send plain ABORT
@@ -654,13 +671,13 @@ peer will be silently discarded.
 
 In ENCRYPTED state the association initiating SCTP Endpoint (Client)
 MUST validate the INIT sent CRYPT parameter, thus the Client will send
-an EVALID chunk that will contain exactly the same list of Protection
+a PVALID chunk that will contain exactly the same list of Protection
 Engines as previously sent in CRYPT option of INIT chunk and in the
 same order.
 
-When the Server will receive EVALID, it will compare the list of
+When the Server will receive PVALID , it will compare the list of
 Protection Engines with the list received in the INIT chunk, if they
-are identical it will reply to the Client with an EVALID chunk
+are identical it will reply to the Client with a PVALID chunk
 containing the Protection Engine previously sent as CRYPT option in
 INIT-ACK chunk, it will clear the T-valid timer and will move into
 ESTABLISHED state.
@@ -670,8 +687,8 @@ ERROR chunk and an ABORT chunk. ERROR CAUSE will indicate EVALIDATE
 meaning that an error has been happening during VALIDATION of SCTP
 Endpoints.
 
-After sending EVALID, the Client will wait for the Server to reply
-with the EVALID confirmation. The Client will compare the Protection
+After sending PVALID , the Client will wait for the Server to reply
+with the PVALID confirmation. The Client will compare the Protection
 Engine received from the Server, if the value is the same it will
 clear the T-valid timer and move into ESTABLISHED state.  If the
 chosen Protection Engines don't match, it will generate an ERROR chunk
@@ -703,8 +720,8 @@ in order of preference (see {{sctp-Crypto-chunk-init-options}}).
 
 As alternative, an SCTP Endpoint acting as Server willing to support
 only Encrypted Associations shall consider INIT chunk not containing
-the CRYPT parameter as an error, thus it will reply with an ERROR
-chunk according to what specified in {{enocrypto}} indicating that the
+the PROTECTED parameter as an error, thus it will reply with an ERROR
+chunk according to what specified in {{enoprotected}} indicating that the
 mandatory CRYPT option is missing.
 
 An SCTP Endpoint acting as Server, when receiving an INIT chunk with
@@ -730,15 +747,15 @@ chunks will be exchanged.  Any other type of plain text chunks will be
 silently discarded.
 
 After completion of Encrypted Association initialization, the Client
-MUST send to the Server an EVALID Chunk (see
-{{sctp-Crypto-chunk-newchunk-evalid-chunk}}) containing the list of
+MUST send to the Server a PVALID Chunk (see
+{{sctp-Crypto-chunk-newchunk-pvalid-chunk}}) containing the list of
 Protection Engines previously sent in the CRYPT parameter of the INIT
-chunk. The Server receiving the EVALID chunk will compare the
+chunk. The Server receiving the PVALID chunk will compare the
 Protection Engines list with the one previously received in the INIT
 chunk, if they will be exactly the same, with the same Protection
-engine in the same position, it will reply to the Client with an
-EVALID chunk containing the chose Protection Engine, otherwise it will
-reply with an ABORT chunk.  When the Client will receive the EVALID
+engine in the same position, it will reply to the Client with a
+PVALID chunk containing the chose Protection Engine, otherwise it will
+reply with an ABORT chunk.  When the Client will receive the PVALID
 chunk, it will compare with the previous chosen Protection Engine and
 in case of mismatch with the one received previously as CRYPT
 parameter in the INIT-ACK chunk, it will reply with ABORT, otherwise
@@ -929,7 +946,7 @@ https://www.iana.org/assignments/sctp-parameters/sctp-parameters.xhtml#sctp-para
 
 | ID Value | Chunk Type | Reference |
 | TBA5 | Crypto Chunk (CRYPTO) | RFC-To-Be |
-| TBA6 | Endpoint Validation Chunk (EVALID) | RFC-To-Be |
+| TBA6 | Endpoint Validation Chunk (PVALID ) | RFC-To-Be |
 {: #iana-chunk-types title="New Chunk Types Registered" cols="r l l"}
 
 

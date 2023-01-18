@@ -11,7 +11,7 @@ This is the working area for the individual Internet-Draft, "Stream Control Tran
 ## Contributing
 
 See the
-[guidelines for contributions](https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/blob//CONTRIBUTING.md).
+[guidelines for contributions](https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/blob/main/CONTRIBUTING.md).
 
 Contributions can be made by creating pull requests.
 The GitHub interface supports creating pull requests using the Edit (✏) button.

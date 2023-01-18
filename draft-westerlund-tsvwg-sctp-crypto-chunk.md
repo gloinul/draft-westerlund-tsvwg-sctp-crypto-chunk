@@ -147,7 +147,7 @@ header and the SHUTDOWN-COMPLETE chunk.
 SCTP CRYPTO chunk capability is agreed by the peers at the
 initialization of the SCTP association, during that phase the peers
 exchange information about the protection engine availability. Once
-the peers have agreed on what protection to use, the SCTP hosts start
+the peers have agreed on what protection to use, the SCTP endpoints start
 sending SCTP Encrypted chunks containing the initialization
 information related to the protection engine including the endpoint
 validation. This is depending on the chosen protection engine thus is
@@ -158,10 +158,10 @@ is meant to be initialized and the ULP is informed about that, from
 this time on it's possible for the ULPs to exchange data.
 
 CRYPTO chunks will never be retransmitted, retransmission is
-implemented by SCTP host at chunk level as in the legacy.  Duplicated
+implemented by SCTP endpoint at chunk level as in the legacy.  Duplicated
 CRYPTO chunks, whenever they will be accepted by the protection
 engine, will result in duplicated SCTP chunks and will be handled as
-duplicated chunks by SCTP host in the same way a duplicated SCTP packet
+duplicated chunks by SCTP endpoint in the same way a duplicated SCTP packet
 with those SCTP chunks would have been.
 
 
@@ -204,7 +204,7 @@ An example of protection engine can be DTLS.
 
 protection engine and SCTP are asynchronous, meaning that the
 protection engine may deliver the decrypted SCTP Payload to the SCTP
-Host without respecting the reception order.  It's up to SCTP Host to
+endpoint without respecting the reception order.  It's up to SCTP endpoint to
 reorder the chunks in the reception buffer and to take care of the
 flow control according to what specified in {{RFC9260}}. From SCTP
 perspective the CRYPTO chunk is part of the transport network.
@@ -496,7 +496,7 @@ Cause-Specific EVALIDATE.
 
 ## Timeout During KEY Handshake or Validation (ETMOUT) {#etmout}
 
-Whenever a T-valid timeout occurs, the SCTP Host will send an ERROR
+Whenever a T-valid timeout occurs, the SCTP endpoint will send an ERROR
 chunk with ETMOUT cause (specified in
 {{sctp-Crypto-new-error-causes}}). Depending on the state, and
 additional Cause-Specific code will be added.
@@ -508,11 +508,11 @@ Cause-Specific code to use is EVALIDATE.
 
 ## Critical Error from Protection Engine {#eengine}
 
-Protection engine MAY inform local SCTP Host about errors,
+Protection engine MAY inform local SCTP endpoint about errors,
 in such case it's to be defined in the Cipher Specification document.
 When an Error in the protection engine compromises the
 protection mechanism, the protection engine shall stop processing
-data in such a way that the local SCTP Host will not be able sending
+data in such a way that the local SCTP endpoint will not be able sending
 or receiving any chunk for the specified Association.
 This will cause the Association to be closed by legacy
 timer-based mechanism. Since the Association protection is
@@ -764,7 +764,7 @@ it will discard it.
 ## Termination of an Encrypted Association {#termination-procedure}
 
 Besides the procedures for terminating an association explained in
-{{RFC9260}}, the Protection Engine SHALL ask SCTP Host for
+{{RFC9260}}, the protection engine SHALL ask SCTP endpoint for
 terminating an association when having an internal error or by
 detecting a security violation, using the procedure described
 in {{eengine}}.  The internal design of Protection
@@ -882,7 +882,7 @@ the Flags (see {{sctp-Crypto-chunk-newchunk-crypt-struct}}) according
 to that specification.
 
 Meta data belonging to the SCTP packet received SHALL be tied to the
-relevant chunks and forwarded transparently to the SCTP Host.
+relevant chunks and forwarded transparently to the SCTP endpoint.
 
 ### SCTP Header Handler
 

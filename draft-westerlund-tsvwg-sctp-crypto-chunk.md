@@ -153,7 +153,7 @@ information related to the Protection Engine including the endpoint
 validation. This is depending on the chosen Protection Engine thus is
 not being detailed in the current specification.
 
-When the endpoint authentication has been completed, the asssociation
+When the endpoint authentication has been completed, the association
 is meant to be initialized and the ULP is informed about that, from
 this time on it's possible for the ULPs to exchange data.
 
@@ -178,7 +178,7 @@ Protection Engine shall be aware of the PMTU (see {{pmtu}}).
 
 A Protection Engine may use KEYs, in this case the KEY Management
 part of the Protection Engine is the set of data and procedures
-that take care of KEY distribution, verification and update.
+that take care of KEY distribution, verification, and update.
 
 KEY Management of Protection Engine SHOULD exploit SCTP Crypto Chunk for
 handshaking, in that case any packet being exchanged between
@@ -465,7 +465,7 @@ If the Protection Engine specifies that KEY handling is implemented
 inband it may happen that the procedure has errors. In such case an
 ERROR chunk will be sent with ECRYPTO cause code (specified in
 {{sctp-Crypto-new-error-causes}}) and additional Cause-Specific
-EHANDSHAKE. The error MAY contain furher Cause-Specific Informations
+EHANDSHAKE. The error MAY contain further Cause-Specific Informations
 according to the Cipher Specification.
 
 ## Error in Protection Engines Validation (EVALIDATE) {#evalidate}
@@ -491,13 +491,13 @@ Cause-Specific code to use is EVALIDATE.
 ## Critical Error from Protection Engine {#eengine}
 
 Protection Engine MAY inform local SCTP Host about errors,
-in such case it's to be defined in the Cipher Secification document.
+in such case it's to be defined in the Cipher Specification document.
 When an Error in the Protection Engine compromises the
 protection mechanism, the Protection Engine shall stop processing
 data in such a way that the local SCTP Host will not be able sending
 or receiving any chunk for the specified Association.
 This will cause the Association to be closed by legacy
-timer based mechanism. Since the Association protection is
+timer-based mechanism. Since the Association protection is
 compromised no further data will be sent and the remote peer
 will also experience timeout on the Association.
 
@@ -528,7 +528,7 @@ SCTP-parameters {{IANA-SCTP-PARAMETERS}}:
 {: #sctp-Crypto-new-error-causes title="New Error Causes" cols="r l l"}
 
 The following {{sctp-Crypto-new-local-error-causes}} defines the error
-causes that don't need IANA specificaion as they are subordinate to
+causes that don't need IANA specification as they are subordinate to
 ECRYPTO.
 
 | Value | Cause Code | Reference |
@@ -688,7 +688,7 @@ The timer T-Valid supervises initializations that depend on how
 the handshake is specified for the Protection Engine and also on
 the characteristics of the transport network.
 This specification recommends a default value of 30 seconds for
-T-valid. This value is supersed by what recommended in the
+T-valid. This value is superseded by what recommended in the
 Cipher Specification for each Protection Engine.
 
 # Procedures {#procedures}

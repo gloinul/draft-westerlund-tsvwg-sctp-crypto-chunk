@@ -144,7 +144,7 @@ the Association and no information is sent unprotected except than the
 initial SCTP handshake, the SCTP common Header, the SCTP CRYPTO chunk
 header and the SHUTDOWN-COMPLETE chunk.
 
-SCTP Crypto Chunk capability is agreed by the peers at the
+SCTP CRYPTO chunk capability is agreed by the peers at the
 initialization of the SCTP Association, during that phase the peers
 exchange information about the Protection Engine availability. Once
 the peers have agreed on what protection to use, the SCTP hosts start
@@ -171,7 +171,7 @@ The Protection Engine, independently from the security
 characteristics, needs to be capable working on an unreliable
 transport mechanism same as UDP and have own KEY handler capability.
 
-SCTP Crypto Chunk directly exploits the Protection Engine by
+SCTP CRYPTO Chunk directly exploits the Protection Engine by
 requesting encryption and decryption of a buffer, in particular the
 encrypted buffer shall never exceed the SCTP payload size thus
 Protection Engine shall be aware of the PMTU (see {{pmtu}}).
@@ -180,12 +180,12 @@ A Protection Engine may use KEYs, in this case the KEY Management
 part of the Protection Engine is the set of data and procedures
 that take care of KEY distribution, verification, and update.
 
-KEY Management of Protection Engine SHOULD exploit SCTP Crypto Chunk for
+KEY Management of Protection Engine SHOULD exploit SCTP CRYPTO Chunk for
 handshaking, in that case any packet being exchanged between
 Protection Engine peers shall be transported as payload of Encrypted
 chunk (see {{crypto-chunk}}).
 
-KEY Management MAY use other mechanism than what provided by SCTP Crypto
+KEY Management MAY use other mechanism than what provided by SCTP CRYPTO
 Chunks, in any case the mechanism for KEY Management MUST be specified
 in the Cipher Specification document for that specific
 Protection Engine.
@@ -200,14 +200,14 @@ document for that specific Protection Engine.
 
 An example of Protection Engine can be DTLS.
 
-## SCTP Crypto Chunk Buffering and Flow Control {#buffering}
+## SCTP CRYPTO Chunk Buffering and Flow Control {#buffering}
 
 Protection Engine and SCTP are asynchronous, meaning that the
 Protection Engine may deliver the decrypted SCTP Payload to the SCTP
 Host without respecting the reception order.  It's up to SCTP Host to
 reorder the chunks in the reception buffer and to take care of the
 flow control according to what specified in {{RFC9260}}. From SCTP
-perspective the Crypto Chunk is part of the transport network.
+perspective the CRYPTO Chunk is part of the transport network.
 
 Even though the above allows the implementors to adopt a
 multithreading design of the Protection Engines, the actual
@@ -217,9 +217,9 @@ retransmissions.
 
 ## PMTU Considerations {#pmtu}
 
-The addition of the Crypto to SCTP reduces the room for payload, in
+The addition of the CRYPTO chunk to SCTP reduces the room for payload, in
 order to cope with that when creating the payload of SCTP for
-protection the size of the Crypto chunk header and plain text
+protection the size of the CRYPTO chunk header and plain text
 expansion due to algorithm and any authentication tag needs to be
 included in the calculation.
 
@@ -233,7 +233,7 @@ Cipher Specification.
 From SCTP perspective, if there is a maximum size of plain text data
 that can be protected by the Protection Engine that must be
 communicated to SCTP. As such a limit will limit the PMTU for SCTP to
-the maximums plain text plus Crypto chunk and algorithm overhead plus
+the maximums plain text plus CRYPTO chunk and algorithm overhead plus
 the SCTP common header.
 
 ## Congestion Control Considerations {#congestion}
@@ -832,13 +832,13 @@ header. Only one CRYPTO chunk can be sent in a SCTP packet.
 When the Association state machine (see {{sctp-Crypto-state-diagram}})
 has reached the CRYPT PENDING state, it MAY handle KEY handshake
 inband depending on how the specification for the chosen Protection
-Engine has been defined.  In such case, the Crypto Chunk Handler will
+Engine has been defined.  In such case, the CRYPTO Chunk Handler will
 receive plain Control Chunks from the SCTP Chunk Handler and ENCRYPT
 chunks from the Protection Engine.  Plain Control chunks and ENCRYPT
 chunks CANNOT be bundled within the same SCTP packet.
 
 When the Association state machine (see {{sctp-Crypto-state-diagram}})
-has reached the ENCRYPTED state, the Crypto Chunk Handler will receive
+has reached the ENCRYPTED state, the CRYPTO Chunk Handler will receive
 Control Chunks and Data chunks from the SCTP Chunk Handler as a
 complete SCTP Payload with maximum size limited by PMTU reduced by the
 dimension of the SCTP common header and the ENCRYPT chunk header.
@@ -849,7 +849,7 @@ encrypted payload with maximum size PMTU reduced by the dimension of
 the SCTP common header and the ENCRYPT chunk header.
 
 Depending on the specification for the chosen Protection Engine, when
-forming the ENCRYPT chunk header the Crypto Chunk Handler may set the
+forming the ENCRYPT chunk header the CRYPTO Chunk Handler may set the
 Flags (see {{sctp-Crypto-chunk-newchunk-crypt-struct}}).
 
 An SCTP packet containing an SCTP ENCRYPT Chunk SHALL be delivered
@@ -860,7 +860,7 @@ without delay and SCTP bundling is NOT PERMITTED.
 When the Association state machine (see {{sctp-Crypto-state-diagram}})
 has reached the CRYPT PENDING state, it MAY handle KEY handshake
 inband depending on how the specification for the chosen Protection
-Engine has been defined.  In such case, the Crypto Chunk Handler will
+Engine has been defined.  In such case, the CRYPTO chunk Handler will
 receive plain Control Chunks and ENCRYPT chunks from the SCTP Header
 Handler.  ENCRYPT chunks will be forwarded to the Protection Engine
 whilst plain Control chunks will be forwarded to SCTP Chunk Handler.
@@ -868,7 +868,7 @@ During CRYPT PENDING state, plain Control chunks and ENCRYPT chunks
 CANNOT be bundled within the same SCTP packet.
 
 When the Association state machine (see {{sctp-Crypto-state-diagram}})
-has reached the ENCRYPTED state, the Crypto Chunk Handler will receive
+has reached the ENCRYPTED state, the CRYPTO Chunk Handler will receive
 ENCRYPT chunks from the SCTP Header Handler.  Payload from ENCRYPT
 Chunks will be forwarded to the Protection Engine in use for that
 specific Association for decryption, the Protection Engine will return
@@ -877,7 +877,7 @@ SCTP Chunk Handler that will split it in separated chunks and will
 handle them according to {{RFC9260}}.
 
 Depending on the specification for the chosen Protection Engine, when
-receiving the ENCRYPT chunk header the Crypto Chunk Handler may handle
+receiving the ENCRYPT chunk header the CRYPTO Chunk Handler may handle
 the Flags (see {{sctp-Crypto-chunk-newchunk-crypt-struct}}) according
 to that specification.
 

@@ -1,7 +1,7 @@
 ---
 docname: draft-westerlund-tsvwg-sctp-crypto-chunk-latest
 title: Stream Control Transmission Protocol (SCTP) CRYPTO Chunk
-abbrev: SCTP Crypto Chunk
+abbrev: SCTP CRYPTO Chunk
 obsoletes:
 cat: std
 ipr: trust200902

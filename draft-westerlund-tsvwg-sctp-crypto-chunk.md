@@ -146,11 +146,11 @@ header and the SHUTDOWN-COMPLETE chunk.
 
 SCTP CRYPTO chunk capability is agreed by the peers at the
 initialization of the SCTP Association, during that phase the peers
-exchange information about the Protection Engine availability. Once
+exchange information about the protection engine availability. Once
 the peers have agreed on what protection to use, the SCTP hosts start
 sending SCTP Encrypted chunks containing the initialization
-information related to the Protection Engine including the endpoint
-validation. This is depending on the chosen Protection Engine thus is
+information related to the protection engine including the endpoint
+validation. This is depending on the chosen protection engine thus is
 not being detailed in the current specification.
 
 When the endpoint authentication has been completed, the association
@@ -167,50 +167,50 @@ with those SCTP chunks would have been.
 
 ## Protection Engines Considerations {#protection-engines}
 
-The Protection Engine, independently from the security
+The protection engine, independently from the security
 characteristics, needs to be capable working on an unreliable
 transport mechanism same as UDP and have own KEY handler capability.
 
-SCTP CRYPTO Chunk directly exploits the Protection Engine by
+SCTP CRYPTO chunk directly exploits the protection engine by
 requesting encryption and decryption of a buffer, in particular the
 encrypted buffer shall never exceed the SCTP payload size thus
-Protection Engine shall be aware of the PMTU (see {{pmtu}}).
+protection engine shall be aware of the PMTU (see {{pmtu}}).
 
-A Protection Engine may use KEYs, in this case the KEY Management
-part of the Protection Engine is the set of data and procedures
+A protection engine may use KEYs, in this case the KEY Management
+part of the protection engine is the set of data and procedures
 that take care of KEY distribution, verification, and update.
 
-KEY Management of Protection Engine SHOULD exploit SCTP CRYPTO Chunk for
+KEY Management of protection engine SHOULD exploit SCTP CRYPTO chunk for
 handshaking, in that case any packet being exchanged between
-Protection Engine peers shall be transported as payload of Encrypted
+protection engine peers shall be transported as payload of Encrypted
 chunk (see {{crypto-chunk}}).
 
 KEY Management MAY use other mechanism than what provided by SCTP CRYPTO
-Chunks, in any case the mechanism for KEY Management MUST be specified
+chunks, in any case the mechanism for KEY Management MUST be specified
 in the Cipher Specification document for that specific
-Protection Engine.
+protection engine.
 
-Out-of-band communication between Protection Engines MAY exploit the
+Out-of-band communication between protection engines MAY exploit the
 Flags byte provided by the ENCRYPT chunk header (see
 {{sctp-Crypto-chunk-newchunk-crypt-struct}}).
 
 Details of the use of Flags, if different from what described in the
 current document, MUST be specified in the Cipher Specification
-document for that specific Protection Engine.
+document for that specific protection engine.
 
-An example of Protection Engine can be DTLS.
+An example of protection engine can be DTLS.
 
 ## SCTP CRYPTO Chunk Buffering and Flow Control {#buffering}
 
-Protection Engine and SCTP are asynchronous, meaning that the
-Protection Engine may deliver the decrypted SCTP Payload to the SCTP
+protection engine and SCTP are asynchronous, meaning that the
+protection engine may deliver the decrypted SCTP Payload to the SCTP
 Host without respecting the reception order.  It's up to SCTP Host to
 reorder the chunks in the reception buffer and to take care of the
 flow control according to what specified in {{RFC9260}}. From SCTP
-perspective the CRYPTO Chunk is part of the transport network.
+perspective the CRYPTO chunk is part of the transport network.
 
 Even though the above allows the implementors to adopt a
-multithreading design of the Protection Engines, the actual
+multithreading design of the protection engines, the actual
 implementation should consider that out-of-order handling of SCTP
 chunks is not desired and may cause false congestions and
 retransmissions.
@@ -223,15 +223,15 @@ protection the size of the CRYPTO chunk header and plain text
 expansion due to algorithm and any authentication tag needs to be
 included in the calculation.
 
-On the other hand, the Protection Engine needs to be informed about
+On the other hand, the protection engine needs to be informed about
 the PMTU by removing from the value the sum of the common SCTP header
 and the Encrypted chunk header. This implies that SCTP can propagate
-the computed PMTU at run time specifically. The way Protection Engine
+the computed PMTU at run time specifically. The way protection engine
 provides the primitive for PMTU communication shall be part of the
 Cipher Specification.
 
 From SCTP perspective, if there is a maximum size of plain text data
-that can be protected by the Protection Engine that must be
+that can be protected by the protection engine that must be
 communicated to SCTP. As such a limit will limit the PMTU for SCTP to
 the maximums plain text plus CRYPTO chunk and algorithm overhead plus
 the SCTP common header.
@@ -242,10 +242,10 @@ The SCTP mechanism for handling congestion control does depend on
 successful data transfer for enlarging or reducing the congestion
 window CWND (see {{RFC9260}} section 7.2).
 
-It may happen that Protection Engine discards packets due to internal
+It may happen that protection engine discards packets due to internal
 checks or because it has detected a malicious attempt.
 
-The Protection Engine shall not interfere with the SCTP congestion
+The protection engine shall not interfere with the SCTP congestion
 control mechanism, this basically means that from SCTP perspective
 the congestion control is exactly the same as how specified
 in {{RFC9260}}.
@@ -311,7 +311,7 @@ handshake.
       Each protection engine is specified by a 16-bit word.
 
    Padding: 0, or 2 bytes (unsigned integer) If the length of the
-      Protection Engines is not a multiple of 4 bytes, the sender MUST
+      Protection Engines field is not a multiple of 4 bytes, the sender MUST
       pad the chunk with all zero bytes to make the chunk 32-bit
       aligned.  The Padding MUST NOT be longer than 2 bytes and it
       MUST be ignored by the receiver.
@@ -380,7 +380,7 @@ The CRYPTO chunk is used to hold the protected payload of a plain SCTP packet.
 
 This section defines the new chunk types that will be used to validate
 the negotiation of the protection engine selected for CRYPTO
-Chunk.  {{sctp-Crypto-chunk-newchunk-pvalid-chunk}} illustrates the new
+chunk.  {{sctp-Crypto-chunk-newchunk-pvalid-chunk}} illustrates the new
 chunk type.
 
 | Chunk Type | Chunk Name |
@@ -420,13 +420,13 @@ The PVALID chunk is used to hold the protection engines list.
       This value holds the length of the Protection Engines field in bytes plus 4.
 
    Protection Engines: n words (unsigned integer) This holds the list
-      of Protection Engines in order of preference.  Each Protection
+      of protection engines in order of preference.  Each Protection
       engine is specified by a 16-bit word. This field MUST be
       identical to the content of the CRYPT parameter ({{crypt-parameter}}) Protection
       Engines field that the endpoint sent in the handshake.
 
    Padding: 0, or 2 bytes (unsigned integer)
-      If the length of the Protection Engines is not a multiple of 4 bytes, the sender
+      If the length of the Protection Engines field is not a multiple of 4 bytes, the sender
       MUST pad the chunk with all zero bytes to make the chunk 32-bit
       aligned.  The Padding MUST NOT be longer than 3 bytes and it MUST
       be ignored by the receiver.
@@ -471,15 +471,15 @@ according to {{RFC9260}}, section 3.3.10.2.
 
 ## Error in the Protection Engine List (EPROTLIST) {#eprotlist}
 
-If list of Protection Engines contained in the INIT signal doesn't
-contain at least an entry that fits the list of Protection Engines
+If list of protection engines contained in the INIT signal doesn't
+contain at least an entry that fits the list of protection engines
 at the server, the server will reply with an ERROR chunk with ECRYPTO
 cause code (specified in {{sctp-Crypto-new-error-causes}}) and additional
 Cause-Specific EPROTLIST.
 
 ## Error During KEY Handshake (EHANDSHAKE) {#ekeyhandshake}
 
-If the Protection Engine specifies that KEY handling is implemented
+If the protection engine specifies that KEY handling is implemented
 inband it may happen that the procedure has errors. In such case an
 ERROR chunk will be sent with ECRYPTO cause code (specified in
 {{sctp-Crypto-new-error-causes}}) and additional Cause-Specific
@@ -488,7 +488,7 @@ according to the Cipher Specification.
 
 ## Error in Protection Engines Validation (EVALIDATE) {#evalidate}
 
-An error may occur during Protection Engine Validation (see
+An error may occur during protection engine Validation (see
 {encrypted-state}).
 In such case an ERROR chunk will be sent with ECRYPTO cause code
 (specified in {{sctp-Crypto-new-error-causes}}) and additional
@@ -500,7 +500,7 @@ Whenever a T-valid timeout occurs, the SCTP Host will send an ERROR
 chunk with ETMOUT cause (specified in
 {{sctp-Crypto-new-error-causes}}). Depending on the state, and
 additional Cause-Specific code will be added.
-If the Protection Engine specifies that KEY handling is implemented
+If the protection engine specifies that KEY handling is implemented
 inband and the T-valid timeout occurs during the handshake
 the Cause-Specific code to use is EHANDSHAKE.
 If the T-valid timeout occurs during the Validation, the
@@ -508,10 +508,10 @@ Cause-Specific code to use is EVALIDATE.
 
 ## Critical Error from Protection Engine {#eengine}
 
-Protection Engine MAY inform local SCTP Host about errors,
+Protection engine MAY inform local SCTP Host about errors,
 in such case it's to be defined in the Cipher Specification document.
-When an Error in the Protection Engine compromises the
-protection mechanism, the Protection Engine shall stop processing
+When an Error in the protection engine compromises the
+protection mechanism, the protection engine shall stop processing
 data in such a way that the local SCTP Host will not be able sending
 or receiving any chunk for the specified Association.
 This will cause the Association to be closed by legacy
@@ -521,17 +521,17 @@ will also experience timeout on the Association.
 
 ## Non-critical Error in the Protection Engine {#non-critical-errors}
 
-A non-critical error in the Protection Engine means that the
-Protection Engine is capable of recovering without the need
+A non-critical error in the Pprotection engine means that the
+protection engine is capable of recovering without the need
 of the whole Association to be restarted.
 
 From SCTP perspective, a non-critical error will be perceived
 as a temporary problem in the transport and will be handled
 with retransmissions and SACKS according to {{RFC9260}}.
 
-When the Protection Engine will experience a non-critical error,
+When the protection engine will experience a non-critical error,
 an ERROR chunks SHALL NOT be sent. This way non-critical errors
-are handled and how the Protection Engine will recover from
+are handled and how the protection engine will recover from
 these errors is being described in the Cipher Specifications.
 
 ## New Error Causes {#new_errors}
@@ -645,9 +645,9 @@ When entering CRYPT PENDING state, a T-valid timer is started that
 will cover the whole validation time including the in-band KEY
 handling.  It's up to the implementor to take care of the value for
 the timer also related to the time needed for KEY handshake of each
-Protection Engine.
+protection engine.
 
-If KEY handling is in-band, the Protection Engine will start the
+If KEY handling is in-band, the protection engine will start the
 handshake with its peer and in case of failure or T-valid
 timeout, it will generate an ERROR chunk and an ABORT chunk.  The
 ERROR handling follows what specified in {{ekeyhandshake}}.  When
@@ -661,7 +661,7 @@ Association will enter ENCRYPTED state.
 
 The Association state machine can only reach ENCRYPTED state from
 CRYPT PENDING state (see {{crypt-pending-state}}). When entering into
-ENCRYPTED state the T-valid timer is running and the Protection Engine
+ENCRYPTED state the T-valid timer is running and the protection engine
 has completed the KEY handshake so that encrypted data can be sent to
 the peer.
 
@@ -676,7 +676,7 @@ Engines as previously sent in CRYPT option of INIT chunk and in the
 same order.
 
 When the Server will receive PVALID , it will compare the list of
-Protection Engines with the list received in the INIT chunk, if they
+protection engines with the list received in the INIT chunk, if they
 are identical it will reply to the Client with a PVALID chunk
 containing the Protection Engine previously sent as CRYPT option in
 INIT-ACK chunk, it will clear the T-valid timer and will move into
@@ -733,7 +733,7 @@ ERROR according to {{eprotlist}}.
 
 When Client and Server have agreed on an Encrypted Association by
 means of handshaking INIT/INIT-ACK with a common Protection Engine,
-only Control Chunks and Encrypted Chunks will be accepted. Any Data
+only Control chunks and Encrypted chunks will be accepted. Any Data
 chunk being sent on an Encrypted Association will be silently
 discarded.
 
@@ -747,7 +747,7 @@ chunks will be exchanged.  Any other type of plain text chunks will be
 silently discarded.
 
 After completion of Encrypted Association initialization, the Client
-MUST send to the Server a PVALID Chunk (see
+MUST send to the Server a PVALID chunk (see
 {{sctp-Crypto-chunk-newchunk-pvalid-chunk}}) containing the list of
 Protection Engines previously sent in the CRYPT parameter of the INIT
 chunk. The Server receiving the PVALID chunk will compare the
@@ -774,17 +774,17 @@ document.
 # Encrypted Data Chunk Handling {#encrypted-data-handling}
 
 With reference to the State Diagram as shown in
-{{sctp-Crypto-state-diagram}}, the handling of Control Chunks, Data
-Chunks and Encrypted chunks follows the rules defined below:
+{{sctp-Crypto-state-diagram}}, the handling of Control chunks, Data
+chunks and Encrypted chunks follows the rules defined below:
 
 - When the Association is in states CLOSED, COOKIE-WAIT, COOKIE-ECHOED
-and CRYPT PENDING, any Control Chunk is sent plain. No DATA chunks
+and CRYPT PENDING, any Control chunk is sent plain. No DATA chunks
 shall be sent in these states and DATA chunks received shall be
 silently discarded.
 
 - When the Association is in states ENCRYPTED and in general in a
 state different than CLOSED, COOKIE-WAIT, COOKIE-ECHOED and CRYPT
-PENDING, any Control Chunk as well as Data chunks will be used to
+PENDING, any Control chunk as well as Data chunks will be used to
 create an SCTP payload that will be encrypted by the Protection Engine
 and the result from that encryption will be the used as payload of an
 ENCRYPT chunk that will be the only chunk of the SCTP packet to be
@@ -808,7 +808,7 @@ sent.
 The diagram shown in {{sctp-Crypto-encrypt-chunk-states-1}} describes
 the structure of an SCTP packet being sent or received when the
 Association has not reached the ENCRYPTED state yet. In this case only
-Control Chunks or ENCRYPT chunk can be handled.  Only one ENCRYPT
+Control chunks or ENCRYPT chunk can be handled.  Only one ENCRYPT
 chunk can be sent in a SCTP packet.
 
 ~~~~~~~~~~~ aasvg
@@ -832,14 +832,14 @@ header. Only one CRYPTO chunk can be sent in a SCTP packet.
 When the Association state machine (see {{sctp-Crypto-state-diagram}})
 has reached the CRYPT PENDING state, it MAY handle KEY handshake
 inband depending on how the specification for the chosen Protection
-Engine has been defined.  In such case, the CRYPTO Chunk Handler will
-receive plain Control Chunks from the SCTP Chunk Handler and ENCRYPT
+Engine has been defined.  In such case, the CRYPTO chunk Handler will
+receive plain Control chunks from the SCTP chunk Handler and ENCRYPT
 chunks from the Protection Engine.  Plain Control chunks and ENCRYPT
 chunks CANNOT be bundled within the same SCTP packet.
 
 When the Association state machine (see {{sctp-Crypto-state-diagram}})
-has reached the ENCRYPTED state, the CRYPTO Chunk Handler will receive
-Control Chunks and Data chunks from the SCTP Chunk Handler as a
+has reached the ENCRYPTED state, the CRYPTO chunk Handler will receive
+Control chunks and Data chunks from the SCTP chunk Handler as a
 complete SCTP Payload with maximum size limited by PMTU reduced by the
 dimension of the SCTP common header and the ENCRYPT chunk header.
 
@@ -849,7 +849,7 @@ encrypted payload with maximum size PMTU reduced by the dimension of
 the SCTP common header and the ENCRYPT chunk header.
 
 Depending on the specification for the chosen Protection Engine, when
-forming the ENCRYPT chunk header the CRYPTO Chunk Handler may set the
+forming the ENCRYPT chunk header the CRYPTO chunk Handler may set the
 Flags (see {{sctp-Crypto-chunk-newchunk-crypt-struct}}).
 
 An SCTP packet containing an SCTP ENCRYPT Chunk SHALL be delivered
@@ -870,14 +870,14 @@ CANNOT be bundled within the same SCTP packet.
 When the Association state machine (see {{sctp-Crypto-state-diagram}})
 has reached the ENCRYPTED state, the CRYPTO Chunk Handler will receive
 ENCRYPT chunks from the SCTP Header Handler.  Payload from ENCRYPT
-Chunks will be forwarded to the Protection Engine in use for that
+chunks will be forwarded to the Protection Engine in use for that
 specific Association for decryption, the Protection Engine will return
 a plain SCTP Payload.  The Plain SCTP Payload will be forwarded to
 SCTP Chunk Handler that will split it in separated chunks and will
 handle them according to {{RFC9260}}.
 
 Depending on the specification for the chosen Protection Engine, when
-receiving the ENCRYPT chunk header the CRYPTO Chunk Handler may handle
+receiving the ENCRYPT chunk header the CRYPTO Cchunk Handler may handle
 the Flags (see {{sctp-Crypto-chunk-newchunk-crypt-struct}}) according
 to that specification.
 

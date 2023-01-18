@@ -107,7 +107,7 @@ chunk layering in regard to SCTP and the Upper Layer Protocol (ULP).
 |                     |
 |        ULP          |
 |                     |
-+---------------------+ <- User Level Messages
++---------------------+ <-- User Level Messages
 |                     |
 | SCTP Chunks Handler | +-- SCTP Unprotected Payload
 |                     |/

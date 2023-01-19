@@ -474,7 +474,7 @@ section 3.3.10.7) and PROTECTED in the missing param Information field.
 ~~~~~~~~~~~
 {: #sctp-Crypto-init-chunk-missing-protected title="ERROR Missing PROTECTED Paramater" artwork-align="center"}
 
-Cause Length is equal to the number of missing parameters N + 8 * 2
+Cause Length is equal to the number of missing parameters 8 + N * 2
 according to {{RFC9260}}, section 3.3.10.2.
 
 ## Error in the Protection Engine List (EPROTLIST) {#eprotlist}

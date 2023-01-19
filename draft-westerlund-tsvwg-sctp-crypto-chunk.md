@@ -274,7 +274,7 @@ the new parameter type.
 
 | Parameter Type | Parameter Name |
 | 0x80xx | Protected Association (PROTECTED) |
-{: #sctp-Crypto-chunk-init-parameter title="New INIT Parameter" cols="r l"}
+{: #sctp-Crypto-chunk-init-parameter title="New INIT/INIT-ACK Parameter" cols="r l"}
 
 Note that the parameter format requires the receiver to ignore the
 parameter and continue processing if the parameter is not understood.

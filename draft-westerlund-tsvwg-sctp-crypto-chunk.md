@@ -604,19 +604,19 @@ generate State Cookie |    +---------+ delete TCB         send ABORT
          |     +-----------------)----+-----+
          |     |                 |          |
          |     |                 v          v
-         |     |              +-----------------+
-         |     |              |  CRYPT PENDING  | If INIT/INIT-ACK
-         |     |              +--------+--------+ has CRYPT option
-         |     |                       |          start T-valid
-         |     |                       |          timer.
+         |     |              +-------------------+
+         |     |              |  PROTECT PENDING  | If INIT/INIT-ACK
+         |     |              +--------+----------+ has PROTECTED
+         |     |                       |            option start
+         |     |                       |            T-valid timer.
          |     |                       |
          |     |                       | [CRYPTO SETUP]
          |     |                       |-----------------
          |     |                       | send and receive
          |     |                       | encrypt engine handshake
-         |     |                       | by means of ENCRYPT chunks
-         |     |                       | in case of error
-         |     |                       | send plain ABORT
+         |     |                       | by means of CRYPTO chunks.
+         |     |                       |
+         |     |                       |
          |     |                       v
          |     |              +-----------------+
          |     |              |    ENCRYPTED    |
@@ -626,9 +626,9 @@ generate State Cookie |    +---------+ delete TCB         send ABORT
          |     |                       |------------------------
          |     |                       | send and receive
          |     |                       | PVALID by means of
-         |     |                       | ENCRYPT chunk
-         |     |                       | in case of error
-         |     |                       | send plain ABORT
+         |     |                       | CRYPTO chunk.
+         |     |                       |
+         |     |                       |
          |     +-----------------+     |
          +-----------------+     |     |
                            |     |     |
@@ -644,12 +644,12 @@ generate State Cookie |    +---------+ delete TCB         send ABORT
 This section describes details on the amendment to the SCTP
 association Establishment state machine.
 
-### CRYPT PENDING {#crypt-pending-state}
+### PROTECT PENDING {#protect-pending-state}
 
-The presence of CRYPT option in INIT or INIT-ACK chunk makes the State
-Machine entering CRYPT PENDING state instead of ESTABLISHED.
+The presence of PROTECT option in INIT or INIT-ACK chunk makes the State
+Machine entering PROTECT PENDING state instead of ESTABLISHED.
 
-When entering CRYPT PENDING state, a T-valid timer is started that
+When entering PROTECT PENDING state, a T-valid timer is started that
 will cover the whole validation time including the in-band KEY
 handling.  It's up to the implementor to take care of the value for
 the timer also related to the time needed for KEY handshake of each
@@ -668,7 +668,7 @@ association will enter ENCRYPTED state.
 ### ENCRYPTED {#encrypted-state}
 
 The association state machine can only reach ENCRYPTED state from
-CRYPT PENDING state (see {{crypt-pending-state}}). When entering into
+PROTECT PENDING state (see {{protect-pending-state}}). When entering into
 ENCRYPTED state the T-valid timer is running and the protection engine
 has completed the KEY handshake so that encrypted data can be sent to
 the peer.
@@ -678,15 +678,15 @@ and any other type of plain text SCTP chunks coming from the remote
 peer will be silently discarded.
 
 In ENCRYPTED state the association initiating SCTP Endpoint (Client)
-MUST validate the INIT sent CRYPT parameter, thus the Client will send
+MUST validate the INIT sent PROTECTED parameter, thus the Client will send
 a PVALID chunk that will contain exactly the same list of Protection
-Engines as previously sent in CRYPT option of INIT chunk and in the
+Engines as previously sent in PROTECTED option of INIT chunk and in the
 same order.
 
 When the Server will receive PVALID , it will compare the list of
 protection engines with the list received in the INIT chunk, if they
 are identical it will reply to the Client with a PVALID chunk
-containing the Protection Engine previously sent as CRYPT option in
+containing the Protection Engine previously sent as PROTECTED option in
 INIT-ACK chunk, it will clear the T-valid timer and will move into
 ESTABLISHED state.
 
@@ -730,11 +730,11 @@ As alternative, an SCTP Endpoint acting as Server willing to support
 only Encrypted associations shall consider INIT chunk not containing
 the PROTECTED parameter as an error, thus it will reply with an ERROR
 chunk according to what specified in {{enoprotected}} indicating that the
-mandatory CRYPT option is missing.
+mandatory PROTECTED option is missing.
 
 An SCTP Endpoint acting as Server, when receiving an INIT chunk with
 CRYPT parameter, will search the list of Protection Engines for a
-common choice and will reply with INIT-ACK containing the CRYPT
+common choice and will reply with INIT-ACK containing the PROTECTED
 parameter with the chosen Protection Engine. When the Server cannot
 find a supported Protection Engine, it will reply with ABORT and
 ERROR according to {{eprotlist}}.
@@ -757,7 +757,7 @@ silently discarded.
 After completion of Encrypted association initialization, the Client
 MUST send to the Server a PVALID chunk (see
 {{sctp-Crypto-chunk-newchunk-pvalid-chunk}}) containing the list of
-Protection Engines previously sent in the CRYPT parameter of the INIT
+Protection Engines previously sent in the PROTECTED parameter of the INIT
 chunk. The Server receiving the PVALID chunk will compare the
 Protection Engines list with the one previously received in the INIT
 chunk, if they will be exactly the same, with the same Protection
@@ -765,7 +765,7 @@ engine in the same position, it will reply to the Client with a
 PVALID chunk containing the chose Protection Engine, otherwise it will
 reply with an ABORT chunk.  When the Client will receive the PVALID
 chunk, it will compare with the previous chosen Protection Engine and
-in case of mismatch with the one received previously as CRYPT
+in case of mismatch with the one received previously as PROTECTED
 parameter in the INIT-ACK chunk, it will reply with ABORT, otherwise
 it will discard it.
 
@@ -786,12 +786,12 @@ With reference to the State Diagram as shown in
 chunks and Encrypted chunks follows the rules defined below:
 
 - When the association is in states CLOSED, COOKIE-WAIT, COOKIE-ECHOED
-and CRYPT PENDING, any Control chunk is sent plain. No DATA chunks
+and PROTECT PENDING, any Control chunk is sent plain. No DATA chunks
 shall be sent in these states and DATA chunks received shall be
 silently discarded.
 
 - When the association is in states ENCRYPTED and in general in a
-state different than CLOSED, COOKIE-WAIT, COOKIE-ECHOED and CRYPT
+state different than CLOSED, COOKIE-WAIT, COOKIE-ECHOED and PROTECT
 PENDING, any Control chunk as well as Data chunks will be used to
 create an SCTP payload that will be encrypted by the Protection Engine
 and the result from that encryption will be the used as payload of an
@@ -838,7 +838,7 @@ header. Only one CRYPTO chunk can be sent in a SCTP packet.
 ## Encrypted Data Chunk Transmission {#data-sending}
 
 When the association state machine (see {{sctp-Crypto-state-diagram}})
-has reached the CRYPT PENDING state, it MAY handle KEY handshake
+has reached the PROTECT PENDING state, it MAY handle KEY handshake
 inband depending on how the specification for the chosen Protection
 Engine has been defined.  In such case, the CRYPTO chunk Handler will
 receive plain Control chunks from the SCTP chunk Handler and ENCRYPT
@@ -866,13 +866,13 @@ without delay and SCTP bundling is NOT PERMITTED.
 ## Encrypted Data Chunk Reception {#data-receiving}
 
 When the association state machine (see {{sctp-Crypto-state-diagram}})
-has reached the CRYPT PENDING state, it MAY handle KEY handshake
+has reached the PROTECT PENDING state, it MAY handle KEY handshake
 inband depending on how the specification for the chosen Protection
 Engine has been defined.  In such case, the CRYPTO chunk Handler will
 receive plain Control Chunks and ENCRYPT chunks from the SCTP Header
 Handler.  ENCRYPT chunks will be forwarded to the Protection Engine
 whilst plain Control chunks will be forwarded to SCTP Chunk Handler.
-During CRYPT PENDING state, plain Control chunks and ENCRYPT chunks
+During PROTECT PENDING state, plain Control chunks and ENCRYPT chunks
 CANNOT be bundled within the same SCTP packet.
 
 When the association state machine (see {{sctp-Crypto-state-diagram}})

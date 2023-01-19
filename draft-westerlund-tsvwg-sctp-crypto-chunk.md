@@ -367,7 +367,7 @@ The CRYPTO chunk is used to hold the protected payload of a plain SCTP packet.
 Chunk Type: 8 bits (unsigned integer)
 : This value MUST be set to 0x0x for all CRYPTO chunks.
 
-Chunk Flags: 8 bits 
+Chunk Flags: 8 bits
 : This is used by the protection engine and ignored by SCTP.
 
 Chunk Length: 16 bits (unsigned integer)

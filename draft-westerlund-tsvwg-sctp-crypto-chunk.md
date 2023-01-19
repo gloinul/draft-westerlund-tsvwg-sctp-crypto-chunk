@@ -302,23 +302,24 @@ handshake.
 ~~~~~~~~~~~
 {: #sctp-Crypto-chunk-init-options title="Protected Association Parameter" artwork-align="center"}
 
-   Parameter Type: 16 bits (unsigned integer)
-      This value MUST be set to 0x80xx.
+{: vspace="0"}
+Parameter Type: 16 bits (unsigned integer)
+: This value MUST be set to 0x80xx.
 
-   Parameter Length: 16 bits (unsigned integer)
-      This value holds the length of the Protection Engines field in
-      bytes plus 4.
+Parameter Length: 16 bits (unsigned integer)
+: This value holds the length of the Protection Engines field in
+  bytes plus 4.
 
-   Protection Engines: variable length
-      This holds the list of protection engines in order of preference.
-      Each protection engine is specified by a 16-bit unsigned integer.
+Protection Engines: variable length
+: This holds the list of protection engines in order of preference.
+  Each protection engine is specified by a 16-bit unsigned integer.
 
-   Padding: 0 or 16 bits
-      If the length of the
-      Protection Engines field is not a multiple of 4 bytes, the sender MUST
-      pad the chunk with all zero bytes to make the chunk 32-bit
-      aligned.  The Padding MUST NOT be longer than 2 bytes and it
-      MUST be ignored by the receiver.
+Padding: 0 or 16 bits
+: If the length of the
+  Protection Engines field is not a multiple of 4 bytes, the sender MUST
+  pad the chunk with all zero bytes to make the chunk 32-bit
+  aligned.  The Padding MUST NOT be longer than 2 bytes and it
+  MUST be ignored by the receiver.
 
 RFC-Editor Note: Please replace 0x08xx with the actual parameter type
 value assigned by IANA and then remove this note.
@@ -362,23 +363,24 @@ The CRYPTO chunk is used to hold the protected payload of a plain SCTP packet.
 ~~~~~~~~~~~
 {: #sctp-Crypto-chunk-newchunk-crypt-struct title="CRYPTO Chunk Structure" artwork-align="center"}
 
-   Chunk Type: 8 bits (unsigned integer)
-      This value MUST be set to 0x0x for all CRYPTO chunks.
+{: vspace="0"}
+Chunk Type: 8 bits (unsigned integer)
+: This value MUST be set to 0x0x for all CRYPTO chunks.
 
-   Chunk Flags: 8 bits 
-      This is used by the protection engine and ignored by SCTP.
+Chunk Flags: 8 bits 
+: This is used by the protection engine and ignored by SCTP.
 
-   Chunk Length: 16 bits (unsigned integer)
-      This value holds the length of the Payload in bytes plus 4.
+Chunk Length: 16 bits (unsigned integer)
+: This value holds the length of the Payload in bytes plus 4.
 
-   Payload: variable length
-      This holds the encrypted data.
+Payload: variable length
+: This holds the encrypted data.
 
-   Padding: 0, 8, 16, or 24 bits
-      If the length of the Payload is not a multiple of 4 bytes, the sender
-      MUST pad the chunk with all zero bytes to make the chunk 32-bit
-      aligned.  The Padding MUST NOT be longer than 3 bytes and it MUST
-      be ignored by the receiver.
+Padding: 0, 8, 16, or 24 bits
+: If the length of the Payload is not a multiple of 4 bytes, the sender
+  MUST pad the chunk with all zero bytes to make the chunk 32-bit
+  aligned.  The Padding MUST NOT be longer than 3 bytes and it MUST
+  be ignored by the receiver.
 
 ##  INIT Option Validation Chunk (PVALID) {#pvalid-chunk}
 
@@ -414,27 +416,28 @@ The PVALID chunk is used to hold the protection engines list.
 ~~~~~~~~~~~
 {: #sctp-Crypto-chunk-newchunk-PVALID -struct title="PVALID Chunk Structure" artwork-align="center"}
 
-   Chunk Type: 8 bits (unsigned integer)
-      This value MUST be set to 0xXX.
+{: vspace="0"}
+Chunk Type: 8 bits (unsigned integer)
+: This value MUST be set to 0xXX.
 
-   Chunk Flags: 8 bits
-      SHOULD be set to zero on transmit and MUST be ignored on receipt.
+Chunk Flags: 8 bits
+: SHOULD be set to zero on transmit and MUST be ignored on receipt.
 
-   Chunk Length: 16 bits (unsigned integer)
-      This value holds the length of the Protection Engines field in bytes plus 4.
+Chunk Length: 16 bits (unsigned integer)
+: This value holds the length of the Protection Engines field in bytes plus 4.
 
-   Protection Engines: variable length
-      This holds the list
-      of protection engines in order of preference.  Each Protection
-      engine is specified by a 16-bit unsigned integer. This field MUST be
-      identical to the content of the Protected Association Parameter ({{crypt-parameter}}) Protection
-      Engines field that the endpoint sent in the handshake.
+Protection Engines: variable length
+: This holds the list
+  of protection engines in order of preference.  Each Protection
+  engine is specified by a 16-bit unsigned integer. This field MUST be
+  identical to the content of the Protected Association Parameter ({{crypt-parameter}}) Protection
+  Engines field that the endpoint sent in the handshake.
 
-   Padding: 0 or 16 bits
-      If the length of the Protection Engines field is not a multiple of 4 bytes, the sender
-      MUST pad the chunk with all zero bytes to make the chunk 32-bit
-      aligned.  The Padding MUST NOT be longer than 3 bytes and it MUST
-      be ignored by the receiver.
+Padding: 0 or 16 bits
+: If the length of the Protection Engines field is not a multiple of 4 bytes, the sender
+  MUST pad the chunk with all zero bytes to make the chunk 32-bit
+  aligned.  The Padding MUST NOT be longer than 3 bytes and it MUST
+  be ignored by the receiver.
 
 RFC-Editor Note: Please replace 0xXX with the actual chunk type value
 assigned by IANA and then remove this note.

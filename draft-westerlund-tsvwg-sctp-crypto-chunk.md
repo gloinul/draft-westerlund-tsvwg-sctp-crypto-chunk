@@ -121,8 +121,8 @@ chunk layering in regard to SCTP and the Upper Layer Protocol (ULP).
 |                     |
 +---------------------+
 ~~~~~~~~~~~
-{: #sctp-Crypto-chunk-layering title="CRYPTO chunk layering
-in regard to SCTP and ULP" artwork-align="center"}
+{: #sctp-Crypto-chunk-layering title="CRYPTO Chunk Layering
+in Regard to SCTP and ULP" artwork-align="center"}
 
 Use of the CRYPTO chunk is defined per SCTP association and a SCTP
 association uses a single protection engine. Different associations
@@ -300,7 +300,7 @@ handshake.
 |                               |            padding            |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ~~~~~~~~~~~
-{: #sctp-Crypto-chunk-init-options title="Protected association parameter" artwork-align="center"}
+{: #sctp-Crypto-chunk-init-options title="Protected Association Parameter" artwork-align="center"}
 
    Type: 2 byte (unsigned integer)
       This value MUST be set to 0x80xx.
@@ -805,7 +805,7 @@ sent.
 |                           Chunk #n                            |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ~~~~~~~~~~~
-{: #sctp-Crypto-encrypt-chunk-states-1 title="SCTP packet before ENCRYPTED state" artwork-align="center"}
+{: #sctp-Crypto-encrypt-chunk-states-1 title="SCTP Packet Before ENCRYPTED State" artwork-align="center"}
 
 The diagram shown in {{sctp-Crypto-encrypt-chunk-states-1}} describes
 the structure of an SCTP packet being sent or received when the
@@ -822,7 +822,7 @@ chunk can be sent in a SCTP packet.
 |                         CRYPTO Chunk                          |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ~~~~~~~~~~~
-{: #sctp-Crypto-encrypt-chunk-states-2 title="SCTP packet after ENCRYPTED state" artwork-align="center"}
+{: #sctp-Crypto-encrypt-chunk-states-2 title="SCTP Packet After ENCRYPTED State" artwork-align="center"}
 
 The diagram shown in {{sctp-Crypto-encrypt-chunk-states-2}} describes
 the structure of an SCTP packet being sent after the ENCRYPTED state

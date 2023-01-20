@@ -794,7 +794,7 @@ silently discarded.
 
 - When the association is in states ENCRYPTED and in general in a
 state different than CLOSED, COOKIE-WAIT, COOKIE-ECHOED and PROTECT
-PENDING, any Control chunk as well as Data chunks will be used to
+PENDING, any Control chunk as well as DATA chunks will be used to
 create an SCTP payload that will be encrypted by the Protection Engine
 and the result from that encryption will be the used as payload of an
 ENCRYPT chunk that will be the only chunk of the SCTP packet to be
@@ -849,7 +849,7 @@ chunks CANNOT be bundled within the same SCTP packet.
 
 When the association state machine (see {{sctp-Crypto-state-diagram}})
 has reached the ENCRYPTED state, the CRYPTO chunk Handler will receive
-Control chunks and Data chunks from the SCTP chunk Handler as a
+Control chunks and DATA chunks from the SCTP chunk Handler as a
 complete SCTP Payload with maximum size limited by PMTU reduced by the
 dimension of the SCTP common header and the CRYPTO chunk header.
 

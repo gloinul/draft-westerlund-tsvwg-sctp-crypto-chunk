@@ -311,15 +311,16 @@ Parameter Length: 16 bits (unsigned integer)
   bytes plus 4.
 
 Protection Engines: variable length
-: This holds the list of protection engines in order of preference.
-  Each protection engine is specified by a 16-bit unsigned integer.
+: In the INIT chunk this holds the list of protection engines in order
+  of preference. In the INIT-ACK chunk this holds a single chosen
+  protection engine. Each protection engine is specified by a
+  16-bit unsigned integer.
 
 Padding: 0 or 16 bits
-: If the length of the
-  Protection Engines field is not a multiple of 4 bytes, the sender MUST
-  pad the chunk with all zero bytes to make the chunk 32-bit
-  aligned.  The Padding MUST NOT be longer than 2 bytes and it
-  MUST be ignored by the receiver.
+: If the length of the Protection Engines field is not a multiple
+  of 4 bytes, the sender MUST pad the chunk with all zero bytes
+  to make the chunk 32-bit aligned. The Padding MUST NOT be longer
+  than 2 bytes and it MUST be ignored by the receiver.
 
 RFC-Editor Note: Please replace 0x08xx with the actual parameter type
 value assigned by IANA and then remove this note.
@@ -431,7 +432,7 @@ Protection Engines: variable length
   of protection engines in order of preference.  Each Protection
   engine is specified by a 16-bit unsigned integer. This field MUST be
   identical to the content of the Protected Association Parameter ({{crypt-parameter}}) Protection
-  Engines field that the endpoint sent in the handshake.
+  Engines field that the endpoint sent in the INIT chunk.
 
 Padding: 0 or 16 bits
 : If the length of the

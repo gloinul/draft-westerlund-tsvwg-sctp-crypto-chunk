@@ -434,10 +434,11 @@ Protection Engines: variable length
   Engines field that the endpoint sent in the handshake.
 
 Padding: 0 or 16 bits
-: If the length of the Protection Engines field is not a multiple of 4 bytes, the sender
-  MUST pad the chunk with all zero bytes to make the chunk 32-bit
-  aligned.  The Padding MUST NOT be longer than 3 bytes and it MUST
-  be ignored by the receiver.
+: If the length of the
+  Protection Engines field is not a multiple of 4 bytes, the sender MUST
+  pad the chunk with all zero bytes to make the chunk 32-bit
+  aligned.  The Padding MUST NOT be longer than 2 bytes and it
+  MUST be ignored by the receiver.
 
 RFC-Editor Note: Please replace 0xXX with the actual chunk type value
 assigned by IANA and then remove this note.

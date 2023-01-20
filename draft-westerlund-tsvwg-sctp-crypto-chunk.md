@@ -202,7 +202,7 @@ An example of protection engine can be DTLS.
 
 ## SCTP CRYPTO Chunk Buffering and Flow Control {#buffering}
 
-protection engine and SCTP are asynchronous, meaning that the
+Protection engine and SCTP are asynchronous, meaning that the
 protection engine may deliver the decrypted SCTP Payload to the SCTP
 endpoint without respecting the reception order.  It's up to SCTP endpoint to
 reorder the chunks in the reception buffer and to take care of the
@@ -225,10 +225,10 @@ included in the calculation.
 
 On the other hand, the protection engine needs to be informed about
 the PMTU by removing from the value the sum of the common SCTP header
-and the Encrypted chunk header. This implies that SCTP can propagate
+and the CRYPTO chunk header. This implies that SCTP can propagate
 the computed PMTU at run time specifically. The way protection engine
 provides the primitive for PMTU communication shall be part of the
-Cipher Specification.
+protection engine specification.
 
 From SCTP perspective, if there is a maximum size of plain text data
 that can be protected by the protection engine that must be
@@ -454,7 +454,7 @@ additional information.
 ## Mandatory PROTECTED Option Missing (ENOPROTECTED) {#enoprotected}
 
 When a client SCTP endpoint sends an INIT chunk that doesn't contain the
-PROTECTED association parameter towards an SCTP endpoint that only
+Protected Association parameter towards an SCTP endpoint that only
 accepts protected associations, the server endpoint will raise a
 Missing Mandatory Parameter error. The ERROR chunk will contain
 the cause code 'Missing Mandatory Parameter' (2) (see {{RFC9260}}
@@ -643,7 +643,7 @@ generate State Cookie |    +---------+ delete TCB         send ABORT
 ## New States {#new-states}
 
 This section describes details on the amendment to the SCTP
-association Establishment state machine.
+association establishment state machine.
 
 ### PROTECT PENDING {#protect-pending-state}
 

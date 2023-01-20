@@ -273,7 +273,7 @@ association setup. {{sctp-Crypto-chunk-init-parameter}} illustrates
 the new parameter type.
 
 | Parameter Type | Parameter Name |
-| 0x80xx | Protected Association (PROTECTED) |
+| 0x80xx | Protected Association (PROTECTEDASSOC) |
 {: #sctp-Crypto-chunk-init-parameter title="New INIT/INIT-ACK Parameter" cols="r l"}
 
 Note that the parameter format requires the receiver to ignore the
@@ -281,7 +281,7 @@ parameter and continue processing if the parameter is not understood.
 This is accomplished (as described in {{RFC9260}}, Section 3.2.1.)  by
 the use of the upper bits of the parameter type.
 
-## Protected Association Parameter {#crypt-parameter}
+## Protected Association Parameter {#protectedassoc-parameter}
 
 This parameter is used to carry the list of proposed protection
 engines and the chosen protection engine during INIT/INIT-ACK
@@ -431,7 +431,7 @@ Protection Engines: variable length
 : This holds the list
   of protection engines in order of preference.  Each Protection
   engine is specified by a 16-bit unsigned integer. This field MUST be
-  identical to the content of the Protected Association Parameter ({{crypt-parameter}}) Protection
+  identical to the content of the Protected Association Parameter ({{protectedassoc-parameter}}) Protection
   Engines field that the endpoint sent in the INIT chunk.
 
 Padding: 0 or 16 bits
@@ -452,14 +452,14 @@ used when SCTP endpoint detects a faulty condition. The special case is
 when the error is detected by the protection engine that may provide
 additional information.
 
-## Mandatory PROTECTED Option Missing (ENOPROTECTED) {#enoprotected}
+## Mandatory Protected Association Parameter Missing (ENOPROTECTED) {#enoprotected}
 
 When a initiator SCTP endpoint sends an INIT chunk that doesn't contain the
 Protected Association parameter towards an SCTP endpoint that only
 accepts protected associations, the responder endpoint will raise a
 Missing Mandatory Parameter error. The ERROR chunk will contain
 the cause code 'Missing Mandatory Parameter' (2) (see {{RFC9260}}
-section 3.3.10.7) and PROTECTED in the missing param Information field.
+section 3.3.10.7) and  PROTECTEDASSOC in the missing param Information field.
 
 ~~~~~~~~~~~ aasvg
  0                   1                   2                   3
@@ -469,12 +469,12 @@ section 3.3.10.7) and PROTECTED in the missing param Information field.
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                 Number of missing params = N                  |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|            PROTECTED          |     Missing Param Type #2     |
+|        PROTECTEDASSOC         |     Missing Param Type #2     |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |    Missing Param Type #N-1    |     Missing Param Type #N     |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ~~~~~~~~~~~
-{: #sctp-Crypto-init-chunk-missing-protected title="ERROR Missing PROTECTED Paramater" artwork-align="center"}
+{: #sctp-Crypto-init-chunk-missing-protected title="ERROR Missing Protected Association Paramater" artwork-align="center"}
 
 Cause Length is equal to the number of missing parameters 8 + N * 2
 according to {{RFC9260}}, section 3.3.10.2.
@@ -641,7 +641,7 @@ generate State Cookie |    +---------+ delete TCB         send ABORT
          |     |                 v          v
          |     |            +---------------------+
          |     |            |  PROTECTION PENDING | If INIT/INIT-ACK
-         |     |            +----------+----------+ has PROTECTED
+         |     |            +----------+----------+ has PROTECTEDASSOC
          |     |                       |            option start
          |     |                       |            T-valid timer.
          |     |                       |
@@ -713,15 +713,15 @@ and any other type of plain text SCTP chunks coming from the remote
 peer will be silently discarded.
 
 In PROTECTED state the association initiating SCTP Endpoint (initiator)
-MUST validate the INIT sent PROTECTED parameter, thus the initiator will send
+MUST validate the INIT sent PROTECTEDASSOC parameter, thus the initiator will send
 a PVALID chunk that will contain exactly the same list of Protection
-Engines as previously sent in PROTECTED option of INIT chunk and in the
+Engines as previously sent in  PROTECTEDASSOC parameter of INIT chunk and in the
 same order.
 
 When the responder will receive PVALID , it will compare the list of
 protection engines with the list received in the INIT chunk, if they
 are identical it will reply to the initiator with a PVALID chunk
-containing the Protection Engine previously sent as PROTECTED option in
+containing the Protection Engine previously sent as  PROTECTEDASSOC parameter in
 INIT-ACK chunk, it will clear the T-valid timer and will move into
 ESTABLISHED state.
 
@@ -763,13 +763,13 @@ in order of preference (see {{sctp-Crypto-chunk-init-options}}).
 
 As alternative, an SCTP Endpoint acting as responder willing to support
 only Protected associations shall consider INIT chunk not containing
-the PROTECTED parameter as an error, thus it will reply with an ERROR
+the PROTECTEDASSOC parameter as an error, thus it will reply with an ERROR
 chunk according to what specified in {{enoprotected}} indicating that the
-mandatory PROTECTED option is missing.
+mandatory PROTECTEDASSOC parameter is missing.
 
 An SCTP Endpoint acting as responder, when receiving an INIT chunk with
 CRYPT parameter, will search the list of Protection Engines for a
-common choice and will reply with INIT-ACK containing the PROTECTED
+common choice and will reply with INIT-ACK containing the PROTECTEDASSOC
 parameter with the chosen Protection Engine. When the responder cannot
 find a supported Protection Engine, it will reply with ABORT and
 ERROR according to {{eprotlist}}.
@@ -792,7 +792,7 @@ silently discarded.
 After completion of Protected association initialization, the initiator
 MUST send to the responder a PVALID chunk (see
 {{sctp-Crypto-chunk-newchunk-pvalid-chunk}}) containing the list of
-Protection Engines previously sent in the PROTECTED parameter of the INIT
+Protection Engines previously sent in the PROTECTEDASSOC parameter of the INIT
 chunk. The responder receiving the PVALID chunk will compare the
 Protection Engines list with the one previously received in the INIT
 chunk, if they will be exactly the same, with the same Protection
@@ -800,7 +800,7 @@ engine in the same position, it will reply to the initiator with a
 PVALID chunk containing the chose Protection Engine, otherwise it will
 reply with an ABORT chunk.  When the initiator will receive the PVALID
 chunk, it will compare with the previous chosen Protection Engine and
-in case of mismatch with the one received previously as PROTECTED
+in case of mismatch with the one received previously as PROTECTEDASSOC
 parameter in the INIT-ACK chunk, it will reply with ABORT, otherwise
 it will discard it.
 
@@ -1003,7 +1003,7 @@ available at:
 https://www.iana.org/assignments/sctp-parameters/sctp-parameters.xhtml#sctp-parameters-2
 
 | ID Value | Chunk Parameter Type | Reference |
-| TBA8 | Protected Association (CRYPTO) | RFC-To-Be |
+| TBA8 | Protected Association (PROTECTEDASSOC) | RFC-To-Be |
 {: #iana-chunk-parameter-types title="New Chunk Type Parameters Registered" cols="r l l"}
 
 

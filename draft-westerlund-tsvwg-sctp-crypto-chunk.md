@@ -148,7 +148,7 @@ SCTP CRYPTO chunk capability is agreed by the peers at the
 initialization of the SCTP association, during that phase the peers
 exchange information about the protection engine availability. Once
 the peers have agreed on what protection to use, the SCTP endpoints start
-sending SCTP Protected chunks containing the initialization
+sending SCTP Crypto chunks containing the initialization
 information related to the protection engine including the endpoint
 validation. This is depending on the chosen protection engine thus is
 not being detailed in the current specification.
@@ -182,7 +182,7 @@ that take care of KEY distribution, verification, and update.
 
 KEY Management of protection engine SHOULD exploit SCTP CRYPTO chunk for
 handshaking, in that case any packet being exchanged between
-protection engine peers shall be transported as payload of Protected
+protection engine peers shall be transported as payload of Crypto
 chunk (see {{crypto-chunk}}).
 
 KEY Management MAY use other mechanism than what provided by SCTP CRYPTO
@@ -268,7 +268,7 @@ based on packet to big ICMP messages.
 # New Parameter Type {#new-parameter-type}
 
 This section defines the new parameter type that will be used to
-negotiate the use of the CRYPTO chunk and encryption engines during
+negotiate the use of the CRYPTO chunk and protection engines during
 association setup. {{sctp-Crypto-chunk-init-parameter}} illustrates
 the new parameter type.
 
@@ -776,7 +776,7 @@ ERROR according to {{eprotlist}}.
 
 When initiator and responder have agreed on a Protected association by
 means of handshaking INIT/INIT-ACK with a common Protection Engine,
-only Control chunks and Protected chunks will be accepted. Any Data
+only Control chunks and Crypto chunks will be accepted. Any Data
 chunk being sent on an Protected association will be silently
 discarded.
 
@@ -785,7 +785,7 @@ COOKIE-ACK, the Protection Engine shall initialize itself by
 transferring its own data as Payload of the CRYPTO chunk (see
 {{sctp-Crypto-chunk-newchunk-crypt-struct}}) if necessary.  At
 completion of Protection Engine initialization, the setup of the
-Protected association is complete and from that time on only ENCRYPT
+Protected association is complete and from that time on only CRYPTO
 chunks will be exchanged.  Any other type of plain text chunks will be
 silently discarded.
 
@@ -818,7 +818,7 @@ document.
 
 With reference to the State Diagram as shown in
 {{sctp-Crypto-state-diagram}}, the handling of Control chunks, Data
-chunks and Protected chunks follows the rules defined below:
+chunks and Crypto chunks follows the rules defined below:
 
 - When the association is in states CLOSED, COOKIE-WAIT, COOKIE-ECHOED
 and PROTECTION PENDING, any Control chunk is sent plain. No DATA chunks
@@ -851,7 +851,7 @@ sent.
 The diagram shown in {{sctp-Crypto-encrypt-chunk-states-1}} describes
 the structure of an SCTP packet being sent or received when the
 association has not reached the PROTECTED state yet. In this case only
-Control chunks or CRYPTO chunk can be handled.  Only one ENCRYPT
+Control chunks or CRYPTO chunk can be handled.  Only one CRYPTO
 chunk can be sent in a SCTP packet.
 
 ~~~~~~~~~~~ aasvg
@@ -876,8 +876,8 @@ When the association state machine (see {{sctp-Crypto-state-diagram}})
 has reached the PROTECTION PENDING state, it MAY handle KEY handshake
 inband depending on how the specification for the chosen Protection
 Engine has been defined.  In such case, the CRYPTO chunk Handler will
-receive plain Control chunks from the SCTP chunk Handler and ENCRYPT
-chunks from the Protection Engine.  Plain Control chunks and ENCRYPT
+receive plain Control chunks from the SCTP chunk Handler and CRYPTO
+chunks from the Protection Engine.  Plain Control chunks and CRYPTO
 chunks CANNOT be bundled within the same SCTP packet.
 
 When the association state machine (see {{sctp-Crypto-state-diagram}})
@@ -988,7 +988,7 @@ document. The registry at time of writing was available at:
 https://www.iana.org/assignments/sctp-parameters/sctp-parameters.xhtml#sctp-parameters-1
 
 | ID Value | Chunk Type | Reference |
-| TBA6 | Protected Chunk (PROTECTED) | RFC-To-Be |
+| TBA6 | Crypto Chunk (CRYPTO) | RFC-To-Be |
 | TBA7 | Endpoint Validation Chunk (PVALID ) | RFC-To-Be |
 {: #iana-chunk-types title="New Chunk Types Registered" cols="r l l"}
 

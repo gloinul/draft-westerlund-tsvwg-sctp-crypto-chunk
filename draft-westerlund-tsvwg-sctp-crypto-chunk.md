@@ -648,23 +648,23 @@ association establishment state machine.
 
 ### PROTECT PENDING {#protect-pending-state}
 
-The presence of PROTECT option in INIT or INIT-ACK chunk makes the State
+The presence of a Protected Association Parameter in the INIT or INIT-ACK chunk makes the State
 Machine entering PROTECT PENDING state instead of ESTABLISHED.
 
 When entering PROTECT PENDING state, a T-valid timer is started that
-will cover the whole validation time including the in-band KEY
-handling.  It's up to the implementor to take care of the value for
-the timer also related to the time needed for KEY handshake of each
-protection engine.
+will cover the whole validation time including the in-band key establishment.
+It's up to the implementor to take care of the value for
+the timer also related to the time needed for the key establishment
+handshake of each protection engine.
 
-If KEY handling is in-band, the protection engine will start the
+If key establishment is in-band, the protection engine will start the
 handshake with its peer and in case of failure or T-valid
 timeout, it will generate an ERROR chunk and an ABORT chunk.  The
 ERROR handling follows what specified in {{ekeyhandshake}}.  When
 Handshake has been successfully completed, the association state
 machine will enter ENCRYPTED state.
 
-If KEY handling is out-of-band, after starting T-valid timer the SCTP
+If key establishment is out-of-band, after starting T-valid timer the SCTP
 association will enter ENCRYPTED state.
 
 ### ENCRYPTED {#encrypted-state}
@@ -672,7 +672,7 @@ association will enter ENCRYPTED state.
 The association state machine can only reach ENCRYPTED state from
 PROTECT PENDING state (see {{protect-pending-state}}). When entering into
 ENCRYPTED state the T-valid timer is running and the protection engine
-has completed the KEY handshake so that encrypted data can be sent to
+has completed the key establishment handshake so that encrypted data can be sent to
 the peer.
 
 From this time on, only ENCRYPT chunks can be sent to the remote peer

@@ -464,14 +464,15 @@ used when SCTP endpoint detects a faulty condition. The special case is
 when the error is detected by the protection engine that may provide
 additional information.
 
-## Mandatory Protected Association Parameter Missing (ENOPROTECTED) {#enoprotected}
+## Mandatory Protected Association Parameter Missing {#enoprotected}
 
 When a initiator SCTP endpoint sends an INIT chunk that doesn't contain the
 Protected Association parameter towards an SCTP endpoint that only
-accepts protected associations, the responder endpoint will raise a
+accepts protected associations, the responder endpoint SHALL raise a
 Missing Mandatory Parameter error. The ERROR chunk will contain
 the cause code 'Missing Mandatory Parameter' (2) (see {{RFC9260}}
-section 3.3.10.7) and  PROTECTEDASSOC in the missing param Information field.
+section 3.3.10.7) and PROTECTEDASSOC {{protectedassoc-parameter}}
+in the missing param Information field.
 
 ~~~~~~~~~~~ aasvg
  0                   1                   2                   3
@@ -492,7 +493,7 @@ Cause Length is equal to the number of missing parameters 8 + N * 2
 according to {{RFC9260}}, section 3.3.10.2.
 
 
-## Error in Protection (EPROTECT) {#eprotect}
+## Error in Protection {#eprotect}
 
 A new Error Type is defined for Crypto Chunk, it's a generic
 error related to the Protection mechanism describede in this
@@ -523,6 +524,9 @@ by ERROR chunk containing the relevant Error Type and Causes.
 
 Cause Length is equal to the number of Causes 8 + N * 2
 
+Below a number of defined Error Causes are defined, additional causes
+can be registered with IANA following the rules in {{IANA-Extra-Cause}}.
+
 ### Error in the Protection Engine List (EPROTLIST) {#eprotlist}
 
 If list of protection engines contained in the INIT signal doesn't
@@ -531,51 +535,50 @@ at the responder, the responder will reply with an ERROR chunk with EPROTECT
 cause code (specified in {{sctp-Crypto-new-error-causes}}) and additional
 Cause-Specific EPROTLIST.
 
-### Error During KEY Handshake (EHANDSHAKE) {#ekeyhandshake}
+### Error During Protection Handshake (EHANDSHAKE) {#ekeyhandshake}
 
-If the protection engine specifies that KEY handling is implemented
-inband it may happen that the procedure has errors. In such case an
-ERROR chunk will be sent with EPROTECT cause code (specified in
+If the protection engine specifies a hand shake for example for
+authentication and key management is implemented inband it may happen
+that the procedure has errors. In such case an ERROR chunk will be
+sent with EPROTECT cause code (specified in
 {{sctp-Crypto-new-error-causes}}) and additional Cause-Specific
-EHANDSHAKE. The error MAY contain further Cause-Specific Informations
-according to the Cipher Specification.
+EHANDSHAKE.
 
-### Error in Protection Engines Validation (EVALIDATE) {#evalidate}
+### Failure in Protection Engines Validation (EVALIDATE) {#evalidate}
 
-An error may occur during protection engine Validation (see
+An Failure may occur during protection engine Validation (see
 {encrypted-state}).
 In such case an ERROR chunk will be sent with EPROTECT cause code
 (specified in {{sctp-Crypto-new-error-causes}}) and additional
-Cause-Specific EVALIDATE.
+Cause-Specific EVALIDATE to indicate this failure. This error
+MUST be sent with an SCTP abort to terminate the SCTP association.
 
 ### Timeout During KEY Handshake or Validation (ETMOUT) {#etmout}
 
-Whenever a T-valid timeout occurs, the SCTP endpoint will send an ERROR
-chunk with ETMOUT cause (specified in
+Whenever a T-valid timeout occurs, the SCTP endpoint will send an
+ERROR chunk with ETMOUT cause (specified in
 {{sctp-Crypto-new-error-causes}}). Depending on the state, and
-additional Cause-Specific code will be added.
-If the protection engine specifies that KEY handling is implemented
-inband and the T-valid timeout occurs during the handshake
-the Cause-Specific code to use is EHANDSHAKE.
-If the T-valid timeout occurs during the Validation, the
-Cause-Specific code to use is EVALIDATE.
+additional Cause-Specific code will be added.  If the protection
+engine specifies that key management is implemented inband and the
+T-valid timeout occurs during the handshake the Cause-Specific code to
+use is EHANDSHAKE.  If the T-valid timeout occurs during the
+Validation, the Cause-Specific code to use is EVALIDATE.
 
 ## Critical Error from Protection Engine {#eengine}
 
-Protection engine MAY inform local SCTP endpoint about errors,
-in such case it's to be defined in the Cipher Specification document.
-When an Error in the protection engine compromises the
-protection mechanism, the protection engine shall stop processing
-data in such a way that the local SCTP endpoint will not be able sending
-or receiving any chunk for the specified Association.
-This will cause the Association to be closed by legacy
-timer-based mechanism. Since the Association protection is
-compromised no further data will be sent and the remote peer
-will also experience timeout on the Association.
+Protection engine MAY inform local SCTP endpoint about errors, in such
+case it's to be defined in the protection engine specification
+document.  When an Error in the protection engine compromises the
+protection mechanism, the protection engine may stop processing data
+all together, thus the local SCTP endpoint will not be able to send or
+receive any chunk for the specified Association.  This will cause the
+Association to be closed by legacy timer-based mechanism. Since the
+Association protection is compromised no further data will be sent and
+the remote peer will also experience timeout on the Association.
 
 ## Non-critical Error in the Protection Engine {#non-critical-errors}
 
-A non-critical error in the Pprotection engine means that the
+A non-critical error in the protection engine means that the
 protection engine is capable of recovering without the need
 of the whole Association to be restarted.
 
@@ -584,7 +587,7 @@ as a temporary problem in the transport and will be handled
 with retransmissions and SACKS according to {{RFC9260}}.
 
 When the protection engine will experience a non-critical error,
-an ERROR chunks SHALL NOT be sent. This way non-critical errors
+an ABORT chunk SHALL NOT be sent. This way non-critical errors
 are handled and how the protection engine will recover from
 these errors is being described in the Cipher Specifications.
 
@@ -597,17 +600,6 @@ SCTP-parameters {{IANA-SCTP-PARAMETERS}}:
 | Value | Cause Code | Reference |
 | TBA1 | EPROTECT | RFC-To-Be |
 {: #sctp-Crypto-new-error-causes title="New Error Causes" cols="r l l"}
-
-The following {{sctp-Crypto-new-local-error-causes}} defines the error
-causes that don't need IANA specification as they are subordinate to
-EPROTECT.
-
-| Value | Cause Code | Reference |
-| TBA2 | EPROTLIST | RFC-To-Be |
-| TBA3 | EHANDSHAKE | RFC-To-Be |
-| TBA4 | EVALIDATE | RFC-To-Be |
-| TBA5 | ETMOUT | RFC-To-Be |
-{: #sctp-Crypto-new-local-error-causes title="New Local Error Causes" cols="r l l"}
 
 
 # Protected SCTP State Diagram {#state-diagram}
@@ -953,11 +945,12 @@ delivers it towards the lower transport layer.
 
 # IANA Considerations {#IANA-Consideration}
 
-This document defines one new registry in the Stream Control
-Transmission Protocol (SCTP) Parameters group that IANA maintains for
-the protection engine identifiers. It also adds registry entries into
-several other registries in the Stream Control Transmission Protocol
-(SCTP) Parameters group:
+This document defines two new registries in the Stream Control
+Transmission Protocol (SCTP) Parameters group that IANA
+maintains. Theses registries are for the protection engine identifiers
+and extra cause codes for protection related errors. It also adds
+registry entries into several other registries in the Stream Control
+Transmission Protocol (SCTP) Parameters group:
 
 *  Two new SCTP Chunk Types
 
@@ -989,6 +982,35 @@ registry is depicted below in {{iana-protection-engine-identifier}}.
 
 New entries are registered following the Specification Required policy
 as defined by {{RFC8126}}.
+
+## Protection Error Cause Codes Registry {#IANA-Extra-Cause}
+
+IANA is requested to create a new registry called "Protection Error
+Cause Codes". This registry is part of the Stream Control Transmission
+Protocol (SCTP) Parameters grouping.
+
+The purpose of this registry is to enable identification of different
+protection related errors when using CRYPTO chunk and a protection
+engine.  Entries in the registry requires an Meaning, a reference to
+the specification defining the error, and a contact. Each entry will
+be assigned by IANA a unique 16-bit unsigned integer identifier for
+their protection engine. Values 0-65534 are available for
+assignment. Value 65535 is reserved for future extension. The proposed
+general form of the registry is depicted below in
+{{iana-protection-error-cause}}.
+
+| Cause Code | Meaning | Reference | Contact |
+| 0 | Error in the Protection Engine List | RFC-To-Be | Authors |
+| 1 | Error During Protection Handshake | RFC-To-Be | Authors|
+| 2 | Failure in Protection Engines Validation | RFC-To-Be | Authors |
+| 3 | Timeout During KEY Handshake or Validation | RFC-To-Be | Authors |
+| 4-65534 | Available for Assignment | RFC-To-Be | Authors |
+| 65535 | Reserved | RFC-To-Be | Authors |
+{: #iana-protection-error-cause title="Protection Error Cause Code" cols="r l l l"}
+
+New entries are registered following the Specification Required policy
+as defined by {{RFC8126}}.
+
 
 
 ## SCTP Chunk Types

@@ -78,7 +78,8 @@ features provided by SCTP and its extensions.
    authentication, data integrity protection, and data replay
    protection for SCTP packets after the SCTP association has been
    established. The exact properties will depend on the companion
-   cipher specification used with the CRYPTO chunk.
+   specification defining the protection engine used with the CRYPTO
+   chunk.
 
    Applications using SCTP CRYPTO chunk can use all transport
    features provided by SCTP and its extensions. Due to its level of
@@ -146,7 +147,7 @@ header and the SHUTDOWN-COMPLETE chunk.
 
 SCTP CRYPTO chunk capability is agreed by the peers at the
 initialization of the SCTP association, during that phase the peers
-exchange information about the protection engine availability. Once
+exchange information about the protection engines available. Once
 the peers have agreed on what protection to use, the SCTP endpoints start
 sending SCTP Crypto chunks containing the initialization
 information related to the protection engine including the endpoint
@@ -169,26 +170,26 @@ with those SCTP chunks would have been.
 
 The protection engine, independently from the security
 characteristics, needs to be capable working on an unreliable
-transport mechanism same as UDP and have own KEY handler capability.
+transport mechanism same as UDP and have own key management
+capability.
 
 SCTP CRYPTO chunk directly exploits the protection engine by
 requesting encryption and decryption of a buffer, in particular the
 encrypted buffer shall never exceed the SCTP payload size thus
 protection engine shall be aware of the PMTU (see {{pmtu}}).
 
-A protection engine may use KEYs, in this case the KEY Management
+A protection engine may use keys, in this case the key management
 part of the protection engine is the set of data and procedures
-that take care of KEY distribution, verification, and update.
+that take care of key distribution, verification, and update.
 
-KEY Management of protection engine SHOULD exploit SCTP CRYPTO chunk for
-handshaking, in that case any packet being exchanged between
-protection engine peers shall be transported as payload of Crypto
-chunk (see {{crypto-chunk}}).
+Key management of protection engine is RECOMMENDED to use the SCTP
+CRYPTO chunk for handshaking, in that case any packet being exchanged
+between protection engine peers shall be transported as payload of
+Crypto chunk (see {{crypto-chunk}}).
 
-KEY Management MAY use other mechanism than what provided by SCTP CRYPTO
-chunks, in any case the mechanism for KEY Management MUST be specified
-in the Cipher Specification document for that specific
-protection engine.
+Key management MAY use other mechanism than what provided by SCTP CRYPTO
+chunks, in any case the mechanism for key management MUST be specified
+in the specification for that protection engine.
 
 Out-of-band communication between protection engines MAY exploit the
 Flags byte provided by the CRYPTO chunk header (see
@@ -198,16 +199,24 @@ Details of the use of Flags, if different from what described in the
 current document, MUST be specified in the Cipher Specification
 document for that specific protection engine.
 
+The SCTP common header is assumed to be implicitly protected by the
+protection engine. This protection is based on the assumption that
+there will be a one to one mapping between SCTP association and
+individually established security contexts. If the protection engine
+does not meat that assumption further protection of the common header
+is likely required.
+
 An example of protection engine can be DTLS.
 
 ## SCTP CRYPTO Chunk Buffering and Flow Control {#buffering}
 
 Protection engine and SCTP are asynchronous, meaning that the
 protection engine may deliver the decrypted SCTP Payload to the SCTP
-endpoint without respecting the reception order.  It's up to SCTP endpoint to
-reorder the chunks in the reception buffer and to take care of the
-flow control according to what specified in {{RFC9260}}. From SCTP
-perspective the CRYPTO chunk is part of the transport network.
+endpoint without respecting the reception order.  It's up to SCTP
+endpoint to reorder the chunks in the reception buffer and to take
+care of the flow control according to what specified in
+{{RFC9260}}. From SCTP perspective the CRYPTO chunk processing is part
+of the transport network.
 
 Even though the above allows the implementors to adopt a
 multithreading design of the protection engines, the actual
@@ -217,11 +226,11 @@ retransmissions.
 
 ## PMTU Considerations {#pmtu}
 
-The addition of the CRYPTO chunk to SCTP reduces the room for payload, in
-order to cope with that when creating the payload of SCTP for
-protection the size of the CRYPTO chunk header and plain text
-expansion due to algorithm and any authentication tag needs to be
-included in the calculation.
+The addition of the CRYPTO chunk to SCTP reduces the room for payload,
+due to the size of the CRYPTO chunk header and plain text expansion
+due to ciphering algorithm and any authentication tag.  Thus, the SCTP
+layer creating the plain text payload needs to know about the overhead
+to adjust its target payload size appropriately.
 
 On the other hand, the protection engine needs to be informed about
 the PMTU by removing from the value the sum of the common SCTP header

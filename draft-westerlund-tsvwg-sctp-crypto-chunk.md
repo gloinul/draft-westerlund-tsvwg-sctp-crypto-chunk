@@ -344,25 +344,27 @@ transport protected SCTP payload.
 {{sctp-Crypto-chunk-newchunk-crypt}} illustrates the new chunk type.
 
 | Chunk Type | Chunk Name |
-| 0x0x | Crypto Chunk (CRYPTO) |
+| 0x4X | Crypto Chunk (CRYPTO) |
 {: #sctp-Crypto-chunk-newchunk-crypt title="CRYPTO Chunk Type" cols="r l"}
 
 RFC-Editor Note: Please replace 0x0x with the actual chunk type value
 assigned by IANA and then remove this note.
 
 It should be noted that the CRYPTO chunk format requires the receiver
-to ignore the chunk if it is not understood and silently discard all
-chunks that follow in the same SCP packet.  This is accomplished
-(as described in {{RFC9260}} Section 3.2.) by the use of the upper
-bits of the chunk type.
+stop processing this SCTP packet, discard the unrecognized chunk and
+all further chunks, and report the unrecognized chunk in an ERROR
+chunk using the 'Unrecognized Chunk Type' error cause.  This is
+accomplished (as described in {{RFC9260}} Section 3.2.) by the use of
+the upper bits of the chunk type.
 
-The CRYPTO chunk is used to hold the protected payload of a plain SCTP packet.
+The CRYPTO chunk is used to hold the protected payload of a plain SCTP
+packet.
 
 ~~~~~~~~~~~ aasvg
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|  Type = 0x0x  |  Chunk Flags  |         Chunk Length          |
+|  Type = 0x4X  |  Chunk Flags  |         Chunk Length          |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                                                               |
 |                            Payload                            |
@@ -375,7 +377,7 @@ The CRYPTO chunk is used to hold the protected payload of a plain SCTP packet.
 
 {: vspace="0"}
 Chunk Type: 8 bits (unsigned integer)
-: This value MUST be set to 0x0x for all CRYPTO chunks.
+: This value MUST be set to 0x4X for all CRYPTO chunks.
 
 Chunk Flags: 8 bits
 : This is used by the protection engine and ignored by SCTP.
@@ -400,12 +402,13 @@ chunk.  {{sctp-Crypto-chunk-newchunk-pvalid-chunk}} illustrates the new
 chunk type.
 
 | Chunk Type | Chunk Name |
-| 0x0x | INIT Option Validation (PVALID) |
+| 0x4X | INIT Option Validation (PVALID) |
 {: #sctp-Crypto-chunk-newchunk-pvalid-chunk title="PVALID Chunk Type" cols="r l"}
 
 It should be noted that the PVALID chunk format requires the receiver
-to ignore the chunk if it is not understood and silently discard all
-chunks that follow in the same SCP packet.  This is accomplished
+stop processing this SCTP packet, discard the unrecognized chunk and
+all further chunks, and report the unrecognized chunk in an ERROR
+chunk using the 'Unrecognized Chunk Type' error cause.   This is accomplished
 (as described in {{RFC9260}} Section 3.2.) by the use of the
 upper bits of the chunk type.
 
@@ -415,7 +418,7 @@ The PVALID chunk is used to hold the protection engines list.
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|  Type = 0xXX  |   Flags = 0   |         Chunk Length          |
+|  Type = 0x4X  |   Flags = 0   |         Chunk Length          |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                                                               |
 |                      Protection Engines                       |
@@ -428,10 +431,10 @@ The PVALID chunk is used to hold the protection engines list.
 
 {: vspace="0"}
 Chunk Type: 8 bits (unsigned integer)
-: This value MUST be set to 0xXX.
+: This value MUST be set to 0x4X.
 
-Chunk Flags: 8 bits
-: SHOULD be set to zero on transmit and MUST be ignored on receipt.
+Chunk Flags: 8 bits : MUST be set to zero on transmit and MUST be
+  ignored on receipt.
 
 Chunk Length: 16 bits (unsigned integer)
 : This value holds the length of the Protection Engines field in bytes plus 4.
@@ -450,7 +453,7 @@ Padding: 0 or 16 bits
   aligned.  The Padding MUST NOT be longer than 2 bytes and it
   MUST be ignored by the receiver.
 
-RFC-Editor Note: Please replace 0xXX with the actual chunk type value
+RFC-Editor Note: Please replace 0x4X with the actual chunk type value
 assigned by IANA and then remove this note.
 
 

@@ -196,7 +196,7 @@ Flags byte provided by the CRYPTO chunk header (see
 {{sctp-Crypto-chunk-newchunk-crypt-struct}}).
 
 Details of the use of Flags, if different from what described in the
-current document, MUST be specified in the Cipher Specification
+current document, MUST be specified in the Protection Engine Specification
 document for that specific protection engine.
 
 The SCTP common header is assumed to be implicitly protected by the
@@ -501,7 +501,7 @@ document and has a structure that allows detailed information
 to be added as Causes.
 
 This specification describes some of the Causes whilst the
-Cipher Specification MAY add further Causes related to the
+Protection Engine Specification MAY add further Causes related to the
 related Protection Engine.
 
 When detecting an error, SCTP will send an ABORT chunk followed
@@ -557,7 +557,7 @@ MUST be sent with an SCTP abort to terminate the SCTP association.
 
 Whenever a T-valid timeout occurs, the SCTP endpoint will send an
 ERROR chunk with ETMOUT cause (specified in
-{{sctp-Crypto-new-error-causes}}). Depending on the state, and
+{{sctp-Crypto-new-error-causes}}). Depending on the state, an
 additional Cause-Specific code will be added.  If the protection
 engine specifies that key management is implemented inband and the
 T-valid timeout occurs during the handshake the Cause-Specific code to
@@ -589,7 +589,7 @@ with retransmissions and SACKS according to {{RFC9260}}.
 When the protection engine will experience a non-critical error,
 an ABORT chunk SHALL NOT be sent. This way non-critical errors
 are handled and how the protection engine will recover from
-these errors is being described in the Cipher Specifications.
+these errors is being described in the Protection Engine Specifications.
 
 ## New Error Causes {#new_errors}
 
@@ -753,7 +753,7 @@ the handshake is specified for the Protection Engine and also on
 the characteristics of the transport network.
 This specification recommends a default value of 30 seconds for
 T-valid. This value is superseded by what recommended in the
-Cipher Specification for each Protection Engine.
+Protection Engine Specification for each Protection Engine.
 
 # Procedures {#procedures}
 

@@ -67,7 +67,7 @@ features provided by SCTP and its extensions.
    This specification defines the actual CRYPTO chunk. How to enable
    it usage, how it interacts with the SCTP association establishment
    to enable endpoint authentication, key-establishment, and other
-   features of the separate specification.
+   features require a separate protection engine specification.
 
    This specification is intended to be capable of enabling mutual
    authentication of endpoints, data confidentiality, data origin
@@ -75,7 +75,8 @@ features provided by SCTP and its extensions.
    protection for SCTP packets after the SCTP association has been
    established. The exact properties will depend on the companion
    specification defining the protection engine used with the CRYPTO
-   chunk.
+   chunk. The protection engine specification might be based on an
+   existing security protocol.
 
    Applications using SCTP CRYPTO chunk can use all transport
    features provided by SCTP and its extensions. Due to its level of
@@ -145,9 +146,9 @@ SCTP CRYPTO chunk capability is agreed by the peers at the
 initialization of the SCTP association, during that phase the peers
 exchange information about the protection engines available. Once
 the peers have agreed on what protection to use, the SCTP endpoints start
-sending SCTP Crypto chunks containing the initialization
-information related to the protection engine including the endpoint
-validation. This is depending on the chosen protection engine thus is
+sending SCTP CRYPTO chunks containing the initialization
+information related to the protection engine including key agreement and
+endpoint authentication. This is depending on the chosen protection engine thus is
 not being detailed in the current specification.
 
 When the endpoint authentication has been completed, the association
@@ -170,12 +171,11 @@ transport mechanism same as UDP and have own key management
 capability.
 
 SCTP CRYPTO chunk directly exploits the protection engine by
-requesting encryption and decryption of a buffer, in particular the
-encrypted buffer shall never exceed the SCTP payload size thus
+requesting protection and unprotection of a buffer, in particular the
+protection buffer shall never exceed the SCTP payload size thus
 protection engine shall be aware of the PMTU (see {{pmtu}}).
 
-A protection engine may use keys, in this case the key management
-part of the protection engine is the set of data and procedures
+The key management part of the protection engine is the set of data and procedures
 that take care of key distribution, verification, and update.
 
 Key management of protection engine is RECOMMENDED to use the SCTP

@@ -39,10 +39,6 @@ normative:
   RFC8174:
   RFC9260:
 
-  IANA-SCTP-PARAMETERS:
-    target: https://www.iana.org/assignments/sctp-parameters/sctp-parameters.xhtml
-    title: Stream Control Transmission Protocol (SCTP) Parameters
-
 --- abstract
 
 This document describes a method for adding cryptographic protection

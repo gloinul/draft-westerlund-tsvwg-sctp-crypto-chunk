@@ -320,10 +320,11 @@ Parameter Length: 16 bits (unsigned integer)
   bytes plus 4.
 
 Protection Engines: variable length
-: In the INIT chunk this holds the list of protection engines in order
-  of preference. In the INIT-ACK chunk this holds a single chosen
-  protection engine. Each protection engine is specified by a
-  16-bit unsigned integer.
+: In the INIT chunk this holds the list of protection engines in descending order of preference,
+  i.e. the most preferred comes first, and the least preferred last in
+  this field. In the INIT-ACK chunk this holds a single chosen
+  protection engine. Each protection engine is specified by a 16-bit
+  unsigned integer.
 
 Padding: 0 or 16 bits
 : If the length of the Protection Engines field is not a multiple
@@ -397,9 +398,10 @@ Padding: 0, 8, 16, or 24 bits
 ##  INIT Option Validation Chunk (PVALID) {#pvalid-chunk}
 
 This section defines the new chunk types that will be used to validate
-the negotiation of the protection engine selected for CRYPTO
-chunk.  {{sctp-Crypto-chunk-newchunk-pvalid-chunk}} illustrates the new
-chunk type.
+the negotiation of the protection engine selected for CRYPTO chunk.
+This to prevent down grade attacks on the negotation of protection
+engines. {{sctp-Crypto-chunk-newchunk-pvalid-chunk}} illustrates the
+new chunk type.
 
 | Chunk Type | Chunk Name |
 | 0x4X | INIT Option Validation (PVALID) |
@@ -408,9 +410,9 @@ chunk type.
 It should be noted that the PVALID chunk format requires the receiver
 stop processing this SCTP packet, discard the unrecognized chunk and
 all further chunks, and report the unrecognized chunk in an ERROR
-chunk using the 'Unrecognized Chunk Type' error cause.   This is accomplished
-(as described in {{RFC9260}} Section 3.2.) by the use of the
-upper bits of the chunk type.
+chunk using the 'Unrecognized Chunk Type' error cause.  This is
+accomplished (as described in {{RFC9260}} Section 3.2.) by the use of
+the upper bits of the chunk type.
 
 The PVALID chunk is used to hold the protection engines list.
 
@@ -439,12 +441,12 @@ Chunk Flags: 8 bits : MUST be set to zero on transmit and MUST be
 Chunk Length: 16 bits (unsigned integer)
 : This value holds the length of the Protection Engines field in bytes plus 4.
 
-Protection Engines: variable length
-: This holds the list
-  of protection engines in order of preference.  Each Protection
-  engine is specified by a 16-bit unsigned integer. This field MUST be
-  identical to the content of the Protected Association Parameter ({{protectedassoc-parameter}}) Protection
-  Engines field that the endpoint sent in the INIT chunk.
+Protection Engines: variable length : This holds the list of
+  protection engines in order of preference.  Each Protection engine is
+  specified by a 16-bit unsigned integer. This field MUST be identical
+  to the content of the Protected Association Parameter
+  ({{protectedassoc-parameter}}) Protection Engines field that the
+  endpoint sent in the INIT chunk.
 
 Padding: 0 or 16 bits
 : If the length of the
@@ -527,13 +529,13 @@ Cause Length is equal to the number of Causes 8 + N * 2
 Below a number of defined Error Causes are defined, additional causes
 can be registered with IANA following the rules in {{IANA-Extra-Cause}}.
 
-### Error in the Protection Engine List (EPROTLIST) {#eprotlist}
+### No Supported Protection Engine (EPROTLIST) {#eprotlist}
 
 If list of protection engines contained in the INIT signal doesn't
-contain at least an entry that fits the list of protection engines
-at the responder, the responder will reply with an ERROR chunk with EPROTECT
-cause code (specified in {{sctp-Crypto-new-error-causes}}) and additional
-Cause-Specific EPROTLIST.
+contain at least an entry that fits the list of protection engines at
+the responder, the responder will reply with an ERROR chunk with
+EPROTECT cause code (specified in {{sctp-Crypto-new-error-causes}})
+and the "No Supported Protection Engine" extra cause code.
 
 ### Error During Protection Handshake (EHANDSHAKE) {#ekeyhandshake}
 
@@ -547,7 +549,7 @@ EHANDSHAKE.
 ### Failure in Protection Engines Validation (EVALIDATE) {#evalidate}
 
 An Failure may occur during protection engine Validation (see
-{encrypted-state}).
+{{protected-state}}).
 In such case an ERROR chunk will be sent with EPROTECT cause code
 (specified in {{sctp-Crypto-new-error-causes}}) and additional
 Cause-Specific EVALIDATE to indicate this failure. This error
@@ -604,7 +606,7 @@ SCTP-parameters {{IANA-SCTP-PARAMETERS}}:
 
 # Protected SCTP State Diagram {#state-diagram}
 
-The {{sctp-Crypto-state-diagram}} shows the changes versus the SCTP
+The {{sctp-Crypto-state-diagram}} shows the changes of the SCTP
 association state machine as described in {{RFC9260}} section 4.
 
 ~~~~~~~~~~~ aasvg
@@ -688,72 +690,77 @@ association establishment state machine.
 The presence of a Protected Association Parameter in the INIT or INIT-ACK chunk makes the State
 Machine entering PROTECTION PENDING state instead of ESTABLISHED.
 
-When entering PROTECTION PENDING state, a T-valid timer is started that
-will cover the whole validation time including the in-band key establishment.
-It's up to the implementor to take care of the value for
-the timer also related to the time needed for the key establishment
-handshake of each protection engine.
+When entering PROTECTION PENDING state, a T-valid timer is started
+that will cover the whole validation time including the in-band key
+establishment. The value of T-valid is dependent on the protection
+engine and may also be further adjusted based if expected RTT values
+are outside of the ones commonly occurring on the general Internet,
+see {{t-valid-considerations}}.
 
 If key establishment is in-band, the protection engine will start the
-handshake with its peer and in case of failure or T-valid
-timeout, it will generate an ERROR chunk and an ABORT chunk.  The
-ERROR handling follows what specified in {{ekeyhandshake}}.  When
-Handshake has been successfully completed, the association state
-machine will enter PROTECTED state.
+handshake with its peer and in case of failure or T-valid timeout, it
+will generate an ERROR chunk and an ABORT chunk.  The ERROR handling
+follows what specified in {{ekeyhandshake}}.  When Handshake has been
+successfully completed, the association state machine will enter
+PROTECTED state.
 
-If key establishment is out-of-band, after starting T-valid timer the SCTP
-association will enter PROTECTED state.
+The protection engine specification MUST specify when PRTOECTED state
+can be entered for each endpoint. If key establishment is out-of-band,
+after starting T-valid timer the SCTP association will enter PROTECTED
+state per protection engine specification when the necessary security
+context is in place.
 
 ### PROTECTED {#protected-state}
 
 The association state machine can only reach PROTECTED state from
 PROTECTION PENDING state (see {{protection-pending-state}}). When entering into
 PROTECTED state the T-valid timer is running and the protection engine
-has completed the key establishment handshake so that protected data can be sent to
+has completed the key establishment so that protected data can be sent to
 the peer.
 
 From this time on, only CRYPTO chunks can be sent to the remote peer
 and any other type of plain text SCTP chunks coming from the remote
 peer will be silently discarded.
 
-In PROTECTED state the association initiating SCTP Endpoint (initiator)
-MUST validate the INIT sent PROTECTEDASSOC parameter, thus the initiator will send
-a PVALID chunk that will contain exactly the same list of Protection
-Engines as previously sent in  PROTECTEDASSOC parameter of INIT chunk and in the
-same order.
+In PROTECTED state the association initiating SCTP Endpoint
+(initiator) MUST validate the INIT sent PROTECTEDASSOC parameter, thus
+the initiator will send a PVALID chunk that will contain exactly the
+same list of Protection Engines as previously sent in PROTECTEDASSOC
+parameter of INIT chunk and in the same order.
 
-When the responder will receive PVALID , it will compare the list of
+When the responder will receive PVALID, it will compare the list of
 protection engines with the list received in the INIT chunk, if they
 are identical it will reply to the initiator with a PVALID chunk
-containing the Protection Engine previously sent as  PROTECTEDASSOC parameter in
-INIT-ACK chunk, it will clear the T-valid timer and will move into
-ESTABLISHED state.
+containing the Protection Engine previously sent as PROTECTEDASSOC
+parameter in INIT-ACK chunk, it will clear the T-valid timer and will
+move into ESTABLISHED state.
 
 If the lists of Protection Engines don't match, it will generate an
-ERROR chunk and an ABORT chunk. ERROR CAUSE will indicate EVALIDATE
-meaning that an error has been happening during VALIDATION of SCTP
-Endpoints.
+ERROR chunk and an ABORT chunk. ERROR CAUSE will indicate "Failure in
+Protection Engines Validation" and the SCTP association will be
+terminated.
 
-After sending PVALID , the initiator will wait for the responder to reply
-with the PVALID confirmation. The initiator will compare the Protection
-Engine received from the responder, if the value is the same it will
-clear the T-valid timer and move into ESTABLISHED state.  If the
-chosen Protection Engines don't match, it will generate an ERROR chunk
-and an ABORT chunk. ERROR CAUSE will indicate EVALIDATE meaning that
-an error has been happening during VALIDATION of SCTP Endpoints.
+After sending PVALID, the initiator will wait for the responder to
+reply with the PVALID confirmation. The initiator will compare the
+Protection Engine received from the responder, if the value is the
+same it will clear the T-valid timer and move into ESTABLISHED state.
+If the chosen Protection Engines don't match, it will generate an
+ERROR chunk and an ABORT chunk. ERROR CAUSE will indicate "Failure in
+Protection Engines Validation" that is critical.
 
 If T-valid timer expires either at initiator or responder, it will generate
 an ERROR chunk and an ABORT chunk.  The ERROR handling follows what
 specified in {{etmout}}.
 
-### Consideration on T-valid
+### Consideration on T-valid {#t-valid-considerations}
 
 The timer T-Valid supervises initializations that depend on how
 the handshake is specified for the Protection Engine and also on
 the characteristics of the transport network.
+
 This specification recommends a default value of 30 seconds for
-T-valid. This value is superseded by what recommended in the
-Protection Engine Specification for each Protection Engine.
+T-valid. This value is expected to be superseded by recommendations in
+the Protection Engine Specification for each Protection Engine.
 
 # Procedures {#procedures}
 
@@ -761,26 +768,30 @@ Protection Engine Specification for each Protection Engine.
 
 An SCTP Endpoint acting as initiator willing to create a Protected
 association shall send to the remote peer an INIT chunk containing the
-CRYPT parameter (see {{sctp-Crypto-chunk-newchunk-crypt}}) where the
-Protection Engines lists all the supported Protection Engines, given
-in order of preference (see {{sctp-Crypto-chunk-init-options}}).
+Protected Association parameter (see {{protectedassoc-parameter}})
+where all the supported Protection Engines are listed, given in order
+descending order of preference (see
+{{sctp-Crypto-chunk-init-options}}).
 
-As alternative, an SCTP Endpoint acting as responder willing to support
-only Protected associations shall consider INIT chunk not containing
-the PROTECTEDASSOC parameter as an error, thus it will reply with an ERROR
-chunk according to what specified in {{enoprotected}} indicating that the
-mandatory PROTECTEDASSOC parameter is missing.
+As alternative, an SCTP Endpoint acting as responder willing to
+support only protected associations shall consider INIT chunk not
+containing the Proteced Association parameter as an error, thus it
+will reply with an ERROR chunk according to what specified in
+{{enoprotected}} indicating that for this endpoint mandatory protected
+assocation parameter is missing.
 
-An SCTP Endpoint acting as responder, when receiving an INIT chunk with
-CRYPT parameter, will search the list of Protection Engines for a
-common choice and will reply with INIT-ACK containing the PROTECTEDASSOC
-parameter with the chosen Protection Engine. When the responder cannot
-find a supported Protection Engine, it will reply with ABORT and
-ERROR according to {{eprotlist}}.
+An SCTP Endpoint acting as responder, when receiving an INIT chunk
+with protected assocation parameter, will search the list of
+protection engines for the most preferred commonly supported choice
+and will reply with INIT-ACK containing the protected association
+parameter with the chosen protection engine. When the responder cannot
+find a supported protection engine, it will reply with ABORT and Error
+in Protection with the extra cause code for "No Supported Protection
+Engine" ({{eprotlist}}).
 
-When initiator and responder have agreed on a Protected association by
-means of handshaking INIT/INIT-ACK with a common Protection Engine,
-only Control chunks and Crypto chunks will be accepted. Any Data
+When initiator and responder have agreed on a protected association by
+means of handshaking INIT/INIT-ACK with a common protection engine,
+only control chunks and CRYPTO chunks will be accepted. Any DATA
 chunk being sent on an Protected association will be silently
 discarded.
 
@@ -790,23 +801,27 @@ transferring its own data as Payload of the CRYPTO chunk (see
 {{sctp-Crypto-chunk-newchunk-crypt-struct}}) if necessary.  At
 completion of Protection Engine initialization, the setup of the
 Protected association is complete and from that time on only CRYPTO
-chunks will be exchanged.  Any other type of plain text chunks will be
-silently discarded.
+chunks will be exchanged.  Any plain text chunks will be silently
+discarded.
 
-After completion of Protected association initialization, the initiator
-MUST send to the responder a PVALID chunk (see
+After completion of protected association initialization, the
+initiator MUST send to the responder a PVALID chunk (see
 {{sctp-Crypto-chunk-newchunk-pvalid-chunk}}) containing the list of
-Protection Engines previously sent in the PROTECTEDASSOC parameter of the INIT
-chunk. The responder receiving the PVALID chunk will compare the
-Protection Engines list with the one previously received in the INIT
-chunk, if they will be exactly the same, with the same Protection
-engine in the same position, it will reply to the initiator with a
-PVALID chunk containing the chose Protection Engine, otherwise it will
-reply with an ABORT chunk.  When the initiator will receive the PVALID
-chunk, it will compare with the previous chosen Protection Engine and
-in case of mismatch with the one received previously as PROTECTEDASSOC
-parameter in the INIT-ACK chunk, it will reply with ABORT, otherwise
-it will discard it.
+Protection Engines previously sent in the protected association
+parameter of the INIT chunk. The responder receiving the PVALID chunk
+will compare the Protection Engines list with the one previously
+received in the INIT chunk, if they are exactly the same, with the
+same Protection engine in the same position, it will reply to the
+initiator with a PVALID chunk containing the chosen Protection Engine,
+otherwise it will reply with an ABORT chunk. If the association was
+not aborted the protected assocation is considered succesfully
+established.
+
+When the initiator receive the PVALID chunk, it will compare with the
+previous chosen Protection Engine and in case of mismatch with the one
+received previously in the protected association parameter in the
+INIT-ACK chunk, it will reply with ABORT, otherwise the protected
+association is succesfully established.
 
 ## Termination of a Protected Association {#termination-procedure}
 
@@ -825,16 +840,16 @@ With reference to the State Diagram as shown in
 chunks and Crypto chunks follows the rules defined below:
 
 - When the association is in states CLOSED, COOKIE-WAIT, COOKIE-ECHOED
-and PROTECTION PENDING, any Control chunk is sent plain. No DATA chunks
-shall be sent in these states and DATA chunks received shall be
-silently discarded.
+and PROTECTION PENDING, any Control chunk is sent unprotected
+(i.e. plain text). No DATA chunks shall be sent in these states and
+DATA chunks received shall be silently discarded.
 
 - When the association is in states PROTECTED and in general in a
 state different than CLOSED, COOKIE-WAIT, COOKIE-ECHOED and PROTECTION
 PENDING, any Control chunk as well as DATA chunks will be used to
 create an SCTP payload that will be encrypted by the Protection Engine
-and the result from that encryption will be the used as payload of an
-CRYPTO chunk that will be the only chunk of the SCTP packet to be
+and the result from that encryption will be the used as payload for an
+CRYPTO chunk that will be the only chunk in the SCTP packet to be
 sent.
 
 ~~~~~~~~~~~ aasvg
@@ -855,7 +870,7 @@ sent.
 The diagram shown in {{sctp-Crypto-encrypt-chunk-states-1}} describes
 the structure of an SCTP packet being sent or received when the
 association has not reached the PROTECTED state yet. In this case only
-Control chunks or CRYPTO chunk can be handled.  Only one CRYPTO
+control chunks or CRYPTO chunk can be handled.  Only one CRYPTO
 chunk can be sent in a SCTP packet.
 
 ~~~~~~~~~~~ aasvg
@@ -877,30 +892,30 @@ header. Only one CRYPTO chunk can be sent in a SCTP packet.
 ## Protected Data Chunk Transmission {#data-sending}
 
 When the association state machine (see {{sctp-Crypto-state-diagram}})
-has reached the PROTECTION PENDING state, it MAY handle KEY handshake
-inband depending on how the specification for the chosen Protection
-Engine has been defined.  In such case, the CRYPTO chunk Handler will
-receive plain Control chunks from the SCTP chunk Handler and CRYPTO
-chunks from the Protection Engine.  Plain Control chunks and CRYPTO
-chunks CANNOT be bundled within the same SCTP packet.
+has reached the PROTECTION PENDING state, it MAY perform protection
+engine key management inband depending on how the specification for the
+chosen Protection Engine has been defined.  In such case, the CRYPTO
+chunk Handler will receive plain control chunks from the SCTP chunk
+handler and CRYPTO chunks from the protection engine.  Plain control
+chunks and CRYPTO chunks MUST NOT be bundled within the same SCTP
+packet.
 
 When the association state machine (see {{sctp-Crypto-state-diagram}})
-has reached the PROTECTED state, the CRYPTO chunk Handler will receive
-Control chunks and DATA chunks from the SCTP chunk Handler as a
-complete SCTP Payload with maximum size limited by PMTU reduced by the
-dimension of the SCTP common header and the CRYPTO chunk header.
+has reached the PROTECTED state, the CRYPTO chunk handler will receive
+control chunks and DATA chunks from the SCTP chunk handler as a
+complete SCTP payload with maximum size limited by PMTU reduced by the
+size of the SCTP common header and the CRYPTO chunk overhead.
 
-That plain payload will be sent to the Protection Engine in use for
-that specific association, the Protection Engine will return an
-encrypted payload with maximum size PMTU reduced by the dimension of
-the SCTP common header and the CRYPTO chunk header.
+That plain payload will be sent to the protection engine in use for
+that specific association, the protection engine will return an
+encrypted payload.
 
-Depending on the specification for the chosen Protection Engine, when
-forming the CRYPTO chunk header the CRYPTO chunk Handler may set the
-Flags (see {{sctp-Crypto-chunk-newchunk-crypt-struct}}).
+Depending on the specification for the chosen protection engine, when
+forming the CRYPTO chunk header the CRYPTO chunk handler may set the
+chunk header flags (see {{sctp-Crypto-chunk-newchunk-crypt-struct}}).
 
 An SCTP packet containing an SCTP CRYPTO chunk SHALL be delivered
-without delay and SCTP bundling is NOT PERMITTED.
+without delay and SCTP bundling SHALL NOT be performed.
 
 ## Protected Data Chunk Reception {#data-receiving}
 

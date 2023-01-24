@@ -282,7 +282,7 @@ association setup. {{sctp-Crypto-chunk-init-parameter}} illustrates
 the new parameter type.
 
 | Parameter Type | Parameter Name |
-| 0x80xx | Protected Association (PROTECTEDASSOC) |
+| 0x80xx | Protected Association |
 {: #sctp-Crypto-chunk-init-parameter title="New INIT/INIT-ACK Parameter" cols="r l"}
 
 Note that the parameter format requires the receiver to ignore the
@@ -395,7 +395,7 @@ Padding: 0, 8, 16, or 24 bits
   aligned.  The Padding MUST NOT be longer than 3 bytes and it MUST
   be ignored by the receiver.
 
-##  INIT Option Validation Chunk (PVALID) {#pvalid-chunk}
+##  Protected Association Parameter Validation Chunk (PVALID) {#pvalid-chunk}
 
 This section defines the new chunk types that will be used to validate
 the negotiation of the protection engine selected for CRYPTO chunk.
@@ -404,7 +404,7 @@ engines. {{sctp-Crypto-chunk-newchunk-pvalid-chunk}} illustrates the
 new chunk type.
 
 | Chunk Type | Chunk Name |
-| 0x4X | INIT Option Validation (PVALID) |
+| 0x4X | Protected Association Parameter Validation (PVALID) |
 {: #sctp-Crypto-chunk-newchunk-pvalid-chunk title="PVALID Chunk Type" cols="r l"}
 
 It should be noted that the PVALID chunk format requires the receiver
@@ -468,13 +468,14 @@ additional information.
 
 ## Mandatory Protected Association Parameter Missing {#enoprotected}
 
-When a initiator SCTP endpoint sends an INIT chunk that doesn't contain the
-Protected Association parameter towards an SCTP endpoint that only
-accepts protected associations, the responder endpoint SHALL raise a
-Missing Mandatory Parameter error. The ERROR chunk will contain
-the cause code 'Missing Mandatory Parameter' (2) (see {{RFC9260}}
-section 3.3.10.7) and PROTECTEDASSOC {{protectedassoc-parameter}}
-in the missing param Information field.
+When a initiator SCTP endpoint sends an INIT chunk that doesn't
+contain the Protected Association parameter towards an SCTP endpoint
+that only accepts protected associations, the responder endpoint SHALL
+raise a Missing Mandatory Parameter error. The ERROR chunk will
+contain the cause code 'Missing Mandatory Parameter' (2) (see
+{{RFC9260}} section 3.3.10.7) and the protected association parameter
+identifier {{protectedassoc-parameter}} in the missing param
+Information field.
 
 ~~~~~~~~~~~ aasvg
  0                   1                   2                   3
@@ -484,7 +485,7 @@ in the missing param Information field.
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                 Number of missing params = N                  |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|        PROTECTEDASSOC         |     Missing Param Type #2     |
+|   Protected Association ID    |     Missing Param Type #2     |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |    Missing Param Type #N-1    |     Missing Param Type #N     |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -497,12 +498,12 @@ according to {{RFC9260}}, section 3.3.10.2.
 
 ## Error in Protection {#eprotect}
 
-A new Error Type is defined for Crypto Chunk, it's a generic
+A new Error Type is defined for Crypto Chunk, it's used for any
 error related to the Protection mechanism describede in this
 document and has a structure that allows detailed information
-to be added as Causes.
+to be added as extra causes.
 
-This specification describes some of the Causes whilst the
+This specification describes some of the causes whilst the
 Protection Engine Specification MAY add further Causes related to the
 related Protection Engine.
 
@@ -513,58 +514,73 @@ by ERROR chunk containing the relevant Error Type and Causes.
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|     Cause Code = EPROTECT     |         Cause Length          |
+|     Cause Code = TBA9         |         Cause Length          |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                   Number of Extra Causes = N                  |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|         Extra Cause #2        |         Extra Cause #2        |
+|         Extra Cause #1        |         Extra Cause #2        |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |        Extra Cause #N-1       |         Extra Cause #N        |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ~~~~~~~~~~~
-{: #sctp-eprotect-error-structure title="ERROR EPROTECT Causes" artwork-align="center"}
+{: #sctp-eprotect-error-structure title="Error in Protection Cause Format" artwork-align="center"}
 
-Cause Length is equal to the number of Causes 8 + N * 2
+Casuse Code:
+: The SCTP Error Chunk Cause Code indicating "Error in Protection" is TBA9.
+
+Cause Length: 16-bit unsigned integer
+: Is for N extra Causes equal to  4 + N * 2
+
+Extra Cause: A 16-bit unsigned integer
+: Each Extra Cause indicate an additiona piece of information as part
+  of the error. There MAY be 0 to as many as can fit in the extra
+  cause field in the ERROR Chunk (A maximum of 32764).
+
+Editors Note: Please replace TBA9 above with what is assigned by IANA.
 
 Below a number of defined Error Causes are defined, additional causes
 can be registered with IANA following the rules in {{IANA-Extra-Cause}}.
 
-### No Supported Protection Engine (EPROTLIST) {#eprotlist}
+### No Supported Protection Engine {#eprotlist}
 
 If list of protection engines contained in the INIT signal doesn't
 contain at least an entry that fits the list of protection engines at
-the responder, the responder will reply with an ERROR chunk with
-EPROTECT cause code (specified in {{sctp-Crypto-new-error-causes}})
-and the "No Supported Protection Engine" extra cause code.
+the responder, the responder will reply with an ERROR chunk with error
+in protection cause code (specified in
+{{eprotect}}) and the "No Supported Protection
+Engine" extra cause code identifier 0x00.
 
-### Error During Protection Handshake (EHANDSHAKE) {#ekeyhandshake}
+### Error During Protection Handshake {#ekeyhandshake}
 
 If the protection engine specifies a hand shake for example for
 authentication and key management is implemented inband it may happen
 that the procedure has errors. In such case an ERROR chunk will be
-sent with EPROTECT cause code (specified in
-{{sctp-Crypto-new-error-causes}}) and additional Cause-Specific
-EHANDSHAKE.
+sent with error in protection cause code (specified in
+{{eprotect}}) and extra cause
+"Error During Protection Handshake" identifier 0x01.
 
-### Failure in Protection Engines Validation (EVALIDATE) {#evalidate}
+### Failure in Protection Engines Validation {#evalidate}
 
 An Failure may occur during protection engine Validation (see
-{{protected-state}}).
-In such case an ERROR chunk will be sent with EPROTECT cause code
-(specified in {{sctp-Crypto-new-error-causes}}) and additional
-Cause-Specific EVALIDATE to indicate this failure. This error
-MUST be sent with an SCTP abort to terminate the SCTP association.
+{{protected-state}}).  In such case an ERROR chunk will be sent with
+error in protection cause code (specified in
+{{eprotect}}) and extra cause "Failure in
+Protection Engines Validation" identifer 0x02 to indicate this
+failure. This error MUST be sent together with an SCTP abort to
+terminate the SCTP association.
 
-### Timeout During KEY Handshake or Validation (ETMOUT) {#etmout}
+### Timeout During Protection Handshake or Validation {#etmout}
 
 Whenever a T-valid timeout occurs, the SCTP endpoint will send an
-ERROR chunk with ETMOUT cause (specified in
-{{sctp-Crypto-new-error-causes}}). Depending on the state, an
-additional Cause-Specific code will be added.  If the protection
-engine specifies that key management is implemented inband and the
-T-valid timeout occurs during the handshake the Cause-Specific code to
-use is EHANDSHAKE.  If the T-valid timeout occurs during the
-Validation, the Cause-Specific code to use is EVALIDATE.
+ERROR chunk with "Error in Protection" cause (specified in
+{{eprotect}}) and extra cause "Timeout During
+Protection Handshake or Validation" identifer 0x03 to indicate this
+failure.  To indicate in which phase the timeout occured an additional
+extra cause code is added. If the protection engine specifies that key
+management is implemented inband and the T-valid timeout occurs during
+the handshake the Cause-Specific code to add is "Error During
+Protection Handshake" identifier 0x01.  If the T-valid timeout occurs
+during the protection association parameter validation, the extra
+cause code to use is "Failure in Protection Engines Validation"
+identifer 0x02.
 
 ## Critical Error from Protection Engine {#eengine}
 
@@ -592,17 +608,6 @@ When the protection engine will experience a non-critical error,
 an ABORT chunk SHALL NOT be sent. This way non-critical errors
 are handled and how the protection engine will recover from
 these errors is being described in the Protection Engine Specifications.
-
-## New Error Causes {#new_errors}
-
-This section lists the new error cause that are to be used.
-They require additional lines of the "Error Cause Codes" table in
-SCTP-parameters {{IANA-SCTP-PARAMETERS}}:
-
-| Value | Cause Code | Reference |
-| TBA1 | EPROTECT | RFC-To-Be |
-{: #sctp-Crypto-new-error-causes title="New Error Causes" cols="r l l"}
-
 
 # Protected SCTP State Diagram {#state-diagram}
 
@@ -647,8 +652,9 @@ generate State Cookie |    +---------+ delete TCB         send ABORT
          |     |                 v          v
          |     |            +---------------------+
          |     |            |  PROTECTION PENDING | If INIT/INIT-ACK
-         |     |            +----------+----------+ has PROTECTEDASSOC
-         |     |                       |            option start
+         |     |            +----------+----------+ has Protected
+	 |     |                       |            Association
+         |     |                       |            Parameter start
          |     |                       |            T-valid timer.
          |     |                       |
          |     |                       | [CRYPTO SETUP]
@@ -723,17 +729,17 @@ and any other type of plain text SCTP chunks coming from the remote
 peer will be silently discarded.
 
 In PROTECTED state the association initiating SCTP Endpoint
-(initiator) MUST validate the INIT sent PROTECTEDASSOC parameter, thus
-the initiator will send a PVALID chunk that will contain exactly the
-same list of Protection Engines as previously sent in PROTECTEDASSOC
-parameter of INIT chunk and in the same order.
+(initiator) MUST validate the INIT sent protected association
+parameter, thus the initiator will send a PVALID chunk that will
+contain exactly the same list of Protection Engines as previously sent
+in protected association parameter of INIT chunk and in the same order.
 
 When the responder will receive PVALID, it will compare the list of
 protection engines with the list received in the INIT chunk, if they
 are identical it will reply to the initiator with a PVALID chunk
-containing the Protection Engine previously sent as PROTECTEDASSOC
-parameter in INIT-ACK chunk, it will clear the T-valid timer and will
-move into ESTABLISHED state.
+containing the Protection Engine previously sent as protected
+association parameter in INIT-ACK chunk, it will clear the T-valid
+timer and will move into ESTABLISHED state.
 
 If the lists of Protection Engines don't match, it will generate an
 ERROR chunk and an ABORT chunk. ERROR CAUSE will indicate "Failure in
@@ -971,7 +977,7 @@ Transmission Protocol (SCTP) Parameters group:
 
 *  One new SCTP Chunk Parameter Type
 
-*  Two new SCTP Error Cause Codes
+*  One new SCTP Error Cause Codes
 
 
 ## Protection Engine Identifier Registry
@@ -1038,7 +1044,7 @@ https://www.iana.org/assignments/sctp-parameters/sctp-parameters.xhtml#sctp-para
 
 | ID Value | Chunk Type | Reference |
 | TBA6 | Crypto Chunk (CRYPTO) | RFC-To-Be |
-| TBA7 | Endpoint Validation Chunk (PVALID ) | RFC-To-Be |
+| TBA7 | Protected Association Parameter Validation (PVALID) | RFC-To-Be |
 {: #iana-chunk-types title="New Chunk Types Registered" cols="r l l"}
 
 
@@ -1052,22 +1058,21 @@ available at:
 https://www.iana.org/assignments/sctp-parameters/sctp-parameters.xhtml#sctp-parameters-2
 
 | ID Value | Chunk Parameter Type | Reference |
-| TBA8 | Protected Association (PROTECTEDASSOC) | RFC-To-Be |
+| TBA8 | Protected Association | RFC-To-Be |
 {: #iana-chunk-parameter-types title="New Chunk Type Parameters Registered" cols="r l l"}
 
 
 ## SCTP Error Cause Codes
 
 In the Stream Control Transmission Protocol (SCTP) Parameters group's
-"Error Cause Codes" registry, IANA is requested to add the three new
-entries depicted below in in {{iana-error-cause-codes}} with a
+"Error Cause Codes" registry, IANA is requested to add the new
+entry depicted below in in {{iana-error-cause-codes}} with a
 reference to this document. The registry at time of writing was
 available at:
 https://www.iana.org/assignments/sctp-parameters/sctp-parameters.xhtml#sctp-parameters-24
 
 | ID Value | Error Cause Codes | Reference |
 | TBA9 | Protection Engine Error | RFC-To-Be |
-| TBA10 | Crypto Chunk Parameter Missing | RFC-To-Be |
 {: #iana-error-cause-codes title="Error Cause Codes Parameters Registered" cols="r l l"}
 
 

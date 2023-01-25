@@ -32,6 +32,7 @@ author:
    email: claudio.porfiri@ericsson.com
 
 informative:
+  RFC8446:
 
 normative:
   RFC2119:
@@ -1093,3 +1094,14 @@ as if the peers had been communicating in the absence of an attacker.
 The protection engine initial handshake is verified before the
 association is set as ESTABLISHED, thus no user data are sent before
 validation.
+
+The downgrade protection is only as strong as the weakest of the
+supported protection engines as an active attacker can trick the
+endpoints to negotiate the weakest protection engine and then
+modify the weakly protected CRYPTO chunks to decive the endpoints
+that the negotiation of the protection engines is validated. This
+is similar to the downgrade protection in TLS 1.3 specified in
+Section 4.1.3. of {{RFC8446}} where downgrade protection is not
+provided when TLS 1.2 with static RSA is used. It is RECOMMENDED
+to only support a limited set of strongly profiled protection
+engines.

@@ -438,12 +438,11 @@ Chunk Flags: 8 bits : MUST be set to zero on transmit and MUST be
 Chunk Length: 16 bits (unsigned integer)
 : This value holds the length of the Protection Engines field in bytes plus 4.
 
-Protection Engines: variable length : This holds the list of
-  protection engines in order of preference.  Each Protection engine is
-  specified by a 16-bit unsigned integer. This field MUST be identical
-  to the content of the Protected Association Parameter
-  ({{protectedassoc-parameter}}) Protection Engines field that the
-  endpoint sent in the INIT chunk.
+Protection Engines: variable length
+: This holds the list of protection engines where each protection engine is
+  specified by a 16-bit unsigned integer. The field MUST be identical to the
+  content of the Protected Association Parameter ({{protectedassoc-parameter}})
+  Protection Engines field that the endpoint sent in the INIT or INIT-ACK chunk.
 
 Padding: 0 or 16 bits
 : If the length of the

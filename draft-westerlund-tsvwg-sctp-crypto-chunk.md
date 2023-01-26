@@ -345,7 +345,7 @@ transport protected SCTP payload.
 | 0x4X | Crypto Chunk (CRYPTO) |
 {: #sctp-Crypto-chunk-newchunk-crypt title="CRYPTO Chunk Type" cols="r l"}
 
-RFC-Editor Note: Please replace 0x0x with the actual chunk type value
+RFC-Editor Note: Please replace 0x4x with the actual chunk type value
 assigned by IANA and then remove this note.
 
 It should be noted that the CRYPTO chunk format requires the receiver
@@ -495,7 +495,7 @@ according to {{RFC9260}}, section 3.3.10.2.
 ## Error in Protection {#eprotect}
 
 A new Error Type is defined for Crypto Chunk, it's used for any
-error related to the Protection mechanism describede in this
+error related to the Protection mechanism described in this
 document and has a structure that allows detailed information
 to be added as extra causes.
 
@@ -547,7 +547,7 @@ Engine" extra cause code identifier 0x00.
 ### Error During Protection Handshake {#ekeyhandshake}
 
 If the protection engine specifies a hand shake for example for
-authentication and key management is implemented inband it may happen
+authentication, and key management is implemented inband, it may happen
 that the procedure has errors. In such case an ERROR chunk will be
 sent with error in protection cause code (specified in
 {{eprotect}}) and extra cause
@@ -771,7 +771,7 @@ the Protection Engine Specification for each Protection Engine.
 An SCTP Endpoint acting as initiator willing to create a Protected
 association shall send to the remote peer an INIT chunk containing the
 Protected Association parameter (see {{protectedassoc-parameter}})
-where all the supported Protection Engines are listed, given in order
+where all the supported Protection Engines are listed, given in
 descending order of preference (see
 {{sctp-Crypto-chunk-init-options}}).
 
@@ -898,9 +898,9 @@ has reached the PROTECTION PENDING state, it MAY perform protection
 engine key management inband depending on how the specification for the
 chosen Protection Engine has been defined.  In such case, the CRYPTO
 chunk Handler will receive plain control chunks from the SCTP chunk
-handler and CRYPTO chunks from the protection engine.  Plain control
-chunks and CRYPTO chunks MUST NOT be bundled within the same SCTP
-packet.
+handler and payload for CRYPTO chunks from the protection engine.
+Plain control chunks and CRYPTO chunks MUST NOT be bundled within the
+same SCTP packet.
 
 When the association state machine (see {{sctp-Crypto-state-diagram}})
 has reached the PROTECTED state, the CRYPTO chunk handler will receive
@@ -913,7 +913,7 @@ that specific association, the protection engine will return an
 encrypted payload.
 
 Depending on the specification for the chosen protection engine, when
-forming the CRYPTO chunk header the CRYPTO chunk handler may set the
+forming the CRYPTO chunk header the CRYPTO chunk handler MAY set the
 chunk header flags (see {{sctp-Crypto-chunk-newchunk-crypt-struct}}).
 
 An SCTP packet containing an SCTP CRYPTO chunk SHALL be delivered
@@ -929,7 +929,8 @@ receive plain control chunks and CRYPTO chunks from the SCTP Header
 Handler.  CRYPTO chunks will be forwarded to the protection engine
 whilst plain control chunks will be forwarded to SCTP chunk handler.
 During PROTECTION PENDING state, plain control chunks and CRYPTO chunks
-CANNOT be bundled within the same SCTP packet.
+bundled within the same SCTP packet will be handled as protocol
+error.
 
 When the association state machine (see {{sctp-Crypto-state-diagram}})
 has reached the PROTECTED state, the CRYPTO chunk handler will receive
@@ -941,7 +942,7 @@ SCTP Chunk Handler that will split it in separated chunks and will
 handle them according to {{RFC9260}}.
 
 Depending on the specification for the chosen protection engine, when
-receiving the CRYPTO chunk header the CRYPTO Chunk Handler may handle
+receiving the CRYPTO chunk header the CRYPTO Chunk Handler MAY handle
 the Flags (see {{sctp-Crypto-chunk-newchunk-crypt-struct}}) according
 to that specification.
 

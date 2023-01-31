@@ -649,7 +649,7 @@ generate State Cookie |    +---------+ delete TCB         send ABORT
          |     |            +---------------------+
          |     |            |  PROTECTION PENDING | If INIT/INIT-ACK
          |     |            +----------+----------+ has Protected
-	 |     |                       |            Association
+	       |     |                       |            Association
          |     |                       |            Parameter start
          |     |                       |            T-valid timer.
          |     |                       |
@@ -977,7 +977,7 @@ Transmission Protocol (SCTP) Parameters group:
 *  One new SCTP Error Cause Codes
 
 
-## Protection Engine Identifier Registry
+## Protection Engine Identifier Registry {#iana-protection-engines}
 
 IANA is requested to create a new registry called "CRYPTO Chunk
 Protection Engine Identifiers". This registry is part of the Stream
@@ -1105,3 +1105,30 @@ Section 4.1.3. of {{RFC8446}} where downgrade protection is not
 provided when TLS 1.2 with static RSA is used. It is RECOMMENDED
 to only support a limited set of strongly profiled protection
 engines.
+
+# Requirements towards the protection engines {#requirements}
+
+This section specifies what is to be specified in the description
+of a protection engine.
+
+## Inheritance
+
+The protection engine will inherit the speciications from this
+document and shall not override it or parts of it when not
+specifically permitted.
+
+## Protection Engine registration
+
+The protection engine specification will have one or more
+protection engine to be used in the Protected Association parameter
+as protection engines registered with IANA (see {{iana-protection-engines}}).
+
+## Usage of CRYPTO Chunk
+
+The protection engine specification will detail the usage of CRYPTO chunk
+and provide the meaning of all bits used in the Flags, if any.
+
+## State machine integration
+
+The protection engine specification will detail the state transition
+between PROTECTION PENDING and PROTECTED state (see {{state-diagram}}).

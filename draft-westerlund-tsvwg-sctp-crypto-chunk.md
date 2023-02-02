@@ -649,7 +649,7 @@ generate State Cookie |    +---------+ delete TCB         send ABORT
          |     |            +---------------------+
          |     |            |  PROTECTION PENDING | If INIT/INIT-ACK
          |     |            +----------+----------+ has Protected
-	       |     |                       |            Association
+	 |     |                       |            Association
          |     |                       |            Parameter start
          |     |                       |            T-valid timer.
          |     |                       |

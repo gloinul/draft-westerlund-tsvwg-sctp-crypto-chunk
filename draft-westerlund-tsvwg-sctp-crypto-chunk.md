@@ -1111,24 +1111,19 @@ engines.
 This section specifies what is to be specified in the description
 of a protection engine.
 
-## Inheritance
+ * Define how to protect the plain text set of chunks and encapsulate
+   them in the CRYPTO Chunk payload.
 
-The protection engine will inherit the speciications from this
-document and shall not override it or parts of it when not
-specifically permitted.
+ * Can define its usage of the 8-bit chunk Flags field in the CRYPTO
+   chunk
 
-## Protection Engine registration
+ * Is required to register the defined protection engine(s) with IANA
+   per {{iana-protection-engines}}.
 
-The protection engine specification will have one or more
-protection engine to be used in the Protected Association parameter
-as protection engines registered with IANA (see {{iana-protection-engines}}).
+ * Define how it and in such case how it transmits SCTP packets that
+   are not created by the SCTP chunk handler, and instead by the
+   Protection engine. This requires consideration of congestion
+   control and path MTU.
 
-## Usage of CRYPTO Chunk
-
-The protection engine specification will detail the usage of CRYPTO chunk
-and provide the meaning of all bits used in the Flags, if any.
-
-## State machine integration
-
-The protection engine specification will detail the state transition
-between PROTECTION PENDING and PROTECTED state (see {{state-diagram}}).
+ * detail the state transition between PROTECTION PENDING and
+   PROTECTED state (see {{state-diagram}}).

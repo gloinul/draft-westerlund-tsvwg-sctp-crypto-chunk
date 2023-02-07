@@ -168,7 +168,7 @@ with those SCTP chunks would have been.
 
 The protection engine, independently from the security
 characteristics, needs to be capable working on an unreliable
-transport mechanism same as UDP and have own key management
+transport mechanism same as UDP and have its own key management
 capability.
 
 SCTP CRYPTO chunk directly exploits the protection engine by
@@ -239,7 +239,7 @@ protection engine specification.
 From SCTP perspective, if there is a maximum size of plain text data
 that can be protected by the protection engine that must be
 communicated to SCTP. As such a limit will limit the PMTU for SCTP to
-the maximums plain text plus CRYPTO chunk and algorithm overhead plus
+the maximum plain text plus CRYPTO chunk and algorithm overhead plus
 the SCTP common header.
 
 ## Congestion Control Considerations {#congestion}
@@ -432,8 +432,8 @@ The PVALID chunk is used to hold the protection engines list.
 Chunk Type: 8 bits (unsigned integer)
 : This value MUST be set to 0x4X.
 
-Chunk Flags: 8 bits : MUST be set to zero on transmit and MUST be
-  ignored on receipt.
+Chunk Flags: 8 bits
+: MUST be set to zero on transmit and MUST be ignored on receipt.
 
 Chunk Length: 16 bits (unsigned integer)
 : This value holds the length of the Protection Engines field in bytes plus 4.
@@ -519,13 +519,14 @@ by ERROR chunk containing the relevant Error Type and Causes.
 ~~~~~~~~~~~
 {: #sctp-eprotect-error-structure title="Error in Protection Cause Format" artwork-align="center"}
 
-Casuse Code:
+{: vspace="0"}
+Casuse Code: 16 bits (unsigned integer)
 : The SCTP Error Chunk Cause Code indicating "Error in Protection" is TBA9.
 
-Cause Length: 16-bit unsigned integer
+Cause Length: 16 bits (unsigned integer)
 : Is for N extra Causes equal to  4 + N * 2
 
-Extra Cause: A 16-bit unsigned integer
+Extra Cause: 16 bits (unsigned integer)
 : Each Extra Cause indicate an additional piece of information as part
   of the error. There MAY be 0 to as many as can fit in the extra
   cause field in the ERROR Chunk (A maximum of 32764).

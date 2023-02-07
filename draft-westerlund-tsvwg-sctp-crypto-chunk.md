@@ -842,18 +842,24 @@ With reference to the State Diagram as shown in
 {{sctp-Crypto-state-diagram}}, the handling of Control chunks, Data
 chunks and Crypto chunks follows the rules defined below:
 
-- When the association is in states CLOSED, COOKIE-WAIT, COOKIE-ECHOED
-and PROTECTION PENDING, any Control chunk is sent unprotected
-(i.e. plain text). No DATA chunks shall be sent in these states and
-DATA chunks received shall be silently discarded.
+- When the association is in states CLOSED, COOKIE-WAIT, and
+COOKIE-ECHOED, any Control chunk is sent unprotected (i.e. plain
+text). No DATA chunks shall be sent in these states and DATA chunks
+received shall be silently discarded.
+
+- When the association is in state and PROTECTION PENDING, any Control
+chunk is sent unprotected (i.e. plain text). No DATA chunks shall be
+sent in these states and DATA chunks received shall be silently
+discarded. CRYPTO Chunks can be sent by the Protection Enginen to
+establish its security context.
 
 - When the association is in states PROTECTED and in general in a
 state different than CLOSED, COOKIE-WAIT, COOKIE-ECHOED and PROTECTION
-PENDING, any Control chunk as well as DATA chunks will be used to
-create an SCTP payload that will be encrypted by the Protection Engine
-and the result from that encryption will be the used as payload for an
-CRYPTO chunk that will be the only chunk in the SCTP packet to be
-sent.
+PENDING, any SCTP chunk including DATA chunks, but excluding CRYPTO
+chunk, will be used to create an SCTP payload that will be encrypted by
+the Protection Engine and the result from that encryption will be the
+used as payload for an CRYPTO chunk that will be the only chunk in the
+SCTP packet to be sent.
 
 ~~~~~~~~~~~ aasvg
  0                   1                   2                   3
@@ -868,13 +874,15 @@ sent.
 |                           Chunk #n                            |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ~~~~~~~~~~~
-{: #sctp-Crypto-encrypt-chunk-states-1 title="SCTP Packet Before PROTECTED State" artwork-align="center"}
+{: #sctp-Crypto-encrypt-chunk-states-1 title="Plain Text SCTP Packet" artwork-align="center"}
 
 The diagram shown in {{sctp-Crypto-encrypt-chunk-states-1}} describes
-the structure of an SCTP packet being sent or received when the
-association has not reached the PROTECTED state yet. In this case only
-control chunks or CRYPTO chunks can be handled.  Only one CRYPTO
-chunk can be sent in a SCTP packet.
+the structure of plain text SCTP packet being sent or received when
+the association has not reached the PROTECTED state yet. SCTP packet
+as depicted in {{sctp-Crypto-encrypt-chunk-states-2}} may also be sent
+in PROTECTION PENDING state. In this case only control chunks or
+CRYPTO chunks can be handled.  Only one CRYPTO chunk can be sent in a
+SCTP packet.
 
 ~~~~~~~~~~~ aasvg
  0                   1                   2                   3
@@ -885,7 +893,7 @@ chunk can be sent in a SCTP packet.
 |                         CRYPTO Chunk                          |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ~~~~~~~~~~~
-{: #sctp-Crypto-encrypt-chunk-states-2 title="SCTP Packet After PROTECTED State has been reached" artwork-align="center"}
+{: #sctp-Crypto-encrypt-chunk-states-2 title="Protected SCTP Packets" artwork-align="center"}
 
 The diagram shown in {{sctp-Crypto-encrypt-chunk-states-2}} describes
 the structure of an SCTP packet being sent after the PROTECTED state

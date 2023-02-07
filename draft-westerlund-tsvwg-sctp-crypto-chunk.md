@@ -885,7 +885,7 @@ chunk can be sent in a SCTP packet.
 |                         CRYPTO Chunk                          |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ~~~~~~~~~~~
-{: #sctp-Crypto-encrypt-chunk-states-2 title="SCTP Packet After PROTECTED State" artwork-align="center"}
+{: #sctp-Crypto-encrypt-chunk-states-2 title="SCTP Packet After PROTECTED State has been reached" artwork-align="center"}
 
 The diagram shown in {{sctp-Crypto-encrypt-chunk-states-2}} describes
 the structure of an SCTP packet being sent after the PROTECTED state

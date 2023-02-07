@@ -889,7 +889,7 @@ chunk can be sent in a SCTP packet.
 
 The diagram shown in {{sctp-Crypto-encrypt-chunk-states-2}} describes
 the structure of an SCTP packet being sent after the PROTECTED state
-has been reached. Suck packets are built with the SCTP common
+has been reached. Such packets are built with the SCTP common
 header. Only one CRYPTO chunk can be sent in a SCTP packet.
 
 ## Protected Data Chunk Transmission {#data-sending}

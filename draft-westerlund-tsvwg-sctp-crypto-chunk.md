@@ -198,9 +198,9 @@ document for that specific protection engine.
 
 The SCTP common header is assumed to be implicitly protected by the
 protection engine. This protection is based on the assumption that
-there will be a one to one mapping between SCTP association and
+there will be a one-to-one mapping between SCTP association and
 individually established security contexts. If the protection engine
-does not meat that assumption further protection of the common header
+does not meet that assumption further protection of the common header
 is likely required.
 
 An example of protection engine can be DTLS.
@@ -396,7 +396,7 @@ Padding: 0, 8, 16, or 24 bits
 
 This section defines the new chunk types that will be used to validate
 the negotiation of the protection engine selected for CRYPTO chunk.
-This to prevent down grade attacks on the negotation of protection
+This to prevent down grade attacks on the negotiation of protection
 engines. {{sctp-Crypto-chunk-newchunk-pvalid-chunk}} illustrates the
 new chunk type.
 
@@ -464,7 +464,7 @@ additional information.
 
 ## Mandatory Protected Association Parameter Missing {#enoprotected}
 
-When a initiator SCTP endpoint sends an INIT chunk that doesn't
+When an initiator SCTP endpoint sends an INIT chunk that doesn't
 contain the Protected Association parameter towards an SCTP endpoint
 that only accepts protected associations, the responder endpoint SHALL
 raise a Missing Mandatory Parameter error. The ERROR chunk will
@@ -526,11 +526,11 @@ Cause Length: 16-bit unsigned integer
 : Is for N extra Causes equal to  4 + N * 2
 
 Extra Cause: A 16-bit unsigned integer
-: Each Extra Cause indicate an additiona piece of information as part
+: Each Extra Cause indicate an additional piece of information as part
   of the error. There MAY be 0 to as many as can fit in the extra
   cause field in the ERROR Chunk (A maximum of 32764).
 
-Editors Note: Please replace TBA9 above with what is assigned by IANA.
+Editor's Note: Please replace TBA9 above with what is assigned by IANA.
 
 Below a number of defined Error Causes are defined, additional causes
 can be registered with IANA following the rules in {{IANA-Extra-Cause}}.
@@ -546,7 +546,7 @@ Engine" extra cause code identifier 0x00.
 
 ### Error During Protection Handshake {#ekeyhandshake}
 
-If the protection engine specifies a hand shake for example for
+If the protection engine specifies a handshake for example for
 authentication, and key management is implemented inband, it may happen
 that the procedure has errors. In such case an ERROR chunk will be
 sent with error in protection cause code (specified in
@@ -555,11 +555,11 @@ sent with error in protection cause code (specified in
 
 ### Failure in Protection Engines Validation {#evalidate}
 
-An Failure may occur during protection engine Validation (see
+A Failure may occur during protection engine Validation (see
 {{protected-state}}).  In such case an ERROR chunk will be sent with
 error in protection cause code (specified in
 {{eprotect}}) and extra cause "Failure in
-Protection Engines Validation" identifer 0x02 to indicate this
+Protection Engines Validation" identifier 0x02 to indicate this
 failure. This error MUST be sent together with an SCTP abort to
 terminate the SCTP association.
 
@@ -568,15 +568,15 @@ terminate the SCTP association.
 Whenever a T-valid timeout occurs, the SCTP endpoint will send an
 ERROR chunk with "Error in Protection" cause (specified in
 {{eprotect}}) and extra cause "Timeout During
-Protection Handshake or Validation" identifer 0x03 to indicate this
-failure.  To indicate in which phase the timeout occured an additional
+Protection Handshake or Validation" identifier 0x03 to indicate this
+failure.  To indicate in which phase the timeout occurred an additional
 extra cause code is added. If the protection engine specifies that key
 management is implemented inband and the T-valid timeout occurs during
 the handshake the Cause-Specific code to add is "Error During
 Protection Handshake" identifier 0x01.  If the T-valid timeout occurs
 during the protection association parameter validation, the extra
 cause code to use is "Failure in Protection Engines Validation"
-identifer 0x02.
+identifier 0x02.
 
 ## Critical Error from Protection Engine {#eengine}
 
@@ -584,7 +584,7 @@ Protection engine MAY inform local SCTP endpoint about errors, in such
 case it's to be defined in the protection engine specification
 document.  When an Error in the protection engine compromises the
 protection mechanism, the protection engine may stop processing data
-all together, thus the local SCTP endpoint will not be able to send or
+altogether, thus the local SCTP endpoint will not be able to send or
 receive any chunk for the specified Association.  This will cause the
 Association to be closed by legacy timer-based mechanism. Since the
 Association protection is compromised no further data will be sent and
@@ -777,13 +777,13 @@ descending order of preference (see
 
 As alternative, an SCTP Endpoint acting as responder willing to
 support only protected associations shall consider INIT chunk not
-containing the Proteced Association parameter as an error, thus it
+containing the Protected Association parameter as an error, thus it
 will reply with an ERROR chunk according to what specified in
 {{enoprotected}} indicating that for this endpoint mandatory protected
-assocation parameter is missing.
+association parameter is missing.
 
 An SCTP Endpoint acting as responder, when receiving an INIT chunk
-with protected assocation parameter, will search the list of
+with protected association parameter, will search the list of
 protection engines for the most preferred commonly supported choice
 and will reply with INIT-ACK containing the protected association
 parameter with the chosen protection engine. When the responder cannot
@@ -794,7 +794,7 @@ Engine" ({{eprotlist}}).
 When initiator and responder have agreed on a protected association by
 means of handshaking INIT/INIT-ACK with a common protection engine,
 only control chunks and CRYPTO chunks will be accepted. Any DATA
-chunk being sent on an Protected association will be silently
+chunk being sent on a Protected association will be silently
 discarded.
 
 After completion of initial handshake, that is after COOKIE-ECHO and
@@ -816,14 +816,14 @@ received in the INIT chunk, if they are exactly the same, with the
 same Protection engine in the same position, it will reply to the
 initiator with a PVALID chunk containing the chosen Protection Engine,
 otherwise it will reply with an ABORT chunk. If the association was
-not aborted the protected assocation is considered succesfully
+not aborted the protected association is considered successfully
 established.
 
 When the initiator receive the PVALID chunk, it will compare with the
 previous chosen Protection Engine and in case of mismatch with the one
 received previously in the protected association parameter in the
 INIT-ACK chunk, it will reply with ABORT, otherwise the protected
-association is succesfully established.
+association is successfully established.
 
 ## Termination of a Protected Association {#termination-procedure}
 
@@ -872,7 +872,7 @@ sent.
 The diagram shown in {{sctp-Crypto-encrypt-chunk-states-1}} describes
 the structure of an SCTP packet being sent or received when the
 association has not reached the PROTECTED state yet. In this case only
-control chunks or CRYPTO chunk can be handled.  Only one CRYPTO
+control chunks or CRYPTO chunks can be handled.  Only one CRYPTO
 chunk can be sent in a SCTP packet.
 
 ~~~~~~~~~~~ aasvg
@@ -1009,7 +1009,7 @@ Protocol (SCTP) Parameters grouping.
 
 The purpose of this registry is to enable identification of different
 protection related errors when using CRYPTO chunk and a protection
-engine.  Entries in the registry requires an Meaning, a reference to
+engine.  Entries in the registry requires a Meaning, a reference to
 the specification defining the error, and a contact. Each entry will
 be assigned by IANA a unique 16-bit unsigned integer identifier for
 their protection engine. Values 0-65534 are available for
@@ -1098,7 +1098,7 @@ validation.
 The downgrade protection is only as strong as the weakest of the
 supported protection engines as an active attacker can trick the
 endpoints to negotiate the weakest protection engine and then
-modify the weakly protected CRYPTO chunks to decive the endpoints
+modify the weakly protected CRYPTO chunks to deceive the endpoints
 that the negotiation of the protection engines is validated. This
 is similar to the downgrade protection in TLS 1.3 specified in
 Section 4.1.3. of {{RFC8446}} where downgrade protection is not
@@ -1125,5 +1125,5 @@ of a protection engine.
    Protection engine. This requires consideration of congestion
    control and path MTU.
 
- * detail the state transition between PROTECTION PENDING and
+ * Detail the state transition between PROTECTION PENDING and
    PROTECTED state (see {{state-diagram}}).

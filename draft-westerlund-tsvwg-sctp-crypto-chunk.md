@@ -839,27 +839,35 @@ document.
 # Protected Data Chunk Handling {#protected-data-handling}
 
 With reference to the State Diagram as shown in
-{{sctp-Crypto-state-diagram}}, the handling of Control chunks, Data
-chunks and Crypto chunks follows the rules defined below:
+{{sctp-Crypto-state-diagram}} and Figure 3 of {{RFC9260}}, the
+handling of Control chunks, Data chunks and Crypto chunks follows the
+rules defined below:
 
 - When the association is in states CLOSED, COOKIE-WAIT, and
 COOKIE-ECHOED, any Control chunk is sent unprotected (i.e. plain
 text). No DATA chunks shall be sent in these states and DATA chunks
 received shall be silently discarded.
 
-- When the association is in state and PROTECTION PENDING, any Control
+- When the association is in state PROTECTION PENDING, any Control
 chunk is sent unprotected (i.e. plain text). No DATA chunks shall be
 sent in these states and DATA chunks received shall be silently
 discarded. CRYPTO Chunks can be sent by the Protection Engine to
 establish its security context.
 
-- When the association is in states PROTECTED and in general in a
-state different than CLOSED, COOKIE-WAIT, COOKIE-ECHOED and PROTECTION
-PENDING, any SCTP chunk including DATA chunks, but excluding CRYPTO
-chunk, will be used to create an SCTP payload that will be encrypted by
-the Protection Engine and the result from that encryption will be the
-used as payload for a CRYPTO chunk that will be the only chunk in the
-SCTP packet to be sent.
+- When the association is in states PROTECTED, any SCTP chunk except
+for DATA and CRYPTO chunks, will be used to create an SCTP payload
+that will be encrypted by the Protection Engine and the result from
+that encryption will be the used as payload for a CRYPTO chunk that
+will be the only chunk in the SCTP packet to be sent.
+
+- When the association is in states ESTABLISHED and in the states for
+association shutdown, i.e. SHUTDOWN-PENDING, SHUTDOWN-SENT,
+SHUTDOWN-RECEIVED, SHUTDOWN-ACK-SENT as defined by {{RFC9260}}, any
+SCTP chunk including DATA chunks, but excluding CRYPTO chunk, will be
+used to create an SCTP payload that will be encrypted by the
+Protection Engine and the result from that encryption will be the used
+as payload for a CRYPTO chunk that will be the only chunk in the SCTP
+packet to be sent.
 
 ~~~~~~~~~~~ aasvg
  0                   1                   2                   3
@@ -877,12 +885,11 @@ SCTP packet to be sent.
 {: #sctp-Crypto-encrypt-chunk-states-1 title="Plain Text SCTP Packet" artwork-align="center"}
 
 The diagram shown in {{sctp-Crypto-encrypt-chunk-states-1}} describes
-the structure of plain text SCTP packet being sent or received when
-the association has not reached the PROTECTED state yet. SCTP packet
-as depicted in {{sctp-Crypto-encrypt-chunk-states-2}} may also be sent
-in PROTECTION PENDING state. In this case only control chunks or
-CRYPTO chunks can be handled.  Only one CRYPTO chunk can be sent in a
-SCTP packet.
+the structure of any plain text SCTP packet being sent or received
+when the association has not reached the PROTECTED state yet. SCTP
+packet as depicted in {{sctp-Crypto-encrypt-chunk-states-2}} may also
+be sent in PROTECTION PENDING state and in any later state of the
+association.
 
 ~~~~~~~~~~~ aasvg
  0                   1                   2                   3

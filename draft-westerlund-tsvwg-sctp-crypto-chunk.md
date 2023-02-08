@@ -706,7 +706,7 @@ follows what specified in {{ekeyhandshake}}.  When Handshake has been
 successfully completed, the association state machine will enter
 PROTECTED state.
 
-The protection engine specification MUST specify when PRTOECTED state
+The protection engine specification MUST specify when PROTECTED state
 can be entered for each endpoint. If key establishment is out-of-band,
 after starting T-valid timer the SCTP association will enter PROTECTED
 state per protection engine specification when the necessary security

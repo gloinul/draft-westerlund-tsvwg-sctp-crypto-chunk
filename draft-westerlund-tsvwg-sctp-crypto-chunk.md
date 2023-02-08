@@ -168,7 +168,7 @@ with those SCTP chunks would have been.
 
 The protection engine, independently from the security
 characteristics, needs to be capable working on an unreliable
-transport mechanism same as UDP and have own key management
+transport mechanism same as UDP and have its own key management
 capability.
 
 SCTP CRYPTO chunk directly exploits the protection engine by
@@ -198,9 +198,9 @@ document for that specific protection engine.
 
 The SCTP common header is assumed to be implicitly protected by the
 protection engine. This protection is based on the assumption that
-there will be a one to one mapping between SCTP association and
+there will be a one-to-one mapping between SCTP association and
 individually established security contexts. If the protection engine
-does not meat that assumption further protection of the common header
+does not meet that assumption further protection of the common header
 is likely required.
 
 An example of protection engine can be DTLS.
@@ -239,7 +239,7 @@ protection engine specification.
 From SCTP perspective, if there is a maximum size of plain text data
 that can be protected by the protection engine that must be
 communicated to SCTP. As such a limit will limit the PMTU for SCTP to
-the maximums plain text plus CRYPTO chunk and algorithm overhead plus
+the maximum plain text plus CRYPTO chunk and algorithm overhead plus
 the SCTP common header.
 
 ## Congestion Control Considerations {#congestion}
@@ -396,7 +396,7 @@ Padding: 0, 8, 16, or 24 bits
 
 This section defines the new chunk types that will be used to validate
 the negotiation of the protection engine selected for CRYPTO chunk.
-This to prevent down grade attacks on the negotation of protection
+This to prevent down grade attacks on the negotiation of protection
 engines. {{sctp-Crypto-chunk-newchunk-pvalid-chunk}} illustrates the
 new chunk type.
 
@@ -432,8 +432,8 @@ The PVALID chunk is used to hold the protection engines list.
 Chunk Type: 8 bits (unsigned integer)
 : This value MUST be set to 0x4X.
 
-Chunk Flags: 8 bits : MUST be set to zero on transmit and MUST be
-  ignored on receipt.
+Chunk Flags: 8 bits
+: MUST be set to zero on transmit and MUST be ignored on receipt.
 
 Chunk Length: 16 bits (unsigned integer)
 : This value holds the length of the Protection Engines field in bytes plus 4.
@@ -464,7 +464,7 @@ additional information.
 
 ## Mandatory Protected Association Parameter Missing {#enoprotected}
 
-When a initiator SCTP endpoint sends an INIT chunk that doesn't
+When an initiator SCTP endpoint sends an INIT chunk that doesn't
 contain the Protected Association parameter towards an SCTP endpoint
 that only accepts protected associations, the responder endpoint SHALL
 raise a Missing Mandatory Parameter error. The ERROR chunk will
@@ -519,18 +519,19 @@ by ERROR chunk containing the relevant Error Type and Causes.
 ~~~~~~~~~~~
 {: #sctp-eprotect-error-structure title="Error in Protection Cause Format" artwork-align="center"}
 
-Casuse Code:
+{: vspace="0"}
+Casuse Code: 16 bits (unsigned integer)
 : The SCTP Error Chunk Cause Code indicating "Error in Protection" is TBA9.
 
-Cause Length: 16-bit unsigned integer
+Cause Length: 16 bits (unsigned integer)
 : Is for N extra Causes equal to  4 + N * 2
 
-Extra Cause: A 16-bit unsigned integer
-: Each Extra Cause indicate an additiona piece of information as part
+Extra Cause: 16 bits (unsigned integer)
+: Each Extra Cause indicate an additional piece of information as part
   of the error. There MAY be 0 to as many as can fit in the extra
   cause field in the ERROR Chunk (A maximum of 32764).
 
-Editors Note: Please replace TBA9 above with what is assigned by IANA.
+Editor's Note: Please replace TBA9 above with what is assigned by IANA.
 
 Below a number of defined Error Causes are defined, additional causes
 can be registered with IANA following the rules in {{IANA-Extra-Cause}}.
@@ -546,7 +547,7 @@ Engine" extra cause code identifier 0x00.
 
 ### Error During Protection Handshake {#ekeyhandshake}
 
-If the protection engine specifies a hand shake for example for
+If the protection engine specifies a handshake for example for
 authentication, and key management is implemented inband, it may happen
 that the procedure has errors. In such case an ERROR chunk will be
 sent with error in protection cause code (specified in
@@ -555,11 +556,11 @@ sent with error in protection cause code (specified in
 
 ### Failure in Protection Engines Validation {#evalidate}
 
-An Failure may occur during protection engine Validation (see
+A Failure may occur during protection engine Validation (see
 {{protected-state}}).  In such case an ERROR chunk will be sent with
 error in protection cause code (specified in
 {{eprotect}}) and extra cause "Failure in
-Protection Engines Validation" identifer 0x02 to indicate this
+Protection Engines Validation" identifier 0x02 to indicate this
 failure. This error MUST be sent together with an SCTP abort to
 terminate the SCTP association.
 
@@ -568,15 +569,15 @@ terminate the SCTP association.
 Whenever a T-valid timeout occurs, the SCTP endpoint will send an
 ERROR chunk with "Error in Protection" cause (specified in
 {{eprotect}}) and extra cause "Timeout During
-Protection Handshake or Validation" identifer 0x03 to indicate this
-failure.  To indicate in which phase the timeout occured an additional
+Protection Handshake or Validation" identifier 0x03 to indicate this
+failure.  To indicate in which phase the timeout occurred an additional
 extra cause code is added. If the protection engine specifies that key
 management is implemented inband and the T-valid timeout occurs during
 the handshake the Cause-Specific code to add is "Error During
 Protection Handshake" identifier 0x01.  If the T-valid timeout occurs
 during the protection association parameter validation, the extra
 cause code to use is "Failure in Protection Engines Validation"
-identifer 0x02.
+identifier 0x02.
 
 ## Critical Error from Protection Engine {#eengine}
 
@@ -584,7 +585,7 @@ Protection engine MAY inform local SCTP endpoint about errors, in such
 case it's to be defined in the protection engine specification
 document.  When an Error in the protection engine compromises the
 protection mechanism, the protection engine may stop processing data
-all together, thus the local SCTP endpoint will not be able to send or
+altogether, thus the local SCTP endpoint will not be able to send or
 receive any chunk for the specified Association.  This will cause the
 Association to be closed by legacy timer-based mechanism. Since the
 Association protection is compromised no further data will be sent and
@@ -777,13 +778,13 @@ descending order of preference (see
 
 As alternative, an SCTP Endpoint acting as responder willing to
 support only protected associations shall consider INIT chunk not
-containing the Proteced Association parameter as an error, thus it
+containing the Protected Association parameter as an error, thus it
 will reply with an ERROR chunk according to what specified in
 {{enoprotected}} indicating that for this endpoint mandatory protected
-assocation parameter is missing.
+association parameter is missing.
 
 An SCTP Endpoint acting as responder, when receiving an INIT chunk
-with protected assocation parameter, will search the list of
+with protected association parameter, will search the list of
 protection engines for the most preferred commonly supported choice
 and will reply with INIT-ACK containing the protected association
 parameter with the chosen protection engine. When the responder cannot
@@ -794,7 +795,7 @@ Engine" ({{eprotlist}}).
 When initiator and responder have agreed on a protected association by
 means of handshaking INIT/INIT-ACK with a common protection engine,
 only control chunks and CRYPTO chunks will be accepted. Any DATA
-chunk being sent on an Protected association will be silently
+chunk being sent on a Protected association will be silently
 discarded.
 
 After completion of initial handshake, that is after COOKIE-ECHO and
@@ -816,14 +817,14 @@ received in the INIT chunk, if they are exactly the same, with the
 same Protection engine in the same position, it will reply to the
 initiator with a PVALID chunk containing the chosen Protection Engine,
 otherwise it will reply with an ABORT chunk. If the association was
-not aborted the protected assocation is considered succesfully
+not aborted the protected association is considered successfully
 established.
 
 When the initiator receive the PVALID chunk, it will compare with the
 previous chosen Protection Engine and in case of mismatch with the one
 received previously in the protected association parameter in the
 INIT-ACK chunk, it will reply with ABORT, otherwise the protected
-association is succesfully established.
+association is successfully established.
 
 ## Termination of a Protected Association {#termination-procedure}
 
@@ -838,21 +839,35 @@ document.
 # Protected Data Chunk Handling {#protected-data-handling}
 
 With reference to the State Diagram as shown in
-{{sctp-Crypto-state-diagram}}, the handling of Control chunks, Data
-chunks and Crypto chunks follows the rules defined below:
+{{sctp-Crypto-state-diagram}} and Figure 3 of {{RFC9260}}, the
+handling of Control chunks, Data chunks and Crypto chunks follows the
+rules defined below:
 
-- When the association is in states CLOSED, COOKIE-WAIT, COOKIE-ECHOED
-and PROTECTION PENDING, any Control chunk is sent unprotected
-(i.e. plain text). No DATA chunks shall be sent in these states and
-DATA chunks received shall be silently discarded.
+- When the association is in states CLOSED, COOKIE-WAIT, and
+COOKIE-ECHOED, any Control chunk is sent unprotected (i.e. plain
+text). No DATA chunks shall be sent in these states and DATA chunks
+received shall be silently discarded.
 
-- When the association is in states PROTECTED and in general in a
-state different than CLOSED, COOKIE-WAIT, COOKIE-ECHOED and PROTECTION
-PENDING, any Control chunk as well as DATA chunks will be used to
-create an SCTP payload that will be encrypted by the Protection Engine
-and the result from that encryption will be the used as payload for an
-CRYPTO chunk that will be the only chunk in the SCTP packet to be
-sent.
+- When the association is in state PROTECTION PENDING, any Control
+chunk is sent unprotected (i.e. plain text). No DATA chunks shall be
+sent in these states and DATA chunks received shall be silently
+discarded. CRYPTO Chunks can be sent by the Protection Engine to
+establish its security context.
+
+- When the association is in states PROTECTED, any SCTP chunk except
+for DATA and CRYPTO chunks, will be used to create an SCTP payload
+that will be encrypted by the Protection Engine and the result from
+that encryption will be the used as payload for a CRYPTO chunk that
+will be the only chunk in the SCTP packet to be sent.
+
+- When the association is in states ESTABLISHED and in the states for
+association shutdown, i.e. SHUTDOWN-PENDING, SHUTDOWN-SENT,
+SHUTDOWN-RECEIVED, SHUTDOWN-ACK-SENT as defined by {{RFC9260}}, any
+SCTP chunk including DATA chunks, but excluding CRYPTO chunk, will be
+used to create an SCTP payload that will be encrypted by the
+Protection Engine and the result from that encryption will be the used
+as payload for a CRYPTO chunk that will be the only chunk in the SCTP
+packet to be sent.
 
 ~~~~~~~~~~~ aasvg
  0                   1                   2                   3
@@ -867,13 +882,14 @@ sent.
 |                           Chunk #n                            |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ~~~~~~~~~~~
-{: #sctp-Crypto-encrypt-chunk-states-1 title="SCTP Packet Before PROTECTED State" artwork-align="center"}
+{: #sctp-Crypto-encrypt-chunk-states-1 title="Plain Text SCTP Packet" artwork-align="center"}
 
 The diagram shown in {{sctp-Crypto-encrypt-chunk-states-1}} describes
-the structure of an SCTP packet being sent or received when the
-association has not reached the PROTECTED state yet. In this case only
-control chunks or CRYPTO chunk can be handled.  Only one CRYPTO
-chunk can be sent in a SCTP packet.
+the structure of any plain text SCTP packet being sent or received
+when the association has not reached the PROTECTED state yet. SCTP
+packet as depicted in {{sctp-Crypto-encrypt-chunk-states-2}} may also
+be sent in PROTECTION PENDING state and in any later state of the
+association.
 
 ~~~~~~~~~~~ aasvg
  0                   1                   2                   3
@@ -884,11 +900,11 @@ chunk can be sent in a SCTP packet.
 |                         CRYPTO Chunk                          |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ~~~~~~~~~~~
-{: #sctp-Crypto-encrypt-chunk-states-2 title="SCTP Packet After PROTECTED State" artwork-align="center"}
+{: #sctp-Crypto-encrypt-chunk-states-2 title="Protected SCTP Packets" artwork-align="center"}
 
 The diagram shown in {{sctp-Crypto-encrypt-chunk-states-2}} describes
 the structure of an SCTP packet being sent after the PROTECTED state
-has been reached. Suck packets are built with the SCTP common
+has been reached. Such packets are built with the SCTP common
 header. Only one CRYPTO chunk can be sent in a SCTP packet.
 
 ## Protected Data Chunk Transmission {#data-sending}
@@ -1009,7 +1025,7 @@ Protocol (SCTP) Parameters grouping.
 
 The purpose of this registry is to enable identification of different
 protection related errors when using CRYPTO chunk and a protection
-engine.  Entries in the registry requires an Meaning, a reference to
+engine.  Entries in the registry requires a Meaning, a reference to
 the specification defining the error, and a contact. Each entry will
 be assigned by IANA a unique 16-bit unsigned integer identifier for
 their protection engine. Values 0-65534 are available for
@@ -1098,7 +1114,7 @@ validation.
 The downgrade protection is only as strong as the weakest of the
 supported protection engines as an active attacker can trick the
 endpoints to negotiate the weakest protection engine and then
-modify the weakly protected CRYPTO chunks to decive the endpoints
+modify the weakly protected CRYPTO chunks to deceive the endpoints
 that the negotiation of the protection engines is validated. This
 is similar to the downgrade protection in TLS 1.3 specified in
 Section 4.1.3. of {{RFC8446}} where downgrade protection is not
@@ -1111,24 +1127,19 @@ engines.
 This section specifies what is to be specified in the description
 of a protection engine.
 
-## Inheritance
+ * Define how to protect the plain text set of chunks and encapsulate
+   them in the CRYPTO Chunk payload.
 
-The protection engine will inherit the speciications from this
-document and shall not override it or parts of it when not
-specifically permitted.
+ * Can define its usage of the 8-bit chunk Flags field in the CRYPTO
+   chunk
 
-## Protection Engine registration
+ * Is required to register the defined protection engine(s) with IANA
+   per {{iana-protection-engines}}.
 
-The protection engine specification will have one or more
-protection engine to be used in the Protected Association parameter
-as protection engines registered with IANA (see {{iana-protection-engines}}).
+ * Define how it and in such case how it transmits SCTP packets that
+   are not created by the SCTP chunk handler, and instead by the
+   Protection engine. This requires consideration of congestion
+   control and path MTU.
 
-## Usage of CRYPTO Chunk
-
-The protection engine specification will detail the usage of CRYPTO chunk
-and provide the meaning of all bits used in the Flags, if any.
-
-## State machine integration
-
-The protection engine specification will detail the state transition
-between PROTECTION PENDING and PROTECTED state (see {{state-diagram}}).
+ * Detail the state transition between PROTECTION PENDING and
+   PROTECTED state (see {{state-diagram}}).

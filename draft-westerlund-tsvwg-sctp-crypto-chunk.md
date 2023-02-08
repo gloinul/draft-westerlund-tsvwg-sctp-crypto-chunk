@@ -850,7 +850,7 @@ received shall be silently discarded.
 - When the association is in state and PROTECTION PENDING, any Control
 chunk is sent unprotected (i.e. plain text). No DATA chunks shall be
 sent in these states and DATA chunks received shall be silently
-discarded. CRYPTO Chunks can be sent by the Protection Enginen to
+discarded. CRYPTO Chunks can be sent by the Protection Engine to
 establish its security context.
 
 - When the association is in states PROTECTED and in general in a
@@ -858,7 +858,7 @@ state different than CLOSED, COOKIE-WAIT, COOKIE-ECHOED and PROTECTION
 PENDING, any SCTP chunk including DATA chunks, but excluding CRYPTO
 chunk, will be used to create an SCTP payload that will be encrypted by
 the Protection Engine and the result from that encryption will be the
-used as payload for an CRYPTO chunk that will be the only chunk in the
+used as payload for a CRYPTO chunk that will be the only chunk in the
 SCTP packet to be sent.
 
 ~~~~~~~~~~~ aasvg

@@ -858,7 +858,8 @@ establish its security context.
 for DATA and CRYPTO chunks, will be used to create an SCTP payload
 that will be encrypted by the Protection Engine and the result from
 that encryption will be the used as payload for a CRYPTO chunk that
-will be the only chunk in the SCTP packet to be sent.
+will be the only chunk in the SCTP packet to be sent. DATA chunks
+received shall be silently discarded.
 
 - When the association is in states ESTABLISHED and in the states for
 association shutdown, i.e. SHUTDOWN-PENDING, SHUTDOWN-SENT,

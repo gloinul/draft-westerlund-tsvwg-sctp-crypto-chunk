@@ -503,8 +503,8 @@ This specification describes some of the causes whilst the
 Protection Engine Specification MAY add further Causes related to the
 related Protection Engine.
 
-When detecting an error, SCTP will send an ABORT chunk followed
-by ERROR chunk containing the relevant Error Type and Causes.
+When detecting an error, SCTP will send an ERROR chunk containing
+the relevant Error Type and Causes followed by an ABORT chunk.
 
 ~~~~~~~~~~~ aasvg
  0                   1                   2                   3
@@ -650,7 +650,7 @@ generate State Cookie |    +---------+ delete TCB         send ABORT
          |     |            +---------------------+
          |     |            |  PROTECTION PENDING | If INIT/INIT-ACK
          |     |            +----------+----------+ has Protected
-         |     |                       |            Association
+	 |     |                       |            Association
          |     |                       |            Parameter start
          |     |                       |            T-valid timer.
          |     |                       |
@@ -788,9 +788,9 @@ with protected association parameter, will search the list of
 protection engines for the most preferred commonly supported choice
 and will reply with INIT-ACK containing the protected association
 parameter with the chosen protection engine. When the responder cannot
-find a supported protection engine, it will reply with ABORT and Error
+find a supported protection engine, it will reply with Error
 in Protection with the extra cause code for "No Supported Protection
-Engine" ({{eprotlist}}).
+Engine" ({{eprotlist}}) followed by an ABORT.
 
 When initiator and responder have agreed on a protected association by
 means of handshaking INIT/INIT-ACK with a common protection engine,

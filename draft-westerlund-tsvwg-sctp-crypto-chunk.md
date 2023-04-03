@@ -221,6 +221,21 @@ implementation should consider that out-of-order handling of SCTP
 chunks is not desired and may cause false congestions and
 retransmissions.
 
+## SCTP Restart Considerations
+
+SCTP Restart procedure allows an Endpoint to recover an Association
+when the remote Endpoint has still the TCB.
+Giving the possibility to an SCTP Endpoint to perform a Restart
+procedure by accepting any plain chunk when the Association has
+been established is not permitted by this recommendation, thus
+supporting SCTP Restart MUST be according to the general rules
+that is using Crypto Chunks.
+An SCTP Endpoint implementing SCTP Crypto Chunk and willing to
+support SCTP Restart MUST use Crypto Chunks, thus it MUST keep
+the Protection Engine connection up and the related keys up to date.
+It's up to the Protection Engine specification to state whether
+SCTP Restart is supported for that particular Protection Engine.
+
 ## PMTU Considerations {#pmtu}
 
 The addition of the CRYPTO chunk to SCTP reduces the room for payload,

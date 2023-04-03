@@ -503,8 +503,8 @@ This specification describes some of the causes whilst the
 Protection Engine Specification MAY add further Causes related to the
 related Protection Engine.
 
-When detecting an error, SCTP will send an ERROR chunk containing
-the relevant Error Type and Causes followed by an ABORT chunk.
+When detecting an error, SCTP will send an ABORT chunk containing
+the relevant Error Type and Causes.
 
 ~~~~~~~~~~~ aasvg
  0                   1                   2                   3
@@ -540,7 +540,7 @@ can be registered with IANA following the rules in {{IANA-Extra-Cause}}.
 
 If list of protection engines contained in the INIT signal doesn't
 contain at least an entry that fits the list of protection engines at
-the responder, the responder will reply with an ERROR chunk with error
+the responder, the responder will reply with an ABORT chunk with error
 in protection cause code (specified in
 {{eprotect}}) and the "No Supported Protection
 Engine" extra cause code identifier 0x00.
@@ -549,7 +549,7 @@ Engine" extra cause code identifier 0x00.
 
 If the protection engine specifies a handshake for example for
 authentication, and key management is implemented inband, it may happen
-that the procedure has errors. In such case an ERROR chunk will be
+that the procedure has errors. In such case an ABORT chunk will be
 sent with error in protection cause code (specified in
 {{eprotect}}) and extra cause
 "Error During Protection Handshake" identifier 0x01.
@@ -557,17 +557,16 @@ sent with error in protection cause code (specified in
 ### Failure in Protection Engines Validation {#evalidate}
 
 A Failure may occur during protection engine Validation (see
-{{protected-state}}).  In such case an ERROR chunk will be sent with
+{{protected-state}}).  In such case an ABORT chunk will be sent with
 error in protection cause code (specified in
 {{eprotect}}) and extra cause "Failure in
 Protection Engines Validation" identifier 0x02 to indicate this
-failure. This error MUST be sent together with an SCTP abort to
-terminate the SCTP association.
+failure.
 
 ### Timeout During Protection Handshake or Validation {#etmout}
 
 Whenever a T-valid timeout occurs, the SCTP endpoint will send an
-ERROR chunk with "Error in Protection" cause (specified in
+ABORT chunk with "Error in Protection" cause (specified in
 {{eprotect}}) and extra cause "Timeout During
 Protection Handshake or Validation" identifier 0x03 to indicate this
 failure.  To indicate in which phase the timeout occurred an additional
@@ -702,7 +701,7 @@ see {{t-valid-considerations}}.
 
 If key establishment is in-band, the protection engine will start the
 handshake with its peer and in case of failure or T-valid timeout, it
-will generate an ERROR chunk and an ABORT chunk.  The ERROR handling
+will generate an ABORT chunk.  The ERROR handling
 follows what specified in {{ekeyhandshake}}.  When Handshake has been
 successfully completed, the association state machine will enter
 PROTECTED state.
@@ -739,7 +738,7 @@ association parameter in INIT-ACK chunk, it will clear the T-valid
 timer and will move into ESTABLISHED state.
 
 If the lists of Protection Engines don't match, it will generate an
-ERROR chunk and an ABORT chunk. ERROR CAUSE will indicate "Failure in
+ABORT chunk. ERROR CAUSE will indicate "Failure in
 Protection Engines Validation" and the SCTP association will be
 terminated.
 
@@ -748,11 +747,11 @@ reply with the PVALID confirmation. The initiator will compare the
 Protection Engine received from the responder, if the value is the
 same it will clear the T-valid timer and move into ESTABLISHED state.
 If the chosen Protection Engines don't match, it will generate an
-ERROR chunk and an ABORT chunk. ERROR CAUSE will indicate "Failure in
+ABORT chunk. ERROR CAUSE will indicate "Failure in
 Protection Engines Validation" that is critical.
 
 If T-valid timer expires either at initiator or responder, it will generate
-an ERROR chunk and an ABORT chunk.  The ERROR handling follows what
+an ABORT chunk.  The ERROR handling follows what
 specified in {{etmout}}.
 
 ### Consideration on T-valid {#t-valid-considerations}
@@ -779,7 +778,7 @@ descending order of preference (see
 As alternative, an SCTP Endpoint acting as responder willing to
 support only protected associations shall consider INIT chunk not
 containing the Protected Association parameter as an error, thus it
-will reply with an ERROR chunk according to what specified in
+will reply with an ABORT chunk according to what specified in
 {{enoprotected}} indicating that for this endpoint mandatory protected
 association parameter is missing.
 
@@ -788,9 +787,9 @@ with protected association parameter, will search the list of
 protection engines for the most preferred commonly supported choice
 and will reply with INIT-ACK containing the protected association
 parameter with the chosen protection engine. When the responder cannot
-find a supported protection engine, it will reply with Error
-in Protection with the extra cause code for "No Supported Protection
-Engine" ({{eprotlist}}) followed by an ABORT.
+find a supported protection engine, it will reply with ABORT containing
+Error in Protection with the extra cause code for "No Supported Protection
+Engine" ({{eprotlist}}).
 
 When initiator and responder have agreed on a protected association by
 means of handshaking INIT/INIT-ACK with a common protection engine,

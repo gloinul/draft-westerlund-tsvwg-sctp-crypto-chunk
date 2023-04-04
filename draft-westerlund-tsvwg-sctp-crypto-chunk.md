@@ -265,7 +265,7 @@ function. However, valid ICMP errors or information may indirectly be
 provided to the protection engine, such as an update to PMTU values
 based on packet to big ICMP messages.
 
-## Path selection consideration
+## Path selection considerations {#multipath}
 
 When an Association is multihomed there are multiple paths between Endpoints.
 The selection of the specific path to be used at a certain time belongs

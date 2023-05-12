@@ -102,18 +102,18 @@ specification. {{sctp-Crypto-chunk-layering}} illustrates the CRYPTO
 chunk layering in regard to SCTP and the Upper Layer Protocol (ULP).
 
 ~~~~~~~~~~~ aasvg
-+---------------------+
-|                     |
-|        ULP          |
-|                     |
-+---------------------+ <-- User Level Messages
-|                     |
-| SCTP Chunks Handler | +-- SCTP Unprotected Payload
-|                     |/
-+---------------------+    +--------------------+
-|        CRYPTO       +--->| Protection Engine  |
-|        Chunk        |    +--------------------+
-|       Handler       |<---+   Key Management   |
++------------------+
+|                  |  +-----------------------------+
+|        ULP       | +                               +
+|                  | v                               |
++------------------+--+ <-- User Level Messages      |
+|                     |                              |
+| SCTP Chunks Handler | +-- SCTP Unprotected Payload |
+|                     |/                             |
++---------------------+    +--------------------+    |
+|        CRYPTO       +--->| Protection Engine  |    |
+|        Chunk        |    +--------------------+    +
+|       Handler       |<---+   Key Management   +<--+
 +---------------------+    +--------------------+
 |                     |\
 | SCTP Header Handler | +-- SCTP Protected Payload
@@ -177,7 +177,9 @@ protection buffer shall never exceed the SCTP payload size thus
 protection engine shall be aware of the PMTU (see {{pmtu}}).
 
 The key management part of the protection engine is the set of data and procedures
-that take care of key distribution, verification, and update.
+that take care of key distribution, verification, and update. For key management
+it's possible to exploit CRYPTO chunks directly or use SCTP DATA chunks,
+in the latter case a dedicated Payload Protocol Identifier shall be used.
 
 Key management of protection engine is RECOMMENDED to use the SCTP
 CRYPTO chunk for handshaking, in that case any packet being exchanged
@@ -754,6 +756,18 @@ Protection Engines Validation" that is critical.
 If T-valid timer expires either at initiator or responder, it will generate
 an ERROR chunk and an ABORT chunk.  The ERROR handling follows what
 specified in {{etmout}}.
+
+### Considerations on key management {#key-management-considerations}
+
+When the Association is either in PROTECTION PENDING or in PROTECTED state,
+in-band key management shall exploit CRYPTO chunks directly.
+
+When the Association is in ESTABLISHED or in any of the states that can
+be reached after ESTABLISHED state, in-band key management MAY exploit
+SCTP DATA chunk, thus the Protection Engine shall be seen as a ULP from SCTP.
+
+In-band key management shall use a dedicated Payload Protocol Identifier
+assigned by IANA and defined in the specific Protection Engine Specification.
 
 ### Consideration on T-valid {#t-valid-considerations}
 

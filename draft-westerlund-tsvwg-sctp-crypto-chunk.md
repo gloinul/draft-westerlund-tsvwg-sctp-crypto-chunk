@@ -221,6 +221,38 @@ implementation should consider that out-of-order handling of SCTP
 chunks is not desired and may cause false congestions and
 retransmissions.
 
+## SCTP Restart Considerations
+
+SCTP Restart procedure allows an Endpoint to recover an association
+when the remote Endpoint has still has the state for the association.
+However, an SCTP association that has an established protection engine
+will not accept a unprotected INIT to restart it, instead it would
+discard it. Thus, an endpoint attempting to restart an SCTP
+association which was using Crypto Chunks MUST have the security
+context for this association, and use it to encapsulate the INIT in a
+CRYPTO chunk. Note, the SCTP common header will contain a verification
+tag equal to 0, combined with CRYPTO chunk when carrying an INIT to
+restart.
+
+An endpoint implementing Crypto Chunk MUST accept receiving SCTP
+packets with a verification tag with value 0 and containing a Crypto
+Chunk. The endpoit will attempt to map the packet to an association
+based on source IP address, destination address and port. If the
+combination of those parameters is not unique the implementor MAY
+choose to send the Crypto Chunk to all Associations that fit with the
+parameters in order to find the right one. The association will
+attempt de-protection operations on the crypto chunk, and if that is
+successful the INIT chunk can be processed as a restart attempt. Note
+that this will update the verification tags for both this endpoint and
+the peer. Failure to authenticate the crypto chunk payload will result
+in it being discarded.
+
+Association restart when using crypto chunks has increased
+requirements on the endpoint maintaining state across the restart. In
+cases this is not possible or failed to be done successfully the
+endpoint will be need to fall back to initiating a new SCTP association.
+
+
 ## PMTU Considerations {#pmtu}
 
 The addition of the CRYPTO chunk to SCTP reduces the room for payload,

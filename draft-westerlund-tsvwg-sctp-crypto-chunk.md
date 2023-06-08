@@ -107,8 +107,11 @@ chunk layering in regard to SCTP and the Upper Layer Protocol (ULP).
 |      ULP      | |                    +-------------.
 |               | |   Key Management   |              |
 +---------------+-+---+----------------+              |
+|                     |                 \    User     |
+|                     |                  +-- Level    |
+| SCTP Chunks Handler |                      Messages |
 |                     |                               |
-| SCTP Chunks Handler | +-- SCTP Unprotected Payload  |
+|                     | +-- SCTP Unprotected Payload  |
 |                     |/                              |
 +---------------------+    +---------------------+    |
 |        CRYPTO       |    | Protection Engine   |    |

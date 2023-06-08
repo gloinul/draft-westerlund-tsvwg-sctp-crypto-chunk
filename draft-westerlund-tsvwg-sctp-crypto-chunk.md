@@ -1189,10 +1189,5 @@ of a protection engine.
  * Is required to register the defined protection engine(s) with IANA
    per {{iana-protection-engines}}.
 
- * Define how it and in such case how it transmits SCTP packets that
-   are not created by the SCTP chunk handler, and instead by the
-   Protection engine. This requires consideration of congestion
-   control and path MTU.
-
  * Detail the state transition between PROTECTION PENDING and
    PROTECTED state (see {{state-diagram}}).

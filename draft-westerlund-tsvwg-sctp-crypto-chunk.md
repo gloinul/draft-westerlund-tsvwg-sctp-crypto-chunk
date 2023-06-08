@@ -102,19 +102,19 @@ specification. {{sctp-Crypto-chunk-layering}} illustrates the CRYPTO
 chunk layering in regard to SCTP and the Upper Layer Protocol (ULP).
 
 ~~~~~~~~~~~ aasvg
-+---------------+ +----------------------------------+
-|               | |           Protection Engine      |
-|      ULP      | +----------------+                 |
-|               | | Key Management |                 |
-+---------------+-+---+----+-------+                 |
-|                     |    |                         |
-| SCTP Chunks Handler | +-- SCTP Unprotected Payload |
-|                     |/   |                         |
-+---------------------+    +--------------------+    |
-|        CRYPTO       |    |  DATA Management   |    |
-|        Chunk        |<-->|                    |    |
-|       Handler       |    +--------------------+----+
-+---------------------+
++---------------+ +--------------------+
+|               | | Protection Engine  |
+|      ULP      | |                    +-------------.
+|               | |   Key Management   |              |
++---------------+-+---+----------------+              |
+|                     |                               |
+| SCTP Chunks Handler | +-- SCTP Unprotected Payload  |
+|                     |/                              |
++---------------------+    +---------------------+    |
+|        CRYPTO       |    | Protection Engine   |    |
+|        Chunk        |<-->|                     |<--'
+|       Handler       |    | Protection Operator |
++---------------------+    +---------------------+
 |                     |\
 | SCTP Header Handler | +-- SCTP Protected Payload
 |                     |

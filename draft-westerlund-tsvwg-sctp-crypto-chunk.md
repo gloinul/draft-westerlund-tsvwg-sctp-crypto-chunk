@@ -309,7 +309,7 @@ function. However, valid ICMP errors or information may indirectly be
 provided to the protection engine, such as an update to PMTU values
 based on packet to big ICMP messages.
 
-## Path selection considerations {#multipath}
+## Path Selection Considerations {#multipath}
 
 When an Association is multihomed there are multiple paths between Endpoints.
 The selection of the specific path to be used at a certain time belongs
@@ -718,7 +718,7 @@ generate State Cookie |    +---------+ delete TCB         send ABORT
          |     |            +---------------------+
          |     |            |  PROTECTION PENDING | If INIT/INIT-ACK
          |     |            +----------+----------+ has Protected
-	 |     |                       |            Association
+         |     |                       |            Association
          |     |                       |            Parameter start
          |     |                       |            T-valid timer.
          |     |                       |

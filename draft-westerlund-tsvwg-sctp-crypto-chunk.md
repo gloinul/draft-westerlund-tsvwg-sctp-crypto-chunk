@@ -36,6 +36,8 @@ informative:
 
 normative:
   RFC2119:
+  RFC4895:
+  RFC5061:
   RFC8126:
   RFC8174:
   RFC9260:
@@ -297,6 +299,26 @@ function. However, valid ICMP errors or information may indirectly be
 provided to the protection engine, such as an update to PMTU values
 based on packet to big ICMP messages.
 
+## ASCONF Considerations
+
+In Crypto Chunk the ASCONF chunk is protected, thus it needs to be
+unprotected first, furthermore it MAY come from an unknown IP Address.
+In order to properly address the ASCONF chunk to the relevant Association
+for being unprotected, Destination Address, Source and Destination ports
+and VTag shall be exploited. If the combination of those parameters
+is not unique the implementor MAY choose to send the Crypto Chunk to
+all Associations that fit with the parameters in order to find the
+right one.
+
+The recommendation {{RFC5061}} specifies that ASCONF message MUST
+be sent in Authenticated way (section 4.1.1 of {{RFC5061}}), thus
+the Association MUST be using the mechanism for SCTP-AUTH specified
+in {{RFC4895}}.
+
+Crypto Chunks, when the Protection Engine provides strong Authentication
+such for instance in case of DTLS, would provide a better mechanism
+for Authentication than SCTP-AUTH. We recommend to amend {{RFC5061}}
+for including Crypto Chunks as Authentication mechanism for ASCONF chunks.
 
 # Conventions
 

@@ -1255,6 +1255,6 @@ of a protection engine.
 
 # Acknowledgments
 
-   The authors thanks Michael Tüxen for his invaluable comments
+   The authors thank Michael Tüxen for his invaluable comments
    helping to cope with Association Restart, ASCONF handling and
    restructuring the Protection Engine architecture.

@@ -103,7 +103,7 @@ chunk layering in regard to SCTP and the Upper Layer Protocol (ULP).
 
 ~~~~~~~~~~~ aasvg
 +---------------+ +--------------------+
-|               | | Protection Engine  |
+|               | | Protection Engine  |  Keys
 |      ULP      | |                    +-------------.
 |               | |   Key Management   |              |
 +---------------+-+---+----------------+              |
@@ -150,7 +150,7 @@ SCTP CRYPTO chunk capability is agreed by the peers at the
 initialization of the SCTP association, during that phase the peers
 exchange information about the protection engines available. Once
 the peers have agreed on what protection to use, the SCTP endpoints start
-sending SCTP CRYPTO chunks containing the initialization
+sending Protection Engine's specific SCTP DATA chunks containing the initialization
 information related to the protection engine including key agreement and
 endpoint authentication. This is depending on the chosen protection engine thus is
 not being detailed in the current specification.
@@ -184,10 +184,15 @@ that take care of key distribution, verification, and update. For key management
 the Protection Engines exploit SCTP DATA chunks having a dedicated Payload
 Protocol Identifier.
 
-Key management of protection engine is RECOMMENDED to use the SCTP
-DATA chunks inside SCTP CRYPTO chunk for handshaking, in that case
-any packet being exchanged between protection engine peers shall be
-transported as payload of Crypto chunk (see {{crypto-chunk}}).
+During initialization, that is before Association reaches the ESTABLISHED
+state (see {{state-diagram}}), inband Key Management SHALL exploit DATA
+chunks with Protection Engine PPID (see {{iana-payload-protection-id}}),
+those DATA chunks SHALL be sent unprotected.
+As soon as the Association reaches ESTABLISHED state,
+Key management of protection engine is RECOMMENDED to use SCTP
+DATA chunks with Protection Engine PPID inside SCTP CRYPTO chunk for
+handshaking, in that case any packet being exchanged between protection
+engine peers shall be transported as payload of Crypto chunk (see {{crypto-chunk}}).
 
 Key management MAY use other mechanism than what provided by SCTP CRYPTO
 chunks, in any case the mechanism for key management MUST be detailed
@@ -749,7 +754,7 @@ timer and will move into ESTABLISHED state.
 
 Once in ESTABLISHED state, only CRYPTO chunks can be sent to the remote peer
 and any other type of plain text SCTP chunks coming from the remote
-peer will be silently discarded.
+peer will be silently discarded with the exception of SHUTDOWN-COMPLETE chunk.
 
 If the lists of Protection Engines don't match, it will generate an
 ERROR chunk and an ABORT chunk. ERROR CAUSE will indicate "Failure in
@@ -878,7 +883,7 @@ received shall be silently discarded.
 chunk is sent unprotected (i.e. plain text). No DATA chunks, except
 than the one used by the Protection Engine for handshake, thus
 being identified with the Protection Engine PPID
-(see {{iana-payload-protection-id}}), shall be
+(see {{iana-payload-protection-id}}), SHALL be
 sent in these states and DATA chunks with different PPID being
 received shall be silently discarded. DATA Chunks with the
 Protection Engine PPID (see {{iana-payload-protection-id}})

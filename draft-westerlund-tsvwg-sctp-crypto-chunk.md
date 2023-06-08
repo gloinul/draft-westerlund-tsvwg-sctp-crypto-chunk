@@ -253,7 +253,6 @@ cases this is not possible or failed to be done successfully the
 endpoint will be need to fall back to initiating a new SCTP association.
 
 
-
 ## PMTU Considerations {#pmtu}
 
 The addition of the CRYPTO chunk to SCTP reduces the room for payload,

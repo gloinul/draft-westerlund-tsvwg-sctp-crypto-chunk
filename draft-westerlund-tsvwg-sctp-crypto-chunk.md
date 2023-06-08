@@ -268,21 +268,24 @@ based on packet to big ICMP messages.
 
 ## ASCONF Considerations
 
-The recommendation {{RFC5061}} specifies that ASCONF message contains
-an Address parameter belonging to the Sending SCTP Endpoint, that
-address MUST be considered part of the association by the
-peer endpoint (the receiver of the ASCONF Chunk).
-The parameter may used by the receiver of the ASCONF to help in finding
-the association.
-The adoption of SCTP Chunk doesn't allow using the ASCONF Address parameter
-for the validation of the Source IP address of the SCTP packet because
-the Chunk needs to be unprotected first.
-In order to cope with the {{RFC5061}} it's recommended that at the reception
-of an SCTP packet from unknown Source IP Address, the SCTP Header Handler
-checks for the VTag and discriminated the Association based on VTag and
-destination Port. If the pair VTag:port is not unique, a copy of the
-contained Crypto Chunk will be sent to all the Association that have
-the same VTag:port as identifiers.
+In Crypto Chunk the ASCONF chunk is protected, thus it needs to be
+unprotected first, furthermore it MAY come from an unknown IP Address.
+In order to properly address the ASCONF chunk to the relevant Association
+for being unprotected, Destination Address, Source and Destination ports
+and VTag shall be exploited. If the combination of those parameters
+is not unique the implementor MAY choose to send the Crypto Chunk to
+all Associations that fit with the parameters in order to find the
+right one.
+
+The recommendation {{RFC5061}} specifies that ASCONF message MUST
+be sent in Authenticated way (section 4.1.1 of {RFC5061{}}), thus
+the Association MUST be using the mechanism for SCTP-AUTH specified
+in {{RFC4895}}.
+
+Crypto Chunks, when the Protection Engine provides strong Authentication
+such for instance in case of DTLS, would provide a better mechanism
+for Authentication than SCTP-AUTH. We recommend to amend {{RFC5061}}
+for including Crypto Chunks as Authentication mechanism for ASCONF chunks.
 
 # Conventions
 

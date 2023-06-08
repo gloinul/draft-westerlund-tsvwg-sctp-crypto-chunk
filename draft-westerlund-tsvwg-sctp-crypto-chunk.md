@@ -309,6 +309,14 @@ function. However, valid ICMP errors or information may indirectly be
 provided to the protection engine, such as an update to PMTU values
 based on packet to big ICMP messages.
 
+## Path selection considerations {#multipath}
+
+When an Association is multihomed there are multiple paths between Endpoints.
+The selection of the specific path to be used at a certain time belongs
+to SCTP protocol that will decide according to {{RFC9260}}.
+The Protection Engine shall not influence the path selection algorithm,
+actually the Protection Engine will not even know what path is being used.
+
 ## ASCONF Considerations
 
 In Crypto Chunk the ASCONF chunk is protected, thus it needs to be

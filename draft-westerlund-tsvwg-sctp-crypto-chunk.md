@@ -1252,3 +1252,9 @@ of a protection engine.
 
  * Detail the state transition between PROTECTION PENDING and
    PROTECTED state (see {{state-diagram}}).
+
+# Acknowledgments
+
+   The authors thanks Michael Tüxen for his invaluable comments
+   helping to cope with Association Restart, ASCONF handling and
+   restructuring the Protection Engine architecture.

@@ -224,7 +224,7 @@ retransmissions.
 ## SCTP Restart Considerations
 
 SCTP Restart procedure allows an Endpoint to recover an Association
-when the remote Endpoint has still the TCB.
+when the remote Endpoint still has the Transmission Control Block (TCB).
 Giving the possibility to an SCTP Endpoint to perform a Restart
 procedure by accepting any plain chunk when the Association has
 been established is not permitted by this recommendation, thus

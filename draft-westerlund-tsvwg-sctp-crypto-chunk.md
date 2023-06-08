@@ -36,6 +36,7 @@ informative:
 
 normative:
   RFC2119:
+  RFC4895:
   RFC5061:
   RFC8126:
   RFC8174:
@@ -278,7 +279,7 @@ all Associations that fit with the parameters in order to find the
 right one.
 
 The recommendation {{RFC5061}} specifies that ASCONF message MUST
-be sent in Authenticated way (section 4.1.1 of {RFC5061{}}), thus
+be sent in Authenticated way (section 4.1.1 of {{RFC5061}}), thus
 the Association MUST be using the mechanism for SCTP-AUTH specified
 in {{RFC4895}}.
 

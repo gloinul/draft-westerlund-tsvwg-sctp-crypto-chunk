@@ -236,7 +236,7 @@ retransmissions.
 ## SCTP Restart Considerations
 
 SCTP Restart procedure allows an Endpoint to recover an association
-when the remote Endpoint has still has the state for the association.
+when the remote Endpoint still has the state for the association.
 However, an SCTP association that has an established protection engine
 will not accept a unprotected INIT to restart it, instead it would
 discard it. Thus, an endpoint attempting to restart an SCTP
@@ -263,7 +263,6 @@ Association restart when using crypto chunks has increased
 requirements on the endpoint maintaining state across the restart. In
 cases this is not possible or failed to be done successfully the
 endpoint will be need to fall back to initiating a new SCTP association.
-
 
 ## PMTU Considerations {#pmtu}
 
@@ -326,7 +325,9 @@ for being unprotected, Destination Address, Source and Destination ports
 and VTag shall be exploited. If the combination of those parameters
 is not unique the implementor MAY choose to send the Crypto Chunk to
 all Associations that fit with the parameters in order to find the
-right one.
+right one. The association will attempt de-protection operations on
+the crypto chunk, and if that is successful the ASCONF chunk can be
+processed.
 
 The recommendation {{RFC5061}} specifies that ASCONF message MUST
 be sent in Authenticated way (section 4.1.1 of {{RFC5061}}), thus
@@ -341,7 +342,6 @@ for including Crypto Chunks as Authentication mechanism for ASCONF chunks.
 # Conventions
 
 {::boilerplate bcp14}
-
 
 # New Parameter Type {#new-parameter-type}
 
@@ -889,7 +889,8 @@ When initiator and responder have agreed on a protected association by
 means of handshaking INIT/INIT-ACK with a common protection engine,
 only control chunks and CRYPTO chunks will be accepted. Any DATA
 chunk being sent on a Protected association will be silently
-discarded.
+discarded with the exception if DATA Chunks with Protection Engine
+PPID that can be used for initial Key Management.
 
 After completion of initial handshake, that is after COOKIE-ECHO and
 COOKIE-ACK, the Protection Engine shall initialize itself by
@@ -955,7 +956,8 @@ for CRYPTO chunks, will be used to create an SCTP payload
 that will be encrypted by the Protection Engine and the result from
 that encryption will be the used as payload for a CRYPTO chunk that
 will be the only chunk in the SCTP packet to be sent. DATA chunks
-received shall be silently discarded. Note that User Data in PROTECTED
+received with PPID different than Protection engine PPID shall be
+silently discarded. Note that User Data in PROTECTED
 state are not used for creating DATA chunks, the only DATA chunk being
 handled are the ones with Protection Engine PPID
 (see {{iana-payload-protection-id}}) related to Protection Engine
@@ -1014,10 +1016,8 @@ When the association state machine (see {{sctp-Crypto-state-diagram}})
 has reached the PROTECTION PENDING state, it MAY perform protection
 engine key management inband depending on how the specification for the
 chosen Protection Engine has been defined.  In such case, the CRYPTO
-chunk Handler will receive plain control chunks from the SCTP chunk
-handler and payload for CRYPTO chunks from the protection engine.
-Plain control chunks and CRYPTO chunks MUST NOT be bundled within the
-same SCTP packet.
+chunk Handler will receive plain control and DATA chunks from the SCTP chunk
+handler.
 
 When the association state machine (see {{sctp-Crypto-state-diagram}})
 has reached the PROTECTED state, the CRYPTO chunk handler will receive
@@ -1042,12 +1042,9 @@ When the association state machine (see {{sctp-Crypto-state-diagram}})
 has reached the PROTECTION PENDING state, it MAY handle key management
 inband depending on how the specification for the chosen protection
 engine has been defined.  In such case, the CRYPTO chunk handler will
-receive plain control chunks and CRYPTO chunks from the SCTP Header
-Handler.  CRYPTO chunks will be forwarded to the protection engine
-whilst plain control chunks will be forwarded to SCTP chunk handler.
-During PROTECTION PENDING state, plain control chunks and CRYPTO chunks
-bundled within the same SCTP packet will be handled as protocol
-error.
+receive plain control chunks and DATA chunks with Protection Engine
+PPID from the SCTP Header Handler. Those plain control chunks will be
+forwarded to SCTP chunk handler.
 
 When the association state machine (see {{sctp-Crypto-state-diagram}})
 has reached the PROTECTED state, the CRYPTO chunk handler will receive

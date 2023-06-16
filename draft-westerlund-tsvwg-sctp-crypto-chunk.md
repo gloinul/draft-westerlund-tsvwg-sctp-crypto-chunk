@@ -405,7 +405,7 @@ handshake.
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|    Parameter Type = 0x80xx    |       Parameter Length        |
+|    Parameter Type = 0x80XX    |       Parameter Length        |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                                                               |
 |                      Protection Engines                       |
@@ -418,7 +418,7 @@ handshake.
 
 {: vspace="0"}
 Parameter Type: 16 bits (unsigned integer)
-: This value MUST be set to 0x80xx.
+: This value MUST be set to 0x80XX.
 
 Parameter Length: 16 bits (unsigned integer)
 : This value holds the length of the Protection Engines field in
@@ -437,7 +437,7 @@ Padding: 0 or 16 bits
   to make the chunk 32-bit aligned. The Padding MUST NOT be longer
   than 2 bytes and it MUST be ignored by the receiver.
 
-RFC-Editor Note: Please replace 0x08xx with the actual parameter type
+RFC-Editor Note: Please replace 0x08XX with the actual parameter type
 value assigned by IANA and then remove this note.
 
 # New Chunk Types {#new-chunk-types}
@@ -594,8 +594,11 @@ Information field.
 ~~~~~~~~~~~
 {: #sctp-Crypto-init-chunk-missing-protected title="ERROR Missing Protected Association Paramater" artwork-align="center"}
 
-Cause Length is equal to the number of missing parameters 8 + N * 2
-according to {{RFC9260}}, section 3.3.10.2.
+Note: Cause Length is equal to the number of missing parameters 8 + N
+* 2 according to {{RFC9260}}, section 3.3.10.2. Also the Protection
+Association ID may be present in any of the N missing params, no order
+implied by the example in
+{{sctp-Crypto-init-chunk-missing-protected}}.
 
 ## Error in Protection {#eprotect}
 
@@ -633,7 +636,7 @@ Cause Length: 16 bits (unsigned integer)
 
 Extra Cause: 16 bits (unsigned integer)
 : Each Extra Cause indicate an additional piece of information as part
-  of the error. There MAY be 0 to as many as can fit in the extra
+  of the error. There MAY be zero to as many as can fit in the extra
   cause field in the ERROR Chunk (A maximum of 32764).
 
 Editor's Note: Please replace TBA9 above with what is assigned by IANA.
@@ -762,8 +765,6 @@ generate State Cookie |    +---------+ delete TCB         send ABORT
          |     |                       |-----------------
          |     |                       | send and receive
          |     |                       | protection engine handshake
-         |     |                       | by means of CRYPTO chunks.
-         |     |                       |
          |     |                       |
          |     |                       v
          |     |           +----------------------+
@@ -775,7 +776,6 @@ generate State Cookie |    +---------+ delete TCB         send ABORT
          |     |                       | send and receive
          |     |                       | PVALID by means of
          |     |                       | CRYPTO chunk.
-         |     |                       |
          |     |                       |
          |     +-----------------+     |
          +-----------------+     |     |
@@ -806,9 +806,9 @@ are outside of the ones commonly occurring on the general Internet,
 see {{t-valid-considerations}}.
 
 If key establishment is in-band, the protection engine will start the
-handshake with its peer and in case of failure or T-valid timeout, it
-will generate an ABORT chunk.  The ERROR handling
-follows what specified in {{ekeyhandshake}}.  When Handshake has been
+handshake with its peer and in case of failure or T-valid timeout, the
+Crypto Chunk will generate an ABORT chunk.  The ERROR handling follows
+what specified in {{ekeyhandshake}}.  When Handshake has been
 successfully completed, the association state machine will enter
 PROTECTED state.
 
@@ -872,11 +872,11 @@ specified in {{etmout}}.
 
 ### Considerations on key management {#key-management-considerations}
 
-When the Association is either in PROTECTION PENDING or in PROTECTED state,
+When the Association is in PROTECTION PENDING state,
 in-band key management shall exploit SCTP DATA chunk with the Protection Engine
 PPID (see {{iana-payload-protection-id}}) that will be sent unencrypted.
 
-When the Association is in ESTABLISHED or in any of the states that can
+When the Association is in PROTECTED, ESTABLISHED or in any of the states that can
 be reached after ESTABLISHED state, in-band key management shall exploit
 SCTP DATA chunk that will be protected by the Protection Engine and
 encapsulated in CRYPTO chunks.
@@ -898,7 +898,7 @@ the Protection Engine Specification for each Protection Engine.
 
 ## Establishment of a Protected Association {#establishment-procedure}
 
-An SCTP Endpoint acting as initiator willing to create a Protected
+An SCTP Endpoint acting as initiator willing to create a protected
 association shall send to the remote peer an INIT chunk containing the
 Protected Association parameter (see {{protectedassoc-parameter}})
 where all the supported Protection Engines are listed, given in
@@ -923,14 +923,13 @@ Engine" ({{eprotlist}}).
 
 When initiator and responder have agreed on a protected association by
 means of handshaking INIT/INIT-ACK with a common protection engine,
-only control chunks and CRYPTO chunks will be accepted. Any DATA
-chunk being sent on a Protected association will be silently
-discarded with the exception if DATA Chunks with Protection Engine
-PPID that can be used for initial Key Management.
+only control chunks, CRYPTO chunks and DATA Chunks with the Protection
+Engine PPID will be accepted. Any other DATA chunk being sent on a Protected
+association will be silently discarded.
 
 After completion of initial handshake, that is after COOKIE-ECHO and
 COOKIE-ACK, the Protection Engine shall initialize itself by
-transferring its own data as Payload of the DATA chunk if necessary.  At
+transferring its own data as payload of the DATA chunk if necessary.  At
 completion of Protection Engine initialization, the setup of the
 Protected association is complete and from that time on only CRYPTO
 chunks will be exchanged.  Any plain text chunks will be silently
@@ -987,7 +986,7 @@ received shall be silently discarded. DATA Chunks with the
 Protection Engine PPID (see {{iana-payload-protection-id}})
 shall be sent by the Protection Engine to establish its security context.
 
-- When the association is in states PROTECTED, any SCTP chunk except
+- When the association is in state PROTECTED, any SCTP chunk except
 for CRYPTO chunks, will be used to create an SCTP payload
 that will be encrypted by the Protection Engine and the result from
 that encryption will be the used as payload for a CRYPTO chunk that

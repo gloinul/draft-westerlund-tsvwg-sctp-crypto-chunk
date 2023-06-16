@@ -34,6 +34,28 @@ author:
 informative:
   RFC8446:
 
+  I-D.westerlund-tsvwg-sctp-crypto-dtls:
+    target: "https://datatracker.ietf.org/doc/draft-westerlund-tsvwg-sctp-crypto-dtls/"
+    title: "Datagram Transport Layer Security (DTLS) in the Stream Control Transmission Protocol (SCTP) CRYPTO Chunk"
+    author:
+      -
+       ins:  M. Westerlund
+       name: Magnus Westerlund
+       org: Ericsson
+       email: magnus.westerlund@ericsson.com
+      -
+       ins: J. Preuß Mattsson
+       name: John Preuß Mattsson
+       org: Ericsson
+       email: john.mattsson@ericsson.com
+      -
+       ins: C. Porfiri
+       name: Claudio Porfiri
+       org: Ericsson
+       email: claudio.porfiri@ericsson.com
+    date: June 2023
+
+
 normative:
   RFC2119:
   RFC4895:
@@ -83,11 +105,13 @@ features provided by SCTP and its extensions but with some limitations.
 
    Applications using SCTP CRYPTO chunk can use all transport features
    provided by SCTP and its extensions. However, there can be some
-   limitations or additional requirements for them to function. Due to
-   its level of integration as discussed in next section it will
-   provide its security functions on all content of the SCTP packet,
-   and will thus not impact the potential to utilize any SCTP
-   functionalities or extensions.
+   limitations or additional requirements for them to function such as
+   those noted for SCTP restart and use of Dynamic Address
+   Reconfiguration, see {{sec-asconf}} and {{sec-restart}}. Due to its
+   level of integration as discussed in next section it will provide
+   its security functions on all content of the SCTP packet, and will
+   thus not impact the potential to utilize any SCTP functionalities
+   or extensions.
 
 # Overview
 
@@ -206,11 +230,9 @@ Key management MAY use other mechanism than what provided by SCTP CRYPTO
 chunks, in any case the mechanism for key management MUST be detailed
 in the specification for that protection engine.
 
-Out-of-band communication between protection engines MAY exploit the
-Flags byte provided by the CRYPTO chunk header (see
-{{sctp-Crypto-chunk-newchunk-crypt-struct}}).
-
-Details of the use of Flags, if different from what described in the
+The protection engines MAY exploit the Flags byte provided by the
+CRYPTO chunk header (see {{sctp-Crypto-chunk-newchunk-crypt-struct}})
+for its needs. Details of the use of Flags, if different from what described in the
 current document, MUST be specified in the Protection Engine Specification
 document for that specific protection engine.
 
@@ -221,7 +243,8 @@ individually established security contexts. If the protection engine
 does not meet that assumption further protection of the common header
 is likely required.
 
-An example of protection engine can be DTLS.
+An example of protection engine can be DTLS as specified in
+{{I-D.westerlund-tsvwg-sctp-crypto-dtls}}.
 
 ## SCTP CRYPTO Chunk Buffering and Flow Control {#buffering}
 
@@ -239,36 +262,6 @@ implementation should consider that out-of-order handling of SCTP
 chunks is not desired and may cause false congestions and
 retransmissions.
 
-## SCTP Restart Considerations
-
-SCTP Restart procedure allows an Endpoint to recover an association
-when the remote Endpoint still has the state for the association.
-However, an SCTP association that has an established protection engine
-will not accept a unprotected INIT to restart it, instead it would
-discard it. Thus, an endpoint attempting to restart an SCTP
-association which was using Crypto Chunks MUST have the security
-context for this association, and use it to encapsulate the INIT in a
-CRYPTO chunk. Note, the SCTP common header will contain a verification
-tag equal to 0, combined with CRYPTO chunk when carrying an INIT to
-restart.
-
-An endpoint implementing Crypto Chunk MUST accept receiving SCTP
-packets with a verification tag with value 0 and containing a Crypto
-Chunk. The endpoit will attempt to map the packet to an association
-based on source IP address, destination address and port. If the
-combination of those parameters is not unique the implementor MAY
-choose to send the Crypto Chunk to all Associations that fit with the
-parameters in order to find the right one. The association will
-attempt de-protection operations on the crypto chunk, and if that is
-successful the INIT chunk can be processed as a restart attempt. Note
-that this will update the verification tags for both this endpoint and
-the peer. Failure to authenticate the crypto chunk payload will result
-in it being discarded.
-
-Association restart when using crypto chunks has increased
-requirements on the endpoint maintaining state across the restart. In
-cases this is not possible or failed to be done successfully the
-endpoint will be need to fall back to initiating a new SCTP association.
 
 ## PMTU Considerations {#pmtu}
 
@@ -298,7 +291,11 @@ successful data transfer for enlarging or reducing the congestion
 window CWND (see {{RFC9260}} section 7.2).
 
 It may happen that protection engine discards packets due to internal
-checks or because it has detected a malicious attempt.
+checks or because it has detected a malicious attempt. As those
+packets do not represent what the peer sent, it is acceptable to
+discount them, although in-situ modification on the path of a packet
+resulting in discarding due to integrity failure will leave a gap, but
+has to be accepted as part of the path behavior.
 
 The protection engine shall not interfere with the SCTP congestion
 control mechanism, this basically means that from SCTP perspective
@@ -307,10 +304,11 @@ in {{RFC9260}}.
 
 ## ICMP Considerations {#icmp}
 
-SCTP implementation will be responsible for handling ICMP messages and
-their validation as specified in {{RFC9260}} Section 10. This includes
-for SCTP packets sent by the protection engines key management
-function. However, valid ICMP errors or information may indirectly be
+The SCTP implementation will be responsible for handling ICMP messages
+and their validation as specified in {{RFC9260}} Section 10. This
+means that the ICMP validation needs to be done in relation to the
+actual sent SCTP packets with the CRYPTO chunk and not the unprotected
+payload. However, valid ICMP errors or information may indirectly be
 provided to the protection engine, such as an update to PMTU values
 based on packet to big ICMP messages.
 
@@ -322,28 +320,60 @@ to SCTP protocol that will decide according to {{RFC9260}}.
 The Protection Engine shall not influence the path selection algorithm,
 actually the Protection Engine will not even know what path is being used.
 
-## ASCONF Considerations
+## Dynamic Address Reconfiguration Considerations  {#sec-asconf}
 
-In Crypto Chunk the ASCONF chunk is protected, thus it needs to be
-unprotected first, furthermore it MAY come from an unknown IP Address.
-In order to properly address the ASCONF chunk to the relevant Association
-for being unprotected, Destination Address, Source and Destination ports
-and VTag shall be exploited. If the combination of those parameters
-is not unique the implementor MAY choose to send the Crypto Chunk to
-all Associations that fit with the parameters in order to find the
-right one. The association will attempt de-protection operations on
-the crypto chunk, and if that is successful the ASCONF chunk can be
-processed.
+When using Dynamic Address Reconfiguration {{RFC5061}} in an SCTP
+association using CRYPTO Chunk the ASCONF chunk is protected, thus it
+needs to be unprotected first, furthermore it MAY come from an unknown
+IP Address.  In order to properly address the ASCONF chunk to the
+relevant Association for being unprotected, Destination Address,
+Source and Destination ports and VTag shall be exploited. If the
+combination of those parameters is not unique the implementor MAY
+choose to send the Crypto Chunk to all Associations that fit with the
+parameters in order to find the right one. The association will
+attempt de-protection operations on the crypto chunk, and if that is
+successful the ASCONF chunk can be processed.
 
-The recommendation {{RFC5061}} specifies that ASCONF message MUST
-be sent in Authenticated way (section 4.1.1 of {{RFC5061}}), thus
-the Association MUST be using the mechanism for SCTP-AUTH specified
-in {{RFC4895}}.
+The recommendation {{RFC5061}} specifies (section 4.1.1 of
+{{RFC5061}}) that ASCONF message are required to be sent authenticated
+with SCTP-AUTH {{RFC4895}}. For SCTP associations using Crypto Chunks,
+when the Protection Engine provides strong Authentication such for
+instance in case of DTLS, results in the use of redundant mechanism
+for Authentication with both SCTP-AUTH and the Crypto Chunk. We
+recommend to amend {{RFC5061}} for including Crypto Chunks as
+Authentication mechanism for ASCONF chunks.
 
-Crypto Chunks, when the Protection Engine provides strong Authentication
-such for instance in case of DTLS, would provide a better mechanism
-for Authentication than SCTP-AUTH. We recommend to amend {{RFC5061}}
-for including Crypto Chunks as Authentication mechanism for ASCONF chunks.
+
+## SCTP Restart Considerations  {#sec-restart}
+
+SCTP Restart procedure allows an endpoint to recover an association
+when the remote endpoint still has the state for the association.
+However, an SCTP association that has an established protection engine
+will not accept a unprotected INIT to restart it, instead it would
+discard it. Thus, an endpoint attempting to restart an SCTP
+association which was using Crypto Chunks MUST have the security
+context for this association, and use it to encapsulate the INIT in a
+CRYPTO chunk. Note, the SCTP common header will contain a verification
+tag equal to 0, combined with CRYPTO chunk when carrying an INIT to
+restart.
+
+An endpoint implementing Crypto Chunk MUST accept receiving SCTP
+packets with a verification tag with value 0 and containing a Crypto
+Chunk. The endpoit will attempt to map the packet to an association
+based on source IP address, destination address and port. If the
+combination of those parameters is not unique the implementor MAY
+choose to send the Crypto Chunk to all Associations that fit with the
+parameters in order to find the right one. The association will
+attempt de-protection operations on the crypto chunk, and if that is
+successful the INIT chunk can be processed as a restart attempt. Note
+that this will update the verification tags for both this endpoint and
+the peer. Failure to authenticate the crypto chunk payload will result
+in it being discarded.
+
+Association restart when using crypto chunks has increased
+requirements on the endpoint maintaining state across the restart. In
+cases this is not possible or failed to be done successfully the
+endpoint will be need to fall back to initiating a new SCTP association.
 
 # Conventions
 

@@ -58,7 +58,7 @@ protected against replay, as well as how key management is
 accomplished.
 
 Applications using SCTP CRYPTO chunk can use all transport
-features provided by SCTP and its extensions.
+features provided by SCTP and its extensions but with some limitations.
 
 --- middle
 
@@ -81,12 +81,13 @@ features provided by SCTP and its extensions.
    chunk. The protection engine specification might be based on an
    existing security protocol.
 
-   Applications using SCTP CRYPTO chunk can use all transport
-   features provided by SCTP and its extensions. Due to its level of
-   integration as discussed in next section it will provide its
-   security functions on all content of the SCTP packet, and will thus
-   not impact the potential to utilize any SCTP functionalities or
-   extensions.
+   Applications using SCTP CRYPTO chunk can use all transport features
+   provided by SCTP and its extensions. However, there can be some
+   limitations or additional requirements for them to function. Due to
+   its level of integration as discussed in next section it will
+   provide its security functions on all content of the SCTP packet,
+   and will thus not impact the potential to utilize any SCTP
+   functionalities or extensions.
 
 # Overview
 
@@ -150,12 +151,13 @@ header and the SHUTDOWN-COMPLETE chunk.
 
 SCTP CRYPTO chunk capability is agreed by the peers at the
 initialization of the SCTP association, during that phase the peers
-exchange information about the protection engines available. Once
-the peers have agreed on what protection to use, the SCTP endpoints start
-sending Protection Engine's specific SCTP DATA chunks containing the initialization
-information related to the protection engine including key agreement and
-endpoint authentication. This is depending on the chosen protection engine thus is
-not being detailed in the current specification.
+exchange information about the protection engines available. Once the
+peers have agreed on what protection to use, the SCTP endpoints start
+sending Protection Engine's payloads in SCTP DATA chunks containing
+the initialization information related to the protection engine
+including key agreement and endpoint authentication. This is depending
+on the chosen protection engine thus is not being detailed in the
+current specification.
 
 When the endpoint authentication has been completed, the association
 is meant to be initialized and the ULP is informed about that, from
@@ -173,28 +175,32 @@ with those SCTP chunks would have been.
 
 The protection engine, independently from the security
 characteristics, needs to be capable working on an unreliable
-transport mechanism same as UDP and have its own key management
-capability.
+transport mechanism same as UDP in regards to the payloads of the
+CRYPTO chunk, and have its own key management capability. SCTP is
+capable of providing reliable transport of key-management messages.
 
 SCTP CRYPTO chunk directly exploits the protection engine by
 requesting protection and unprotection of a buffer, in particular the
-protection buffer shall never exceed the SCTP payload size thus
-protection engine shall be aware of the PMTU (see {{pmtu}}).
+protection buffer should never exceed the possible SCTP packet size
+thus protection engine needs to be aware of the PMTU (see {{pmtu}}).
 
-The key management part of the protection engine is the set of data and procedures
-that take care of key distribution, verification, and update. For key management
-the Protection Engines exploit SCTP DATA chunks having a dedicated Payload
-Protocol Identifier.
+The key management part of the protection engine is the set of data
+and procedures that take care of key distribution, verification, and
+update. For key management the Protection Engines uses SCTP DATA
+chunks identified with a dedicated Payload Protocol Identifier. The
+protection engine can specify if the transmission of any key-managment
+messages are non-reliable or reliable transmitted by SCTP.
 
-During initialization, that is before Association reaches the ESTABLISHED
-state (see {{state-diagram}}), inband Key Management SHALL exploit DATA
-chunks with Protection Engine PPID (see {{iana-payload-protection-id}}),
-those DATA chunks SHALL be sent unprotected.
-As soon as the Association reaches ESTABLISHED state,
-Key management of protection engine is RECOMMENDED to use SCTP
-DATA chunks with Protection Engine PPID inside SCTP CRYPTO chunk for
-handshaking, in that case any packet being exchanged between protection
-engine peers shall be transported as payload of Crypto chunk (see {{crypto-chunk}}).
+During initialization, that is before Association reaches the
+ESTABLISHED state (see {{state-diagram}}), inband Key Management use
+DATA chunks that SHALL use the Protection Engine PPID (see
+{{iana-payload-protection-id}}). These DATA chunks SHALL be sent
+unprotected by the protection engine as no keys have been established
+yet. As soon as the SCTP Association reaches PROTECTED state, any
+protection engine that uses inband key management, i.e. sent using
+SCTP DATA chunks with the Protection Engine PPID, will have their
+message protected inside SCTP CRYPTO chunk protected with the
+currently established key.
 
 Key management MAY use other mechanism than what provided by SCTP CRYPTO
 chunks, in any case the mechanism for key management MUST be detailed

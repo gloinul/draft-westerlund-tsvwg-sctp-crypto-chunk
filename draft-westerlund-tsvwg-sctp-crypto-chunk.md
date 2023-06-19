@@ -293,7 +293,7 @@ window CWND (see {{RFC9260}} section 7.2).
 It may happen that protection engine discards packets due to internal
 checks or because it has detected a malicious attempt. As those
 packets do not represent what the peer sent, it is acceptable to
-discount them, although in-situ modification on the path of a packet
+ignore them, although in-situ modification on the path of a packet
 resulting in discarding due to integrity failure will leave a gap, but
 has to be accepted as part of the path behavior.
 

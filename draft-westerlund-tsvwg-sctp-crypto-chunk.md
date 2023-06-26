@@ -970,7 +970,8 @@ SCTP chunk including DATA chunks, but excluding CRYPTO chunk, will be
 used to create an SCTP payload that will be encrypted by the
 Protection Engine and the result from that encryption will be the used
 as payload for a CRYPTO chunk that will be the only chunk in the SCTP
-packet to be sent.
+packet to be sent. DATA chunks are accepted and handled according
+to section 4 of {{RFC9260}}.
 
 ~~~~~~~~~~~ aasvg
  0                   1                   2                   3

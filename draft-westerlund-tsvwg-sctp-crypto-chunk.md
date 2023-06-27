@@ -1230,7 +1230,7 @@ reference to this document. The registry at time of writing was
 available at:
 https://www.iana.org/assignments/sctp-parameters/sctp-parameters.xhtml#sctp-parameters-25
 
-| ID Value | Error Cause Codes | Reference |
+| ID Value | SCTP Payload Protocol Identifier | Reference |
 | TBA10 | Protection Engine Protocol Identifier | RFC-To-Be |
 {: #iana-payload-protection-id title="Protection Engine Protocol Identifier Registered" cols="r l l"}
 

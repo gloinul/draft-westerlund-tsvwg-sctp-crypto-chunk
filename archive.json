@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2023-06-22T01:19:03.302152+00:00",
+  "timestamp": "2023-08-29T00:58:52.074091+00:00",
   "repo": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
   "labels": [
     {
@@ -283,6 +283,22 @@
       "body": "The section Termination of a Protected Association is not explicit about that the crypto is used for all control message except for the last one SHUTDOWN-COMPLETE. That last thing may need to be covered in this section?",
       "createdAt": "2023-06-16T14:16:13Z",
       "updatedAt": "2023-06-16T14:16:13Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 19,
+      "id": "I_kwDOIc8XPM5vbndr",
+      "title": "Association RESTART",
+      "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/issues/19",
+      "state": "OPEN",
+      "author": "teiclap",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The association RESTART needs clarification. Options with plain or encrypted INIT needs to be described.",
+      "createdAt": "2023-08-28T10:48:09Z",
+      "updatedAt": "2023-08-28T10:48:09Z",
       "closedAt": null,
       "comments": []
     }

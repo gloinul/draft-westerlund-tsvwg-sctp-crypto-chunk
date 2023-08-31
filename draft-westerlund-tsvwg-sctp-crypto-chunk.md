@@ -357,9 +357,9 @@ that encrypted data belonging to the current Association can be
 encrypted and decrypted, the request for SCTP Restart SHOULD use
 INIT chunk in CRYPTO chunk.
 
-When the crypto engine is not preserved, the SCTP Restart
+When the crypto context is not preserved, the SCTP Restart
 can only be accomplished by means of plain text INIT.
-This opens to a man-in-the-middle attack where a malicious peer
+This opens to a man-in-the-middle attack where a malicious attacker
 may theoretcally generate an INIT chunk with proper parameters and
 hitch-hik an Association.
 
@@ -390,7 +390,7 @@ will trigger the creation of a new DTLS connection to be executed as soon as pos
 can only exploit INIT in plain text.
 An SCTP endpoint supporting Association Restart by means of plain text INIT
 SHOULD check that it comes from a legitimate peer, for instance by veryfiyng
-that the peer has been lost and the INIT is an attempt to recovery the Association,
+that the peer has been lost and the INIT is an attempt to recover the Association,
 using an encrypted HB chunk. If the remote peer is capable of answering to
 the encrypted HB with an encrypted HB ACK, the received INIT probably comes
 from an attacker and can be silently discarded, this mitigates the possibility

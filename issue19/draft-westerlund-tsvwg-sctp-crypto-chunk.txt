@@ -5,8 +5,8 @@
 TSVWG                                                      M. Westerlund
 Internet-Draft                                         J. Preuß Mattsson
 Intended status: Standards Track                              C. Porfiri
-Expires: 10 December 2023                                       Ericsson
-                                                             8 June 2023
+Expires: 3 March 2024                                           Ericsson
+                                                          31 August 2023
 
 
         Stream Control Transmission Protocol (SCTP) CRYPTO Chunk
@@ -27,7 +27,7 @@ Abstract
    against replay, as well as how key management is accomplished.
 
    Applications using SCTP CRYPTO chunk can use all transport features
-   provided by SCTP and its extensions.
+   provided by SCTP and its extensions but with some limitations.
 
 About This Document
 
@@ -60,7 +60,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 10 December 2023.
+   This Internet-Draft will expire on 3 March 2024.
 
 Copyright Notice
 
@@ -83,10 +83,14 @@ Table of Contents
      2.1.  Protocol Overview
      2.2.  Protection Engines Considerations
      2.3.  SCTP CRYPTO Chunk Buffering and Flow Control
-     2.4.  SCTP Restart Considerations
-     2.5.  PMTU Considerations
-     2.6.  Congestion Control Considerations
-     2.7.  ICMP Considerations
+     2.4.  PMTU Considerations
+     2.5.  Congestion Control Considerations
+     2.6.  ICMP Considerations
+     2.7.  Path Selection Considerations
+     2.8.  Dynamic Address Reconfiguration Considerations
+     2.9.  SCTP Restart Considerations
+       2.9.1.  INIT chunk in CRYPTO chunk
+       2.9.2.  INIT chunk as plain text
    3.  Conventions
    4.  New Parameter Type
      4.1.  Protected Association Parameter
@@ -106,7 +110,8 @@ Table of Contents
      7.1.  New States
        7.1.1.  PROTECTION PENDING
        7.1.2.  PROTECTED
-       7.1.3.  Consideration on T-valid
+       7.1.3.  Considerations on key management
+       7.1.4.  Consideration on T-valid
    8.  Procedures
      8.1.  Establishment of a Protected Association
      8.2.  Termination of a Protected Association
@@ -120,13 +125,15 @@ Table of Contents
      10.3.  SCTP Chunk Types
      10.4.  SCTP Chunk Parameter Types
      10.5.  SCTP Error Cause Codes
+     10.6.  SCTP Payload Protocol Identifier
    11. Security Considerations
      11.1.  Privacy Considerations
      11.2.  Downgrade Attacks
    12. Requirements towards the protection engines
-   13. References
-     13.1.  Normative References
-     13.2.  Informative References
+   13. Acknowledgments
+   14. References
+     14.1.  Normative References
+     14.2.  Informative References
    Authors' Addresses
 
 1.  Introduction
@@ -149,10 +156,14 @@ Table of Contents
    security protocol.
 
    Applications using SCTP CRYPTO chunk can use all transport features
-   provided by SCTP and its extensions.  Due to its level of integration
-   as discussed in next section it will provide its security functions
-   on all content of the SCTP packet, and will thus not impact the
-   potential to utilize any SCTP functionalities or extensions.
+   provided by SCTP and its extensions.  However, there can be some
+   limitations or additional requirements for them to function such as
+   those noted for SCTP restart and use of Dynamic Address
+   Reconfiguration, see Section 2.8 and Section 2.9.  Due to its level
+   of integration as discussed in next section it will provide its
+   security functions on all content of the SCTP packet, and will thus
+   not impact the potential to utilize any SCTP functionalities or
+   extensions.
 
 2.  Overview
 
@@ -169,23 +180,26 @@ Table of Contents
    protocol specification.  Figure 1 illustrates the CRYPTO chunk
    layering in regard to SCTP and the Upper Layer Protocol (ULP).
 
-           +---------------------+
-           |                     |
-           |        ULP          |
-           |                     |
-           +---------------------+ <-- User Level Messages
-           |                     |
-           | SCTP Chunks Handler | +-- SCTP Unprotected Payload
-           |                     |/
-           +---------------------+    +--------------------+
-           |        CRYPTO       +--->| Protection Engine  |
-           |        Chunk        |    +--------------------+
-           |       Handler       |<---+   Key Management   |
-           +---------------------+    +--------------------+
-           |                     |\
-           | SCTP Header Handler | +-- SCTP Protected Payload
-           |                     |
-           +---------------------+
+          +---------------+ +--------------------+
+          |               | | Protection Engine  |  Keys
+          |      ULP      | |                    +-------------.
+          |               | |   Key Management   |              |
+          +---------------+-+---+----------------+              |
+          |                     |                 \    User     |
+          |                     |                  +-- Level    |
+          | SCTP Chunks Handler |                      Messages |
+          |                     |                               |
+          |                     | +-- SCTP Unprotected Payload  |
+          |                     |/                              |
+          +---------------------+    +---------------------+    |
+          |        CRYPTO       |    | Protection Engine   |    |
+          |        Chunk        |<-->|                     |<--'
+          |       Handler       |    | Protection Operator |
+          +---------------------+    +---------------------+
+          |                     |\
+          | SCTP Header Handler | +-- SCTP Protected Payload
+          |                     |
+          +---------------------+
 
          Figure 1: CRYPTO Chunk Layering in Regard to SCTP and ULP
 
@@ -213,11 +227,11 @@ Table of Contents
    initialization of the SCTP association, during that phase the peers
    exchange information about the protection engines available.  Once
    the peers have agreed on what protection to use, the SCTP endpoints
-   start sending SCTP CRYPTO chunks containing the initialization
-   information related to the protection engine including key agreement
-   and endpoint authentication.  This is depending on the chosen
-   protection engine thus is not being detailed in the current
-   specification.
+   start sending Protection Engine's payloads in SCTP DATA chunks
+   containing the initialization information related to the protection
+   engine including key agreement and endpoint authentication.  This is
+   depending on the chosen protection engine thus is not being detailed
+   in the current specification.
 
    When the endpoint authentication has been completed, the association
    is meant to be initialized and the ULP is informed about that, from
@@ -234,33 +248,42 @@ Table of Contents
 
    The protection engine, independently from the security
    characteristics, needs to be capable working on an unreliable
-   transport mechanism same as UDP and have its own key management
-   capability.
+   transport mechanism same as UDP in regards to the payloads of the
+   CRYPTO chunk, and have its own key management capability.  SCTP is
+   capable of providing reliable transport of key-management messages.
 
    SCTP CRYPTO chunk directly exploits the protection engine by
    requesting protection and unprotection of a buffer, in particular the
-   protection buffer shall never exceed the SCTP payload size thus
-   protection engine shall be aware of the PMTU (see Section 2.5).
+   protection buffer should never exceed the possible SCTP packet size
+   thus protection engine needs to be aware of the PMTU (see
+   Section 2.4).
 
    The key management part of the protection engine is the set of data
    and procedures that take care of key distribution, verification, and
-   update.
+   update.  For key management the Protection Engines uses SCTP DATA
+   chunks identified with a dedicated Payload Protocol Identifier.  The
+   protection engine can specify if the transmission of any key-
+   managment messages are non-reliable or reliable transmitted by SCTP.
 
-   Key management of protection engine is RECOMMENDED to use the SCTP
-   CRYPTO chunk for handshaking, in that case any packet being exchanged
-   between protection engine peers shall be transported as payload of
-   Crypto chunk (see Section 5.1).
+   During initialization, that is before Association reaches the
+   ESTABLISHED state (see Section 7), inband Key Management use DATA
+   chunks that SHALL use the Protection Engine PPID (see Table 9).
+   These DATA chunks SHALL be sent unprotected by the protection engine
+   as no keys have been established yet.  As soon as the SCTP
+   Association reaches PROTECTED state, any protection engine that uses
+   inband key management, i.e. sent using SCTP DATA chunks with the
+   Protection Engine PPID, will have their message protected inside SCTP
+   CRYPTO chunk protected with the currently established key.
 
    Key management MAY use other mechanism than what provided by SCTP
    CRYPTO chunks, in any case the mechanism for key management MUST be
-   specified in the specification for that protection engine.
+   detailed in the specification for that protection engine.
 
-   Out-of-band communication between protection engines MAY exploit the
-   Flags byte provided by the CRYPTO chunk header (see Figure 3).
-
-   Details of the use of Flags, if different from what described in the
-   current document, MUST be specified in the Protection Engine
-   Specification document for that specific protection engine.
+   The protection engines MAY exploit the Flags byte provided by the
+   CRYPTO chunk header (see Figure 3) for its needs.  Details of the use
+   of Flags, if different from what described in the current document,
+   MUST be specified in the Protection Engine Specification document for
+   that specific protection engine.
 
    The SCTP common header is assumed to be implicitly protected by the
    protection engine.  This protection is based on the assumption that
@@ -269,7 +292,8 @@ Table of Contents
    does not meet that assumption further protection of the common header
    is likely required.
 
-   An example of protection engine can be DTLS.
+   An example of protection engine can be DTLS as specified in
+   [I-D.westerlund-tsvwg-sctp-crypto-dtls].
 
 2.3.  SCTP CRYPTO Chunk Buffering and Flow Control
 
@@ -287,39 +311,7 @@ Table of Contents
    chunks is not desired and may cause false congestions and
    retransmissions.
 
-2.4.  SCTP Restart Considerations
-
-   SCTP Restart procedure allows an Endpoint to recover an association
-   when the remote Endpoint has still has the state for the association.
-   However, an SCTP association that has an established protection
-   engine will not accept a unprotected INIT to restart it, instead it
-   would discard it.  Thus, an endpoint attempting to restart an SCTP
-   association which was using Crypto Chunks MUST have the security
-   context for this association, and use it to encapsulate the INIT in a
-   CRYPTO chunk.  Note, the SCTP common header will contain a
-   verification tag equal to 0, combined with CRYPTO chunk when carrying
-   an INIT to restart.
-
-   An endpoint implementing Crypto Chunk MUST accept receiving SCTP
-   packets with a verification tag with value 0 and containing a Crypto
-   Chunk.  The endpoit will attempt to map the packet to an association
-   based on source IP address, destination address and port.  If the
-   combination of those parameters is not unique the implementor MAY
-   choose to send the Crypto Chunk to all Associations that fit with the
-   parameters in order to find the right one.  The association will
-   attempt de-protection operations on the crypto chunk, and if that is
-   successful the INIT chunk can be processed as a restart attempt.
-   Note that this will update the verification tags for both this
-   endpoint and the peer.  Failure to authenticate the crypto chunk
-   payload will result in it being discarded.
-
-   Association restart when using crypto chunks has increased
-   requirements on the endpoint maintaining state across the restart.
-   In cases this is not possible or failed to be done successfully the
-   endpoint will be need to fall back to initiating a new SCTP
-   association.
-
-2.5.  PMTU Considerations
+2.4.  PMTU Considerations
 
    The addition of the CRYPTO chunk to SCTP reduces the room for
    payload, due to the size of the CRYPTO chunk header and plain text
@@ -340,28 +332,122 @@ Table of Contents
    to the maximum plain text plus CRYPTO chunk and algorithm overhead
    plus the SCTP common header.
 
-2.6.  Congestion Control Considerations
+2.5.  Congestion Control Considerations
 
    The SCTP mechanism for handling congestion control does depend on
    successful data transfer for enlarging or reducing the congestion
    window CWND (see [RFC9260] section 7.2).
 
    It may happen that protection engine discards packets due to internal
-   checks or because it has detected a malicious attempt.
+   checks or because it has detected a malicious attempt.  As those
+   packets do not represent what the peer sent, it is acceptable to
+   ignore them, although in-situ modification on the path of a packet
+   resulting in discarding due to integrity failure will leave a gap,
+   but has to be accepted as part of the path behavior.
 
    The protection engine shall not interfere with the SCTP congestion
    control mechanism, this basically means that from SCTP perspective
    the congestion control is exactly the same as how specified in
    [RFC9260].
 
-2.7.  ICMP Considerations
+2.6.  ICMP Considerations
 
-   SCTP implementation will be responsible for handling ICMP messages
-   and their validation as specified in [RFC9260] Section 10.  This
-   includes for SCTP packets sent by the protection engines key
-   management function.  However, valid ICMP errors or information may
+   The SCTP implementation will be responsible for handling ICMP
+   messages and their validation as specified in [RFC9260] Section 10.
+   This means that the ICMP validation needs to be done in relation to
+   the actual sent SCTP packets with the CRYPTO chunk and not the
+   unprotected payload.  However, valid ICMP errors or information may
    indirectly be provided to the protection engine, such as an update to
    PMTU values based on packet to big ICMP messages.
+
+2.7.  Path Selection Considerations
+
+   When an Association is multihomed there are multiple paths between
+   Endpoints.  The selection of the specific path to be used at a
+   certain time belongs to SCTP protocol that will decide according to
+   [RFC9260].  The Protection Engine shall not influence the path
+   selection algorithm, actually the Protection Engine will not even
+   know what path is being used.
+
+2.8.  Dynamic Address Reconfiguration Considerations
+
+   When using Dynamic Address Reconfiguration [RFC5061] in an SCTP
+   association using CRYPTO Chunk the ASCONF chunk is protected, thus it
+   needs to be unprotected first, furthermore it MAY come from an
+   unknown IP Address.  In order to properly address the ASCONF chunk to
+   the relevant Association for being unprotected, Destination Address,
+   Source and Destination ports and VTag shall be exploited.  If the
+   combination of those parameters is not unique the implementor MAY
+   choose to send the Crypto Chunk to all Associations that fit with the
+   parameters in order to find the right one.  The association will
+   attempt de-protection operations on the crypto chunk, and if that is
+   successful the ASCONF chunk can be processed.
+
+   The recommendation [RFC5061] specifies (section 4.1.1 of [RFC5061])
+   that ASCONF message are required to be sent authenticated with SCTP-
+   AUTH [RFC4895].  For SCTP associations using Crypto Chunks, when the
+   Protection Engine provides strong Authentication such for instance in
+   case of DTLS, results in the use of redundant mechanism for
+   Authentication with both SCTP-AUTH and the Crypto Chunk.  We
+   recommend to amend [RFC5061] for including Crypto Chunks as
+   Authentication mechanism for ASCONF chunks.
+
+2.9.  SCTP Restart Considerations
+
+   This section deals with the handling of an unexpected INIT chunk
+   during an Association lifetime as described in [RFC9260] section 5.2
+
+   The cases of interest are
+
+   *  A _association Restart_
+
+   *  D _false chunk created by an attacker_
+
+   The introduction of CRYPTO CHUNK opens for some alternatives.
+
+2.9.1.  INIT chunk in CRYPTO chunk
+
+      If the peer willing to restart the Association has kept the DTLS
+      connection, it can still send CRYPTO chunks that can be processed
+      by the remote peer.  In such case the peer willing to restart the
+      Association SHOULD send the INIT chunk in a CRYPTO chunk and
+      encrypt it.  At reception of the CRYPTO chunk containing INIT, the
+      receiver will follow the procedure described in [RFC9260] section
+      5.2.2 with the exception that all the chunks will be sent in
+      CRYPTO chunks.  An endpoint supporting Association Restart and
+      implementing Crypto Chunk MUST accept receiving SCTP packets with
+      a verification tag with value 0.  The endpoint will attempt to map
+      the packet to an association based on source IP address,
+      destination address and port.  If the combination of those
+      parameters is not unique the implementor MAY choose to send the
+      Crypto Chunk to all Associations that fit with the parameters in
+      order to find the right one.  Note that the Association Restart
+      will update the verification tags for both endpoints.  At the end
+      of the unexpected INIT handshaking the receiver of INIT chunk will
+      trigger the creation of a new DTLS connection to be executed as
+      soon as possible.
+
+2.9.2.  INIT chunk as plain text
+
+      If the peer willing to restart the Association has lost the DTLS
+      connection, it can only exploit INIT in plain text.  An SCTP
+      endpoint supporting Association Restart by means of plain text
+      INIT SHOULD check that it comes from a legitimate peer, for
+      instance by veryfiyng that the peer has been lost and the INIT is
+      an attempt to recovery the Association, using an encrypted HB
+      chunk.  If the remote peer is capable of answering to the
+      encrypted HB with an encrypted HB ACK, the received INIT probably
+      comes from an attacker and can be silently discarded.  A
+      successfully validated INIT chunk will trigger the procedure
+      described in [RFC9260] section 5.2.2
+
+      Note that the Association Restart will update the verification
+      tags for both endpoints.  At the end of the unexpected INIT
+      handshaking the receiver of INIT chunk will trigger the creation
+      of a new DTLS connection to be executed as soon as possible.  Also
+      note that failure in handshaking of a new DTLS connection is
+      considered a protocol violation and will lead to Association Abort
+      (see Section 6.2.2).
 
 3.  Conventions
 
@@ -399,7 +485,7 @@ Table of Contents
       0                   1                   2                   3
       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-     |    Parameter Type = 0x80xx    |       Parameter Length        |
+     |    Parameter Type = 0x80XX    |       Parameter Length        |
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
      |                                                               |
      |                      Protection Engines                       |
@@ -411,7 +497,7 @@ Table of Contents
                  Figure 2: Protected Association Parameter
 
    Parameter Type: 16 bits (unsigned integer)
-      This value MUST be set to 0x80xx.
+      This value MUST be set to 0x80XX.
 
    Parameter Length: 16 bits (unsigned integer)
       This value holds the length of the Protection Engines field in
@@ -430,7 +516,7 @@ Table of Contents
       the chunk 32-bit aligned.  The Padding MUST NOT be longer than 2
       bytes and it MUST be ignored by the receiver.
 
-   RFC-Editor Note: Please replace 0x08xx with the actual parameter type
+   RFC-Editor Note: Please replace 0x08XX with the actual parameter type
    value assigned by IANA and then remove this note.
 
 5.  New Chunk Types
@@ -589,8 +675,10 @@ Table of Contents
 
           Figure 5: ERROR Missing Protected Association Paramater
 
-   Cause Length is equal to the number of missing parameters 8 + N * 2
-   according to [RFC9260], section 3.3.10.2.
+   Note: Cause Length is equal to the number of missing parameters 8 + N
+   * 2 according to [RFC9260], section 3.3.10.2.  Also the Protection
+   Association ID may be present in any of the N missing params, no
+   order implied by the example in Figure 5.
 
 6.2.  Error in Protection
 
@@ -603,8 +691,8 @@ Table of Contents
    Engine Specification MAY add further Causes related to the related
    Protection Engine.
 
-   When detecting an error, SCTP will send an ABORT chunk followed by
-   ERROR chunk containing the relevant Error Type and Causes.
+   When detecting an error, SCTP will send an ABORT chunk containing the
+   relevant Error Type and Causes.
 
       0                   1                   2                   3
       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -627,7 +715,7 @@ Table of Contents
 
    Extra Cause: 16 bits (unsigned integer)
       Each Extra Cause indicate an additional piece of information as
-      part of the error.  There MAY be 0 to as many as can fit in the
+      part of the error.  There MAY be zero to as many as can fit in the
       extra cause field in the ERROR Chunk (A maximum of 32764).
 
    Editor's Note: Please replace TBA9 above with what is assigned by
@@ -640,7 +728,7 @@ Table of Contents
 
    If list of protection engines contained in the INIT signal doesn't
    contain at least an entry that fits the list of protection engines at
-   the responder, the responder will reply with an ERROR chunk with
+   the responder, the responder will reply with an ABORT chunk with
    error in protection cause code (specified in Section 6.2) and the "No
    Supported Protection Engine" extra cause code identifier 0x00.
 
@@ -648,7 +736,7 @@ Table of Contents
 
    If the protection engine specifies a handshake for example for
    authentication, and key management is implemented inband, it may
-   happen that the procedure has errors.  In such case an ERROR chunk
+   happen that the procedure has errors.  In such case an ABORT chunk
    will be sent with error in protection cause code (specified in
    Section 6.2) and extra cause "Error During Protection Handshake"
    identifier 0x01.
@@ -656,16 +744,15 @@ Table of Contents
 6.2.3.  Failure in Protection Engines Validation
 
    A Failure may occur during protection engine Validation (see
-   Section 7.1.2).  In such case an ERROR chunk will be sent with error
+   Section 7.1.2).  In such case an ABORT chunk will be sent with error
    in protection cause code (specified in Section 6.2) and extra cause
    "Failure in Protection Engines Validation" identifier 0x02 to
-   indicate this failure.  This error MUST be sent together with an SCTP
-   abort to terminate the SCTP association.
+   indicate this failure.
 
 6.2.4.  Timeout During Protection Handshake or Validation
 
    Whenever a T-valid timeout occurs, the SCTP endpoint will send an
-   ERROR chunk with "Error in Protection" cause (specified in
+   ABORT chunk with "Error in Protection" cause (specified in
    Section 6.2) and extra cause "Timeout During Protection Handshake or
    Validation" identifier 0x03 to indicate this failure.  To indicate in
    which phase the timeout occurred an additional extra cause code is
@@ -754,8 +841,6 @@ Table of Contents
             |     |                       |-----------------
             |     |                       | send and receive
             |     |                       | protection engine handshake
-            |     |                       | by means of CRYPTO chunks.
-            |     |                       |
             |     |                       |
             |     |                       v
             |     |           +----------------------+
@@ -767,7 +852,6 @@ Table of Contents
             |     |                       | send and receive
             |     |                       | PVALID by means of
             |     |                       | CRYPTO chunk.
-            |     |                       |
             |     |                       |
             |     +-----------------+     |
             +-----------------+     |     |
@@ -795,11 +879,11 @@ Table of Contents
    establishment.  The value of T-valid is dependent on the protection
    engine and may also be further adjusted based if expected RTT values
    are outside of the ones commonly occurring on the general Internet,
-   see Section 7.1.3.
+   see Section 7.1.4.
 
    If key establishment is in-band, the protection engine will start the
-   handshake with its peer and in case of failure or T-valid timeout, it
-   will generate an ERROR chunk and an ABORT chunk.  The ERROR handling
+   handshake with its peer and in case of failure or T-valid timeout,
+   the Crypto Chunk will generate an ABORT chunk.  The ERROR handling
    follows what specified in Section 6.2.2.  When Handshake has been
    successfully completed, the association state machine will enter
    PROTECTED state.
@@ -810,6 +894,11 @@ Table of Contents
    PROTECTED state per protection engine specification when the
    necessary security context is in place.
 
+   Whilst in PROTECTION PENDING state, only User Layer Protocol data
+   belonging to the Protection Engine will be handled, such data will be
+   transferred as SCTP DATA chunks with the Protection Engine PPID (see
+   Table 9) for the Protection Engine handshake.
+
 7.1.2.  PROTECTED
 
    The association state machine can only reach PROTECTED state from
@@ -818,9 +907,10 @@ Table of Contents
    engine has completed the key establishment so that protected data can
    be sent to the peer.
 
-   From this time on, only CRYPTO chunks can be sent to the remote peer
-   and any other type of plain text SCTP chunks coming from the remote
-   peer will be silently discarded.
+   Whilst in PROTECTION PENDING state, only User Layer Protocol data
+   belonging to the Protection Engine will be handled, such data will be
+   transferred as SCTP DATA chunks with the Protection Engine PPID (see
+   Table 9) for the Protection Engine handshake.
 
    In PROTECTED state the association initiating SCTP Endpoint
    (initiator) MUST validate the INIT sent protected association
@@ -836,24 +926,43 @@ Table of Contents
    association parameter in INIT-ACK chunk, it will clear the T-valid
    timer and will move into ESTABLISHED state.
 
+   Once in ESTABLISHED state, only CRYPTO chunks can be sent to the
+   remote peer and any other type of plain text SCTP chunks coming from
+   the remote peer will be silently discarded with the exception of
+   SHUTDOWN-COMPLETE chunk.
+
    If the lists of Protection Engines don't match, it will generate an
-   ERROR chunk and an ABORT chunk.  ERROR CAUSE will indicate "Failure
-   in Protection Engines Validation" and the SCTP association will be
-   terminated.
+   ABORT chunk.  ERROR CAUSE will indicate "Failure in Protection
+   Engines Validation" and the SCTP association will be terminated.
 
    After sending PVALID, the initiator will wait for the responder to
    reply with the PVALID confirmation.  The initiator will compare the
    Protection Engine received from the responder, if the value is the
    same it will clear the T-valid timer and move into ESTABLISHED state.
    If the chosen Protection Engines don't match, it will generate an
-   ERROR chunk and an ABORT chunk.  ERROR CAUSE will indicate "Failure
-   in Protection Engines Validation" that is critical.
+   ABORT chunk.  ERROR CAUSE will indicate "Failure in Protection
+   Engines Validation" that is critical.
 
    If T-valid timer expires either at initiator or responder, it will
-   generate an ERROR chunk and an ABORT chunk.  The ERROR handling
-   follows what specified in Section 6.2.4.
+   generate an ABORT chunk.  The ERROR handling follows what specified
+   in Section 6.2.4.
 
-7.1.3.  Consideration on T-valid
+7.1.3.  Considerations on key management
+
+   When the Association is in PROTECTION PENDING state, in-band key
+   management shall exploit SCTP DATA chunk with the Protection Engine
+   PPID (see Table 9) that will be sent unencrypted.
+
+   When the Association is in PROTECTED, ESTABLISHED or in any of the
+   states that can be reached after ESTABLISHED state, in-band key
+   management shall exploit SCTP DATA chunk that will be protected by
+   the Protection Engine and encapsulated in CRYPTO chunks.
+
+   In-band key management shall use a dedicated Payload Protocol
+   Identifier assigned by IANA and defined in the specific Protection
+   Engine Specification.
+
+7.1.4.  Consideration on T-valid
 
    The timer T-Valid supervises initializations that depend on how the
    handshake is specified for the Protection Engine and also on the
@@ -867,7 +976,7 @@ Table of Contents
 
 8.1.  Establishment of a Protected Association
 
-   An SCTP Endpoint acting as initiator willing to create a Protected
+   An SCTP Endpoint acting as initiator willing to create a protected
    association shall send to the remote peer an INIT chunk containing
    the Protected Association parameter (see Section 4.1) where all the
    supported Protection Engines are listed, given in descending order of
@@ -876,7 +985,7 @@ Table of Contents
    As alternative, an SCTP Endpoint acting as responder willing to
    support only protected associations shall consider INIT chunk not
    containing the Protected Association parameter as an error, thus it
-   will reply with an ERROR chunk according to what specified in
+   will reply with an ABORT chunk according to what specified in
    Section 6.1 indicating that for this endpoint mandatory protected
    association parameter is missing.
 
@@ -886,22 +995,22 @@ Table of Contents
    and will reply with INIT-ACK containing the protected association
    parameter with the chosen protection engine.  When the responder
    cannot find a supported protection engine, it will reply with ABORT
-   and Error in Protection with the extra cause code for "No Supported
-   Protection Engine" (Section 6.2.1).
+   containing Error in Protection with the extra cause code for "No
+   Supported Protection Engine" (Section 6.2.1).
 
    When initiator and responder have agreed on a protected association
    by means of handshaking INIT/INIT-ACK with a common protection
-   engine, only control chunks and CRYPTO chunks will be accepted.  Any
-   DATA chunk being sent on a Protected association will be silently
-   discarded.
+   engine, only control chunks, CRYPTO chunks and DATA Chunks with the
+   Protection Engine PPID will be accepted.  Any other DATA chunk being
+   sent on a Protected association will be silently discarded.
 
    After completion of initial handshake, that is after COOKIE-ECHO and
    COOKIE-ACK, the Protection Engine shall initialize itself by
-   transferring its own data as Payload of the CRYPTO chunk (see
-   Figure 3) if necessary.  At completion of Protection Engine
-   initialization, the setup of the Protected association is complete
-   and from that time on only CRYPTO chunks will be exchanged.  Any
-   plain text chunks will be silently discarded.
+   transferring its own data as payload of the DATA chunk if necessary.
+   At completion of Protection Engine initialization, the setup of the
+   Protected association is complete and from that time on only CRYPTO
+   chunks will be exchanged.  Any plain text chunks will be silently
+   discarded.
 
    After completion of protected association initialization, the
    initiator MUST send to the responder a PVALID chunk (see Table 3)
@@ -942,17 +1051,24 @@ Table of Contents
       received shall be silently discarded.
 
    *  When the association is in state PROTECTION PENDING, any Control
-      chunk is sent unprotected (i.e. plain text).  No DATA chunks shall
-      be sent in these states and DATA chunks received shall be silently
-      discarded.  CRYPTO Chunks can be sent by the Protection Engine to
-      establish its security context.
+      chunk is sent unprotected (i.e. plain text).  No DATA chunks,
+      except than the one used by the Protection Engine for handshake,
+      thus being identified with the Protection Engine PPID (see
+      Table 9), SHALL be sent in these states and DATA chunks with
+      different PPID being received shall be silently discarded.  DATA
+      Chunks with the Protection Engine PPID (see Table 9) shall be sent
+      by the Protection Engine to establish its security context.
 
-   *  When the association is in states PROTECTED, any SCTP chunk except
-      for DATA and CRYPTO chunks, will be used to create an SCTP payload
-      that will be encrypted by the Protection Engine and the result
-      from that encryption will be the used as payload for a CRYPTO
-      chunk that will be the only chunk in the SCTP packet to be sent.
-      DATA chunks received shall be silently discarded.
+   *  When the association is in state PROTECTED, any SCTP chunk except
+      for CRYPTO chunks, will be used to create an SCTP payload that
+      will be encrypted by the Protection Engine and the result from
+      that encryption will be the used as payload for a CRYPTO chunk
+      that will be the only chunk in the SCTP packet to be sent.  DATA
+      chunks received with PPID different than Protection engine PPID
+      shall be silently discarded.  Note that User Data in PROTECTED
+      state are not used for creating DATA chunks, the only DATA chunk
+      being handled are the ones with Protection Engine PPID (see
+      Table 9) related to Protection Engine handshake.
 
    *  When the association is in states ESTABLISHED and in the states
       for association shutdown, i.e. SHUTDOWN-PENDING, SHUTDOWN-SENT,
@@ -961,7 +1077,8 @@ Table of Contents
       be used to create an SCTP payload that will be encrypted by the
       Protection Engine and the result from that encryption will be the
       used as payload for a CRYPTO chunk that will be the only chunk in
-      the SCTP packet to be sent.
+      the SCTP packet to be sent.  DATA chunks are accepted and handled
+      according to section 4 of [RFC9260].
 
       0                   1                   2                   3
       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -1004,10 +1121,8 @@ Table of Contents
    PROTECTION PENDING state, it MAY perform protection engine key
    management inband depending on how the specification for the chosen
    Protection Engine has been defined.  In such case, the CRYPTO chunk
-   Handler will receive plain control chunks from the SCTP chunk handler
-   and payload for CRYPTO chunks from the protection engine.  Plain
-   control chunks and CRYPTO chunks MUST NOT be bundled within the same
-   SCTP packet.
+   Handler will receive plain control and DATA chunks from the SCTP
+   chunk handler.
 
    When the association state machine (see Figure 7) has reached the
    PROTECTED state, the CRYPTO chunk handler will receive control chunks
@@ -1032,12 +1147,9 @@ Table of Contents
    PROTECTION PENDING state, it MAY handle key management inband
    depending on how the specification for the chosen protection engine
    has been defined.  In such case, the CRYPTO chunk handler will
-   receive plain control chunks and CRYPTO chunks from the SCTP Header
-   Handler.  CRYPTO chunks will be forwarded to the protection engine
-   whilst plain control chunks will be forwarded to SCTP chunk handler.
-   During PROTECTION PENDING state, plain control chunks and CRYPTO
-   chunks bundled within the same SCTP packet will be handled as
-   protocol error.
+   receive plain control chunks and DATA chunks with Protection Engine
+   PPID from the SCTP Header Handler.  Those plain control chunks will
+   be forwarded to SCTP chunk handler.
 
    When the association state machine (see Figure 7) has reached the
    PROTECTED state, the CRYPTO chunk handler will receive CRYPTO chunks
@@ -1080,6 +1192,8 @@ Table of Contents
    *  One new SCTP Chunk Parameter Type
 
    *  One new SCTP Error Cause Codes
+
+   *  One new SCTP Payload Protocol Identifier
 
 10.1.  Protection Engine Identifier Registry
 
@@ -1205,6 +1319,23 @@ Table of Contents
 
              Table 8: Error Cause Codes Parameters Registered
 
+10.6.  SCTP Payload Protocol Identifier
+
+   In the Stream Control Transmission Protocol (SCTP) Parameters group's
+   "Payload Protocol Identifiers" registry, IANA is requested to add the
+   new entry depicted below in in Table 9 with a reference to this
+   document.  The registry at time of writing was available at:
+   https://www.iana.org/assignments/sctp-parameters/sctp-
+   parameters.xhtml#sctp-parameters-25
+
+     +==========+=======================================+===========+
+     | ID Value | SCTP Payload Protocol Identifier      | Reference |
+     +==========+=======================================+===========+
+     |    TBA10 | Protection Engine Protocol Identifier | RFC-To-Be |
+     +----------+---------------------------------------+-----------+
+
+        Table 9: Protection Engine Protocol Identifier Registered
+
 11.  Security Considerations
 
    All the security and privacy considerations of the security protocol
@@ -1252,22 +1383,34 @@ Table of Contents
    *  Is required to register the defined protection engine(s) with IANA
       per Section 10.1.
 
-   *  Define how it and in such case how it transmits SCTP packets that
-      are not created by the SCTP chunk handler, and instead by the
-      Protection engine.  This requires consideration of congestion
-      control and path MTU.
-
    *  Detail the state transition between PROTECTION PENDING and
       PROTECTED state (see Section 7).
 
-13.  References
+13.  Acknowledgments
 
-13.1.  Normative References
+   The authors thank Michael Tüxen for his invaluable comments helping
+   to cope with Association Restart, ASCONF handling and restructuring
+   the Protection Engine architecture.
+
+14.  References
+
+14.1.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
               DOI 10.17487/RFC2119, March 1997,
               <https://www.rfc-editor.org/info/rfc2119>.
+
+   [RFC4895]  Tuexen, M., Stewart, R., Lei, P., and E. Rescorla,
+              "Authenticated Chunks for the Stream Control Transmission
+              Protocol (SCTP)", RFC 4895, DOI 10.17487/RFC4895, August
+              2007, <https://www.rfc-editor.org/info/rfc4895>.
+
+   [RFC5061]  Stewart, R., Xie, Q., Tuexen, M., Maruyama, S., and M.
+              Kozuka, "Stream Control Transmission Protocol (SCTP)
+              Dynamic Address Reconfiguration", RFC 5061,
+              DOI 10.17487/RFC5061, September 2007,
+              <https://www.rfc-editor.org/info/rfc5061>.
 
    [RFC8126]  Cotton, M., Leiba, B., and T. Narten, "Guidelines for
               Writing an IANA Considerations Section in RFCs", BCP 26,
@@ -1282,11 +1425,18 @@ Table of Contents
               Transmission Protocol", RFC 9260, DOI 10.17487/RFC9260,
               June 2022, <https://www.rfc-editor.org/info/rfc9260>.
 
-13.2.  Informative References
+14.2.  Informative References
 
    [RFC8446]  Rescorla, E., "The Transport Layer Security (TLS) Protocol
               Version 1.3", RFC 8446, DOI 10.17487/RFC8446, August 2018,
               <https://www.rfc-editor.org/info/rfc8446>.
+
+   [I-D.westerlund-tsvwg-sctp-crypto-dtls]
+              Westerlund, M., Preuß Mattsson, J., and C. Porfiri,
+              "Datagram Transport Layer Security (DTLS) in the Stream
+              Control Transmission Protocol (SCTP) CRYPTO Chunk", June
+              2023, <https://datatracker.ietf.org/doc/draft-westerlund-
+              tsvwg-sctp-crypto-dtls/>.
 
 Authors' Addresses
 

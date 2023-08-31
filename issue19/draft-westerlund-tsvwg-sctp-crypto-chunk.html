@@ -1711,14 +1711,17 @@ Authentication mechanism for ASCONF chunks.<a href="#section-2.8-2" class="pilcr
         </h3>
 <p id="section-2.9-1">This section deals with the handling of an unexpected INIT chunk
 during an Association lifetime as described in <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> section 5.2<a href="#section-2.9-1" class="pilcrow">¶</a></p>
-<p id="section-2.9-2">The cases of interest are<a href="#section-2.9-2" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-2.9-3.1">A <em>association Restart</em><a href="#section-2.9-3.1" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-2.9-3.2">D <em>false chunk created by an attacker</em><a href="#section-2.9-3.2" class="pilcrow">¶</a>
-</li>
-        </ul>
-<p id="section-2.9-4">The introduction of CRYPTO CHUNK opens for some alternatives.<a href="#section-2.9-4" class="pilcrow">¶</a></p>
+<p id="section-2.9-2">The introduction of CRYPTO CHUNK opens for two alternatives depending
+on the encryption engine preserves the crypto context or not.<a href="#section-2.9-2" class="pilcrow">¶</a></p>
+<p id="section-2.9-3">When the encryption engine can preserve the crypto context, meaning
+that encrypted data belonging to the current Association can be
+encrypted and decrypted, the request for SCTP Restart SHOULD use
+INIT chunk in CRYPTO chunk.<a href="#section-2.9-3" class="pilcrow">¶</a></p>
+<p id="section-2.9-4">When the crypto engine is not preserved, the SCTP Restart
+can only be accomplished by means of plain text INIT.
+This opens to a man-in-the-middle attack where a malicious peer
+may theoretcally generate an INIT chunk with proper parameters and
+hitch-hik an Association.<a href="#section-2.9-4" class="pilcrow">¶</a></p>
 <div id="init-chunk-in-crypto-chunk">
 <section id="section-2.9.1">
           <h4 id="name-init-chunk-in-crypto-chunk">
@@ -1726,8 +1729,8 @@ during an Association lifetime as described in <span>[<a href="#RFC9260" class="
           </h4>
 <ul class="normal ulEmpty">
 <li class="normal ulEmpty" id="section-2.9.1-1.1">
-              <p id="section-2.9.1-1.1.1">If the peer willing to restart the Association has kept the DTLS connection,
-it can still send CRYPTO chunks that can be processed by the remote peer.
+              <p id="section-2.9.1-1.1.1">If the crypto context has been preserved the peer aiming for a SCTP Restart
+can still send CRYPTO chunks that can be processed by the remote peer.
 In such case the peer willing to restart the Association SHOULD send the
 INIT chunk in a CRYPTO chunk and encrypt it.
 At reception of the CRYPTO chunk containing INIT, the receiver will follow
@@ -1755,14 +1758,16 @@ will trigger the creation of a new DTLS connection to be executed as soon as pos
           </h4>
 <ul class="normal ulEmpty">
 <li class="normal ulEmpty" id="section-2.9.2-1.1">
-              <p id="section-2.9.2-1.1.1">If the peer willing to restart the Association has lost the DTLS connection,
-it can only exploit INIT in plain text.
+              <p id="section-2.9.2-1.1.1">If the crypto context isn't preserved the peer aiming for a SCTP Restart
+can only exploit INIT in plain text.
 An SCTP endpoint supporting Association Restart by means of plain text INIT
 SHOULD check that it comes from a legitimate peer, for instance by veryfiyng
 that the peer has been lost and the INIT is an attempt to recovery the Association,
 using an encrypted HB chunk. If the remote peer is capable of answering to
 the encrypted HB with an encrypted HB ACK, the received INIT probably comes
-from an attacker and can be silently discarded.
+from an attacker and can be silently discarded, this mitigates the possibility
+of a man-in-the-middle attack, but doesn't fully prevent it as the attacker
+may drop all the answering traffic so that it will drop the HB ACK.
 A successfully validated INIT chunk will trigger the procedure described in
 <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> section 5.2.2<a href="#section-2.9.2-1.1.1" class="pilcrow">¶</a></p>
 </li>

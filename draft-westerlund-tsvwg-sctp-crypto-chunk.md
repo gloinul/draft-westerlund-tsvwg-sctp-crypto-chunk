@@ -346,34 +346,57 @@ Authentication mechanism for ASCONF chunks.
 
 ## SCTP Restart Considerations  {#sec-restart}
 
-SCTP Restart procedure allows an endpoint to recover an association
-when the remote endpoint still has the state for the association.
-However, an SCTP association that has an established protection engine
-will not accept a unprotected INIT to restart it, instead it would
-discard it. Thus, an endpoint attempting to restart an SCTP
-association which was using Crypto Chunks MUST have the security
-context for this association, and use it to encapsulate the INIT in a
-CRYPTO chunk. Note, the SCTP common header will contain a verification
-tag equal to 0, combined with CRYPTO chunk when carrying an INIT to
-restart.
+This section deals with the handling of an unexpected INIT chunk
+during an Association lifetime as described in {{RFC9260}} section 5.2
 
-An endpoint implementing Crypto Chunk MUST accept receiving SCTP
-packets with a verification tag with value 0 and containing a Crypto
-Chunk. The endpoit will attempt to map the packet to an association
+The cases of interest are
+
+- A *association Restart*
+- D *false chunk created by an attacker*
+
+The introduction of CRYPTO CHUNK opens for some alternatives.
+
+### INIT chunk in CRYPTO chunk
+
+>If the peer willing to restart the Association has kept the DTLS connection,
+it can still send CRYPTO chunks that can be processed by the remote peer.
+In such case the peer willing to restart the Association SHOULD send the
+INIT chunk in a CRYPTO chunk and encrypt it.
+At reception of the CRYPTO chunk containing INIT, the receiver will follow
+the procedure described in {{RFC9260}} section 5.2.2 with the exception that
+all the chunks will be sent in CRYPTO chunks.
+An endpoint supporting Association Restart and implementing Crypto Chunk
+MUST accept receiving SCTP packets with a verification tag with value 0.
+The endpoint will attempt to map the packet to an association
 based on source IP address, destination address and port. If the
 combination of those parameters is not unique the implementor MAY
 choose to send the Crypto Chunk to all Associations that fit with the
-parameters in order to find the right one. The association will
-attempt de-protection operations on the crypto chunk, and if that is
-successful the INIT chunk can be processed as a restart attempt. Note
-that this will update the verification tags for both this endpoint and
-the peer. Failure to authenticate the crypto chunk payload will result
-in it being discarded.
+parameters in order to find the right one.
+Note that the Association Restart will update the verification tags for
+both endpoints.
+At the end of the unexpected INIT handshaking the receiver of INIT chunk
+will trigger the creation of a new DTLS connection to be executed as soon as possible.
 
-Association restart when using crypto chunks has increased
-requirements on the endpoint maintaining state across the restart. In
-cases this is not possible or failed to be done successfully the
-endpoint will be need to fall back to initiating a new SCTP association.
+### INIT chunk as plain text
+
+>If the peer willing to restart the Association has lost the DTLS connection,
+it can only exploit INIT in plain text.
+An SCTP endpoint supporting Association Restart by means of plain text INIT
+SHOULD check that it comes from a legitimate peer, for instance by veryfiyng
+that the peer has been lost and the INIT is an attempt to recovery the Association,
+using an encrypted HB chunk. If the remote peer is capable of answering to
+the encrypted HB with an encrypted HB ACK, the received INIT probably comes
+from an attacker and can be silently discarded.
+A successfully validated INIT chunk will trigger the procedure described in
+{{RFC9260}} section 5.2.2
+
+>Note that the Association Restart will update the verification tags for
+both endpoints.
+At the end of the unexpected INIT handshaking the receiver of INIT chunk
+will trigger the creation of a new DTLS connection to be executed as soon as possible.
+Also note that failure in handshaking of a new DTLS connection is considered
+a protocol violation and will lead to Association Abort (see {{ekeyhandshake}}).
+
 
 # Conventions
 

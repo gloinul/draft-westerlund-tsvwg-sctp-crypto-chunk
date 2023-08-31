@@ -349,17 +349,24 @@ Authentication mechanism for ASCONF chunks.
 This section deals with the handling of an unexpected INIT chunk
 during an Association lifetime as described in {{RFC9260}} section 5.2
 
-The cases of interest are
+The introduction of CRYPTO CHUNK opens for two alternatives depending
+on the encryption engine preserves the crypto context or not.
 
-- A *association Restart*
-- D *false chunk created by an attacker*
+When the encryption engine can preserve the crypto context, meaning
+that encrypted data belonging to the current Association can be
+encrypted and decrypted, the request for SCTP Restart SHOULD use
+INIT chunk in CRYPTO chunk.
 
-The introduction of CRYPTO CHUNK opens for some alternatives.
+When the crypto engine is not preserved, the SCTP Restart
+can only be accomplished by means of plain text INIT.
+This opens to a man-in-the-middle attack where a malicious peer
+may theoretcally generate an INIT chunk with proper parameters and
+hitch-hik an Association.
 
 ### INIT chunk in CRYPTO chunk
 
->If the peer willing to restart the Association has kept the DTLS connection,
-it can still send CRYPTO chunks that can be processed by the remote peer.
+>If the crypto context has been preserved the peer aiming for a SCTP Restart
+can still send CRYPTO chunks that can be processed by the remote peer.
 In such case the peer willing to restart the Association SHOULD send the
 INIT chunk in a CRYPTO chunk and encrypt it.
 At reception of the CRYPTO chunk containing INIT, the receiver will follow
@@ -379,14 +386,16 @@ will trigger the creation of a new DTLS connection to be executed as soon as pos
 
 ### INIT chunk as plain text
 
->If the peer willing to restart the Association has lost the DTLS connection,
-it can only exploit INIT in plain text.
+>If the crypto context isn't preserved the peer aiming for a SCTP Restart
+can only exploit INIT in plain text.
 An SCTP endpoint supporting Association Restart by means of plain text INIT
 SHOULD check that it comes from a legitimate peer, for instance by veryfiyng
 that the peer has been lost and the INIT is an attempt to recovery the Association,
 using an encrypted HB chunk. If the remote peer is capable of answering to
 the encrypted HB with an encrypted HB ACK, the received INIT probably comes
-from an attacker and can be silently discarded.
+from an attacker and can be silently discarded, this mitigates the possibility
+of a man-in-the-middle attack, but doesn't fully prevent it as the attacker
+may drop all the answering traffic so that it will drop the HB ACK.
 A successfully validated INIT chunk will trigger the procedure described in
 {{RFC9260}} section 5.2.2
 

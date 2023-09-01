@@ -216,11 +216,11 @@ protection engine can specify if the transmission of any key-managment
 messages are non-reliable or reliable transmitted by SCTP.
 
 During initialization, that is before Association reaches the
-ESTABLISHED state (see {{state-diagram}}), inband Key Management use
+ESTABLISHED state (see {{RFC9260}} section 4), inband Key Management use
 DATA chunks that SHALL use the Protection Engine PPID (see
 {{iana-payload-protection-id}}). These DATA chunks SHALL be sent
 unprotected by the protection engine as no keys have been established
-yet. As soon as the SCTP Association reaches PROTECTED state, any
+yet. As soon as the SCTP Association reaches ESTABLISHED state, any
 protection engine that uses inband key management, i.e. sent using
 SCTP DATA chunks with the Protection Engine PPID, will have their
 message protected inside SCTP CRYPTO chunk protected with the
@@ -664,8 +664,9 @@ sent with error in protection cause code (specified in
 
 ### Failure in Protection Engines Validation {#evalidate}
 
-A Failure may occur during protection engine Validation (see
-{{protected-state}}).  In such case an ABORT chunk will be sent with
+A Failure may occur during protection engine Validation, that is
+before the Association gets into ESTABLISHED state.
+In such case an ABORT chunk will be sent with
 error in protection cause code (specified in
 {{eprotect}}) and extra cause "Failure in
 Protection Engines Validation" identifier 0x02 to indicate this
@@ -713,94 +714,21 @@ an ABORT chunk SHALL NOT be sent. This way non-critical errors
 are handled and how the protection engine will recover from
 these errors is being described in the Protection Engine Specifications.
 
-# Protected SCTP State Diagram {#state-diagram}
+## Integration with SCTP State Machine {#new-states}
 
-The {{sctp-Crypto-state-diagram}} shows the changes of the SCTP
-association state machine as described in {{RFC9260}} section 4.
+This section describes details on how Crypto Chunk procedures
+apply to the SCTP state machine as described in {{RFC9260}} section 4.
 
-~~~~~~~~~~~ aasvg
-                                   .-------- (from any state)
-                       .-----.    |
-         receive INIT |       |   |    receive ABORT      [ABORT]
---------------------- |       v   v    --------------  or ----------
-generate State Cookie |    +---------+ delete TCB         send ABORT
-        send INIT ACK  '---+  CLOSED |                    delete TCB
-                           +--+----+-+
-                             /      \
-                            /        \  [ASSOCIATE]
-                           |          |-----------------
-                           |          | create TCB
-                           |          | send INIT
-          receive valid    |          | start T1-init timer
-          COOKIE  ECHO     |          v
-      (1) -----------------|    +-----------+
-          create TCB       |    |COOKIE-WAIT| (2)
-          send COOKIE ACK  |    +-----+-----+
-                           |          |
-                           |          | receive INIT ACK
-                           |          |-------------------
-                           |          | send COOKIE ECHO
-                           |          | stop T1-init timer
-                           |          | start T1-cookie timer
-                           |          v
-                           |   +-------------+
-                           |   |COOKIE-ECHOED| (3)
-                           |   +------+------+
-                           |          |
-                           |          | receive COOKIE ACK
-                           |          |-------------------
-                           |          | stop T1-cookie timer
-         +-----------------+-----+    |
-         |     +-----------------)----+-----+
-         |     |                 |          |
-         |     |                 v          v
-         |     |            +---------------------+
-         |     |            |  PROTECTION PENDING | If INIT/INIT-ACK
-         |     |            +----------+----------+ has Protected
-         |     |                       |            Association
-         |     |                       |            Parameter start
-         |     |                       |            T-valid timer.
-         |     |                       |
-         |     |                       | [CRYPTO SETUP]
-         |     |                       |-----------------
-         |     |                       | send and receive
-         |     |                       | protection engine handshake
-         |     |                       |
-         |     |                       v
-         |     |           +----------------------+
-         |     |           |       PROTECTED      |
-         |     |           +-----------+----------+
-         |     |                       |
-         |     |                       | [ENDPOINT VALIDATION]
-         |     |                       |------------------------
-         |     |                       | send and receive
-         |     |                       | PVALID by means of
-         |     |                       | CRYPTO chunk.
-         |     |                       |
-         |     +-----------------+     |
-         +-----------------+     |     |
-                           |     |     |
-                           v     v     v
-                         +---------------+
-                         |  ESTABLISHED  |
-                         +---------------+
-~~~~~~~~~~~
-{: #sctp-Crypto-state-diagram title="SCTP State Diagram with Crypto" artwork-align="center"}
-
-## New States {#new-states}
-
-This section describes details on the amendment to the SCTP
-association establishment state machine.
-
-### PROTECTION PENDING {#protection-pending-state}
+### CRYPTO CHUNK Initialization {#crypto-chunk-initialization}
 
 The presence of a Protected Association Parameter in the INIT or INIT-ACK
-chunk makes the State Machine entering PROTECTION PENDING state instead
-of ESTABLISHED.
+chunk triggers the initialization of Crypto Chunk. The new behavior
+happens just after the COOKIE-ECHOED state and before ESTABLISHED state.
+Depending on the encryption engine, the initialization MAY require
+an handshake to be completed before ESTABLISHED state is reached.
 
-When entering PROTECTION PENDING state, a T-valid timer is started
-that will cover the whole validation time including the in-band key
-establishment. The value of T-valid is dependent on the protection
+The Crypto Chunk initialization
+SHOULD be supervised by a  T-valid timer that depends on the protection
 engine and may also be further adjusted based if expected RTT values
 are outside of the ones commonly occurring on the general Internet,
 see {{t-valid-considerations}}.
@@ -810,34 +738,16 @@ handshake with its peer and in case of failure or T-valid timeout, the
 Crypto Chunk will generate an ABORT chunk.  The ERROR handling follows
 what specified in {{ekeyhandshake}}.  When Handshake has been
 successfully completed, the association state machine will enter
-PROTECTED state.
+ESTABLISHED state.
 
-The protection engine specification MUST specify when PROTECTED state
+The protection engine specification MUST specify when ESTABLISHED state
 can be entered for each endpoint. If key establishment is out-of-band,
-after starting T-valid timer the SCTP association will enter PROTECTED
+after starting T-valid timer the SCTP association will enter ESTABLISHED
 state per protection engine specification when the necessary security
 context is in place.
 
-Whilst in PROTECTION PENDING state, only User Layer Protocol data
-belonging to the Protection Engine will be handled, such data will be
-transferred as SCTP DATA chunks with the Protection Engine PPID
-(see {{iana-payload-protection-id}}) for the Protection Engine handshake.
-
-### PROTECTED {#protected-state}
-
-The association state machine can only reach PROTECTED state from
-PROTECTION PENDING state (see {{protection-pending-state}}). When entering into
-PROTECTED state the T-valid timer is running and the protection engine
-has completed the key establishment so that protected data can be sent to
-the peer.
-
-Whilst in PROTECTION PENDING state, only User Layer Protocol data
-belonging to the Protection Engine will be handled, such data will be
-transferred as SCTP DATA chunks with the Protection Engine PPID
-(see {{iana-payload-protection-id}}) for the Protection Engine handshake.
-
-In PROTECTED state the association initiating SCTP Endpoint
-(initiator) MUST validate the INIT sent protected association
+Before reaching ESTABLISHED, the crypto chunk MUST validate the INIT
+sent protected association
 parameter, thus the initiator will send a PVALID chunk that will
 contain exactly the same list of Protection Engines as previously sent
 in protected association parameter of INIT chunk and in the same order.
@@ -848,10 +758,6 @@ are identical it will reply to the initiator with a PVALID chunk
 containing the Protection Engine previously sent as protected
 association parameter in INIT-ACK chunk, it will clear the T-valid
 timer and will move into ESTABLISHED state.
-
-Once in ESTABLISHED state, only CRYPTO chunks can be sent to the remote peer
-and any other type of plain text SCTP chunks coming from the remote
-peer will be silently discarded with the exception of SHUTDOWN-COMPLETE chunk.
 
 If the lists of Protection Engines don't match, it will generate an
 ABORT chunk. ERROR CAUSE will indicate "Failure in
@@ -870,13 +776,23 @@ If T-valid timer expires either at initiator or responder, it will generate
 an ABORT chunk.  The ERROR handling follows what
 specified in {{etmout}}.
 
+Whilst in COOKIE-ECHOED state, only User Layer Protocol data
+belonging to the Protection Engine will be handled, such data will be
+transferred as SCTP DATA chunks with the Protection Engine PPID
+(see {{iana-payload-protection-id}}) for the Protection Engine handshake.
+
+Once in ESTABLISHED state, only CRYPTO chunks can be sent to the remote peer
+and any other type of plain text SCTP chunks coming from the remote
+peer will be silently discarded with the exception of SHUTDOWN-COMPLETE chunk.
+
+
 ### Considerations on key management {#key-management-considerations}
 
-When the Association is in PROTECTION PENDING state,
+When the Association is in COOKIE-ECHOED state,
 in-band key management shall exploit SCTP DATA chunk with the Protection Engine
 PPID (see {{iana-payload-protection-id}}) that will be sent unencrypted.
 
-When the Association is in PROTECTED, ESTABLISHED or in any of the states that can
+When the Association is in ESTABLISHED state or in any of the states that can
 be reached after ESTABLISHED state, in-band key management shall exploit
 SCTP DATA chunk that will be protected by the Protection Engine and
 encapsulated in CRYPTO chunks.
@@ -966,8 +882,7 @@ document.
 
 # Protected Data Chunk Handling {#protected-data-handling}
 
-With reference to the State Diagram as shown in
-{{sctp-Crypto-state-diagram}} and Figure 3 of {{RFC9260}}, the
+With reference to the State Diagram as shown in Figure 3 of {{RFC9260}}, the
 handling of Control chunks, Data chunks and Crypto chunks follows the
 rules defined below:
 
@@ -975,28 +890,6 @@ rules defined below:
 COOKIE-ECHOED, any Control chunk is sent unprotected (i.e. plain
 text). No DATA chunks shall be sent in these states and DATA chunks
 received shall be silently discarded.
-
-- When the association is in state PROTECTION PENDING, any Control
-chunk is sent unprotected (i.e. plain text). No DATA chunks, except
-than the one used by the Protection Engine for handshake, thus
-being identified with the Protection Engine PPID
-(see {{iana-payload-protection-id}}), SHALL be
-sent in these states and DATA chunks with different PPID being
-received shall be silently discarded. DATA Chunks with the
-Protection Engine PPID (see {{iana-payload-protection-id}})
-shall be sent by the Protection Engine to establish its security context.
-
-- When the association is in state PROTECTED, any SCTP chunk except
-for CRYPTO chunks, will be used to create an SCTP payload
-that will be encrypted by the Protection Engine and the result from
-that encryption will be the used as payload for a CRYPTO chunk that
-will be the only chunk in the SCTP packet to be sent. DATA chunks
-received with PPID different than Protection engine PPID shall be
-silently discarded. Note that User Data in PROTECTED
-state are not used for creating DATA chunks, the only DATA chunk being
-handled are the ones with Protection Engine PPID
-(see {{iana-payload-protection-id}}) related to Protection Engine
-handshake.
 
 - When the association is in states ESTABLISHED and in the states for
 association shutdown, i.e. SHUTDOWN-PENDING, SHUTDOWN-SENT,
@@ -1025,9 +918,9 @@ to section 4 of {{RFC9260}}.
 
 The diagram shown in {{sctp-Crypto-encrypt-chunk-states-1}} describes
 the structure of any plain text SCTP packet being sent or received
-when the association has not reached the PROTECTED state yet. SCTP
+when the association has not reached the ESTABLISHED state yet. SCTP
 packet as depicted in {{sctp-Crypto-encrypt-chunk-states-2}} may also
-be sent in PROTECTION PENDING state and in any later state of the
+be sent before reaching ESTABLISHED state and in any later state of the
 association.
 
 ~~~~~~~~~~~ aasvg
@@ -1042,21 +935,21 @@ association.
 {: #sctp-Crypto-encrypt-chunk-states-2 title="Protected SCTP Packets" artwork-align="center"}
 
 The diagram shown in {{sctp-Crypto-encrypt-chunk-states-2}} describes
-the structure of an SCTP packet being sent after the PROTECTED state
+the structure of an SCTP packet being sent after the ESTABLISHED state
 has been reached. Such packets are built with the SCTP common
 header. Only one CRYPTO chunk can be sent in a SCTP packet.
 
 ## Protected Data Chunk Transmission {#data-sending}
 
-When the association state machine (see {{sctp-Crypto-state-diagram}})
-has reached the PROTECTION PENDING state, it MAY perform protection
+When the association state machine (see {{RFC9260}} section 4)
+hasn't reached the ESTABLISHED state, it MAY perform protection
 engine key management inband depending on how the specification for the
 chosen Protection Engine has been defined.  In such case, the CRYPTO
 chunk Handler will receive plain control and DATA chunks from the SCTP chunk
 handler.
 
-When the association state machine (see {{sctp-Crypto-state-diagram}})
-has reached the PROTECTED state, the CRYPTO chunk handler will receive
+When the association state machine (see {{RFC9260}} section 4)
+has reached the ESTABLISHED state, the CRYPTO chunk handler will receive
 control chunks and DATA chunks from the SCTP chunk handler as a
 complete SCTP payload with maximum size limited by PMTU reduced by the
 size of the SCTP common header and the CRYPTO chunk overhead.
@@ -1074,16 +967,16 @@ without delay and SCTP bundling SHALL NOT be performed.
 
 ## Protected Data Chunk Reception {#data-receiving}
 
-When the association state machine (see {{sctp-Crypto-state-diagram}})
-has reached the PROTECTION PENDING state, it MAY handle key management
+When the association state machine (see {{RFC9260}} section 4)
+hasn't reached the ESTABLISHED state, it MAY handle key management
 inband depending on how the specification for the chosen protection
 engine has been defined.  In such case, the CRYPTO chunk handler will
 receive plain control chunks and DATA chunks with Protection Engine
 PPID from the SCTP Header Handler. Those plain control chunks will be
 forwarded to SCTP chunk handler.
 
-When the association state machine (see {{sctp-Crypto-state-diagram}})
-has reached the PROTECTED state, the CRYPTO chunk handler will receive
+When the association state machine (see {{RFC9260}} section 4)
+has reached the ESTABLISHED state, the CRYPTO chunk handler will receive
 CRYPTO chunks from the SCTP Header Handler.  Payload from CRYPTO
 chunks will be forwarded to the protection engine in use for that
 specific association for decryption, the protection engine will return
@@ -1283,8 +1176,8 @@ of a protection engine.
  * Is required to register the defined protection engine(s) with IANA
    per {{iana-protection-engines}}.
 
- * Detail the state transition between PROTECTION PENDING and
-   PROTECTED state (see {{state-diagram}}).
+ * Detail the state transition between COOKIE-ECHOED and
+   ESTABLISHED state (see {{RFC9260}} section 4).
 
 # Acknowledgments
 

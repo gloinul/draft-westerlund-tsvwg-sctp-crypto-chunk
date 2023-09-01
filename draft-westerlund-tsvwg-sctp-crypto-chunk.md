@@ -346,65 +346,79 @@ Authentication mechanism for ASCONF chunks.
 
 ## SCTP Restart Considerations  {#sec-restart}
 
-This section deals with the handling of an unexpected INIT chunk
-during an Association lifetime as described in {{RFC9260}} section 5.2
+This section deals with the handling of an unexpected INIT chunk during an
+Association lifetime as described in {{RFC9260}} section 5.2 The introduction of
+CRYPTO CHUNK opens for two alternatives depending on if the protection engine
+preserves its state (crypto context) or not.
 
-The introduction of CRYPTO CHUNK opens for two alternatives depending
-on the encryption engine preserves the crypto context or not.
+When the encryption engine can preserve the crypto context, meaning that
+encrypted data belonging to the current Association can be encrypted and
+decrypted, the request for SCTP Restart SHOULD use INIT chunk in CRYPTO chunk.
 
-When the encryption engine can preserve the crypto context, meaning
-that encrypted data belonging to the current Association can be
-encrypted and decrypted, the request for SCTP Restart SHOULD use
-INIT chunk in CRYPTO chunk.
-
-When the crypto context is not preserved, the SCTP Restart
-can only be accomplished by means of plain text INIT.
-This opens to a man-in-the-middle attack where a malicious attacker
-may theoretcally generate an INIT chunk with proper parameters and
-hitch-hik an Association.
+When the crypto context is not preserved, the SCTP Restart can only be
+accomplished by means of plain text INIT.  This opens to a man-in-the-middle
+attack where a malicious attacker may theoretcally generate an INIT chunk with
+proper parameters and hijack the SCTP association.
 
 ### INIT chunk in CRYPTO chunk
 
->If the crypto context has been preserved the peer aiming for a SCTP Restart
-can still send CRYPTO chunks that can be processed by the remote peer.
-In such case the peer willing to restart the Association SHOULD send the
-INIT chunk in a CRYPTO chunk and encrypt it.
-At reception of the CRYPTO chunk containing INIT, the receiver will follow
-the procedure described in {{RFC9260}} section 5.2.2 with the exception that
-all the chunks will be sent in CRYPTO chunks.
-An endpoint supporting Association Restart and implementing Crypto Chunk
-MUST accept receiving SCTP packets with a verification tag with value 0.
-The endpoint will attempt to map the packet to an association
-based on source IP address, destination address and port. If the
-combination of those parameters is not unique the implementor MAY
-choose to send the Crypto Chunk to all Associations that fit with the
-parameters in order to find the right one.
-Note that the Association Restart will update the verification tags for
-both endpoints.
-At the end of the unexpected INIT handshaking the receiver of INIT chunk
-will trigger the creation of a new DTLS connection to be executed as soon as possible.
+If the crypto context has been preserved the peer aiming for a SCTP Restart can
+still send CRYPTO chunks that can be processed by the remote peer.  In such case
+the peer willing to restart the Association SHOULD send the INIT chunk in a
+CRYPTO chunk and encrypt it.  At reception of the CRYPTO chunk containing INIT,
+the receiver will follow the procedure described in {{RFC9260}} section 5.2.2
+with the exception that all the chunks will be sent in CRYPTO chunks.
+
+An endpoint supporting SCTP Association Restart and implementing Crypto Chunk
+MUST accept receiving SCTP packets with a verification tag with value 0.  The
+endpoint will attempt to map the packet to an association based on source IP
+address, destination address and port. If the combination of those parameters is
+not unique the implementor MAY choose to send the Crypto Chunk to all
+Associations that fit with the parameters in order to find the right one. Note
+that type of trial decrypting of the SCTP packets will increase the resource
+consumption per packet with the number of matching SCTP associations.
+
+Note that the Association Restart will update the verification tags for both
+endpoints.  At the end of the unexpected INIT handshaking the receiver of INIT
+chunk will trigger the creation of a new DTLS connection to be executed as soon
+as possible to verify the peer identity.
 
 ### INIT chunk as plain text
 
->If the crypto context isn't preserved the peer aiming for a SCTP Restart
-can only exploit INIT in plain text.
-An SCTP endpoint supporting Association Restart by means of plain text INIT
-SHOULD check that it comes from a legitimate peer, for instance by veryfiyng
-that the peer has been lost and the INIT is an attempt to recover the Association,
-using an encrypted HB chunk. If the remote peer is capable of answering to
-the encrypted HB with an encrypted HB ACK, the received INIT probably comes
-from an attacker and can be silently discarded, this mitigates the possibility
-of a man-in-the-middle attack, but doesn't fully prevent it as the attacker
-may drop all the answering traffic so that it will drop the HB ACK.
-A successfully validated INIT chunk will trigger the procedure described in
-{{RFC9260}} section 5.2.2
+If the crypto context isn't preserved the peer aiming for a SCTP Restart can
+only perform an INIT in plain text. Supporting this option opens up the SCTP
+association to an availability attack, where an capable attacker may be able to
+hijack the SCTP association. Therefore an implementation should only support and
+enable this option if restart is cruical.
 
->Note that the Association Restart will update the verification tags for
-both endpoints.
-At the end of the unexpected INIT handshaking the receiver of INIT chunk
-will trigger the creation of a new DTLS connection to be executed as soon as possible.
-Also note that failure in handshaking of a new DTLS connection is considered
-a protocol violation and will lead to Association Abort (see {{ekeyhandshake}}).
+To mount the attack the attacker needs to be able to process copies of packets
+sent from the target endpoint towards its peer for the targeted SCTP
+association. In addition the attacker needs to be able to send IP packets with
+an source address of the target's peer. If the attacker can send an SCTP INIT
+that appear to be from the peer, the target if allowing this option will
+generate an INIT ACK back, and assuming the attacker succesfully completes the
+restart handshake process the attack has managed to change the VTAG for the
+association and the peer will no longer respond, leading to a SCTP assocaitons
+failure.
+
+A mitiagation an SCTP endpoint supporting Association Restart by means of plain
+text INIT SHOULD support is the following. The endpoint when receiving an INIT
+should send HEARTBEATs protected by CRYPTO CHUNK to its peer to validate that
+the peer is unreachable. If the endpoint receive an HEARTBEAT ACK within a
+reasonable time (at least a couple of RTTs) the restart INIT SHOULD be discarded
+as the peer obviously can respond, and thus have no need for a restart. A
+capable attacker can still succeed in its attack supressing the HEARTBEAT(s)
+through packet filtering, congestion overload or any other method preventing the
+HEARTBEATS or there ACKs to reach their destination. If it has been valdiated
+that the peer is unreachable, the INIT chunk will trigger the procedure
+described in {{RFC9260}} section 5.2.2
+
+Note that the Association Restart will update the verification tags for both
+endpoints.  At the end of the unexpected INIT handshaking the receiver of INIT
+chunk SHALL trigger the creation of a new DTLS connection to be executed as soon
+as possible.  Also note that failure in handshaking of a new DTLS connection is
+considered a protocol violation and will lead to Association Abort (see
+{{ekeyhandshake}}).
 
 
 # Conventions

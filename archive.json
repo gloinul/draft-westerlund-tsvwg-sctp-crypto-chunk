@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2023-08-29T00:58:52.074091+00:00",
+  "timestamp": "2023-09-03T01:01:46.714462+00:00",
   "repo": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
   "labels": [
     {
@@ -299,6 +299,22 @@
       "body": "The association RESTART needs clarification. Options with plain or encrypted INIT needs to be described.",
       "createdAt": "2023-08-28T10:48:09Z",
       "updatedAt": "2023-08-28T10:48:09Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 21,
+      "id": "I_kwDOIc8XPM5v3sbl",
+      "title": "State Machine",
+      "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/issues/21",
+      "state": "OPEN",
+      "author": "teiclap",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The State Machine description is unnecessary and may be implemented in a different way.\r\nRemove the State Machine and adapt the text to rfc9260 state machine.",
+      "createdAt": "2023-09-01T07:06:28Z",
+      "updatedAt": "2023-09-01T07:06:28Z",
       "closedAt": null,
       "comments": []
     }
@@ -756,6 +772,99 @@
           "createdAt": "2023-06-20T08:16:58Z",
           "updatedAt": "2023-06-20T08:16:58Z",
           "comments": []
+        }
+      ]
+    },
+    {
+      "number": 20,
+      "id": "PR_kwDOIc8XPM5ZPiu3",
+      "title": "Issue19 - initial work",
+      "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/pull/20",
+      "state": "OPEN",
+      "author": "teiclap",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2023-08-31T14:04:09Z",
+      "updatedAt": "2023-09-01T13:45:55Z",
+      "baseRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
+      "baseRefName": "main",
+      "baseRefOid": "1be0729f4e80c97e18034c13552ca79851832308",
+      "headRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
+      "headRefName": "issue19",
+      "headRefOid": "c7167362012fa45b167a720d3a5158bfb5663ae3",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 22,
+      "id": "PR_kwDOIc8XPM5ZUGQ3",
+      "title": "Removed the state machine and all tuned the text",
+      "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/pull/22",
+      "state": "OPEN",
+      "author": "teiclap",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "It should be clean now and let implementors free to hack it as they like.",
+      "createdAt": "2023-09-01T08:00:50Z",
+      "updatedAt": "2023-09-01T16:03:31Z",
+      "baseRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
+      "baseRefName": "main",
+      "baseRefOid": "1be0729f4e80c97e18034c13552ca79851832308",
+      "headRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
+      "headRefName": "issue21",
+      "headRefOid": "7a57ff115087aea94da03e14d500346662af55e0",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOIc8XPM5fzGyt",
+          "commit": {
+            "abbreviatedOid": "7a57ff1"
+          },
+          "author": "emanjon",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2023-09-01T16:02:44Z",
+          "updatedAt": "2023-09-01T16:02:44Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "I think RFCs uses capital \"Section\"",
+              "createdAt": "2023-09-01T16:02:44Z",
+              "updatedAt": "2023-09-01T16:02:44Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOIc8XPM5fzHDN",
+          "commit": {
+            "abbreviatedOid": "7a57ff1"
+          },
+          "author": "emanjon",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2023-09-01T16:03:31Z",
+          "updatedAt": "2023-09-01T16:03:31Z",
+          "comments": [
+            {
+              "originalPosition": 31,
+              "body": "Maybe better to call it state diagram. The term \"state machine\" is not used in 9260",
+              "createdAt": "2023-09-01T16:03:31Z",
+              "updatedAt": "2023-09-01T16:03:32Z"
+            }
+          ]
         }
       ]
     }

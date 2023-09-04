@@ -27,7 +27,7 @@ features provided by SCTP and its extensions but with some limitations.
 <meta content="draft-westerlund-tsvwg-sctp-crypto-chunk-latest" name="ietf.draft">
 <!-- Generator version information:
   xml2rfc 3.18.0
-    Python 3.11.4
+    Python 3.11.5
     ConfigArgParse 1.5.3
     google-i18n-address 3.1.0
     intervaltree 3.1.0
@@ -1064,7 +1064,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Westerlund, et al.</td>
-<td class="center">Expires 4 March 2024</td>
+<td class="center">Expires 7 March 2024</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1077,12 +1077,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-westerlund-tsvwg-sctp-crypto-chunk-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2023-09-01" class="published">1 September 2023</time>
+<time datetime="2023-09-04" class="published">4 September 2023</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2024-03-04">4 March 2024</time></dd>
+<dd class="expires"><time datetime="2024-03-07">7 March 2024</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1151,7 +1151,7 @@ features provided by SCTP and its extensions but with some limitations.<a href="
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 4 March 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 7 March 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1718,7 +1718,7 @@ encrypted data belonging to the current Association can be encrypted and
 decrypted, the request for SCTP Restart SHOULD use INIT chunk in CRYPTO chunk.<a href="#section-2.9-2" class="pilcrow">¶</a></p>
 <p id="section-2.9-3">When the crypto context is not preserved, the SCTP Restart can only be
 accomplished by means of plain text INIT.  This opens to a man-in-the-middle
-attack where a malicious attacker may theoretcally generate an INIT chunk with
+attack where a malicious attacker may theoretically generate an INIT chunk with
 proper parameters and hijack the SCTP association.<a href="#section-2.9-3" class="pilcrow">¶</a></p>
 <div id="init-chunk-in-crypto-chunk">
 <section id="section-2.9.1">
@@ -1741,7 +1741,7 @@ that type of trial decrypting of the SCTP packets will increase the resource
 consumption per packet with the number of matching SCTP associations.<a href="#section-2.9.1-2" class="pilcrow">¶</a></p>
 <p id="section-2.9.1-3">Note that the Association Restart will update the verification tags for both
 endpoints.  At the end of the unexpected INIT handshaking the receiver of INIT
-chunk will trigger the creation of a new DTLS connection to be executed as soon
+chunk SHALL trigger the creation of a new DTLS connection to be executed as soon
 as possible to verify the peer identity.<a href="#section-2.9.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1754,25 +1754,25 @@ as possible to verify the peer identity.<a href="#section-2.9.1-3" class="pilcro
 only perform an INIT in plain text. Supporting this option opens up the SCTP
 association to an availability attack, where an capable attacker may be able to
 hijack the SCTP association. Therefore an implementation should only support and
-enable this option if restart is cruical.<a href="#section-2.9.2-1" class="pilcrow">¶</a></p>
+enable this option if restart is crucial.<a href="#section-2.9.2-1" class="pilcrow">¶</a></p>
 <p id="section-2.9.2-2">To mount the attack the attacker needs to be able to process copies of packets
 sent from the target endpoint towards its peer for the targeted SCTP
 association. In addition the attacker needs to be able to send IP packets with
-an source address of the target's peer. If the attacker can send an SCTP INIT
-that appear to be from the peer, the target if allowing this option will
+a source address of the target's peer. If the attacker can send an SCTP INIT
+that appear to be from the peer, if the target is allowing this option it will
 generate an INIT ACK back, and assuming the attacker succesfully completes the
 restart handshake process the attack has managed to change the VTAG for the
-association and the peer will no longer respond, leading to a SCTP assocaitons
+association and the peer will no longer respond, leading to a SCTP associatons
 failure.<a href="#section-2.9.2-2" class="pilcrow">¶</a></p>
-<p id="section-2.9.2-3">A mitiagation an SCTP endpoint supporting Association Restart by means of plain
-text INIT SHOULD support is the following. The endpoint when receiving an INIT
+<p id="section-2.9.2-3">As mitigation an SCTP endpoint supporting Association Restart by means of plain
+text INIT SHOULD support is the following. The endpoint receiving an INIT
 should send HEARTBEATs protected by CRYPTO CHUNK to its peer to validate that
 the peer is unreachable. If the endpoint receive an HEARTBEAT ACK within a
 reasonable time (at least a couple of RTTs) the restart INIT SHOULD be discarded
 as the peer obviously can respond, and thus have no need for a restart. A
 capable attacker can still succeed in its attack supressing the HEARTBEAT(s)
 through packet filtering, congestion overload or any other method preventing the
-HEARTBEATS or there ACKs to reach their destination. If it has been valdiated
+HEARTBEATS or there ACKs to reach their destination. If it has been validated
 that the peer is unreachable, the INIT chunk will trigger the procedure
 described in <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> section 5.2.2<a href="#section-2.9.2-3" class="pilcrow">¶</a></p>
 <p id="section-2.9.2-4">Note that the Association Restart will update the verification tags for both

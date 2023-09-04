@@ -27,7 +27,7 @@ features provided by SCTP and its extensions but with some limitations.
 <meta content="draft-westerlund-tsvwg-sctp-crypto-chunk-latest" name="ietf.draft">
 <!-- Generator version information:
   xml2rfc 3.18.0
-    Python 3.11.4
+    Python 3.11.5
     ConfigArgParse 1.5.3
     google-i18n-address 3.1.0
     intervaltree 3.1.0
@@ -1064,7 +1064,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Westerlund, et al.</td>
-<td class="center">Expires 4 March 2024</td>
+<td class="center">Expires 7 March 2024</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1077,12 +1077,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-westerlund-tsvwg-sctp-crypto-chunk-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2023-09-01" class="published">1 September 2023</time>
+<time datetime="2023-09-04" class="published">4 September 2023</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2024-03-04">4 March 2024</time></dd>
+<dd class="expires"><time datetime="2024-03-07">7 March 2024</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1151,7 +1151,7 @@ features provided by SCTP and its extensions but with some limitations.<a href="
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 4 March 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 7 March 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1267,7 +1267,7 @@ features provided by SCTP and its extensions but with some limitations.<a href="
                 <p id="section-toc.1-1.6.2.4.1"><a href="#section-6.4" class="auto internal xref">6.4</a>.  <a href="#name-non-critical-error-in-the-p" class="internal xref">Non-critical Error in the Protection Engine</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.5">
-                <p id="section-toc.1-1.6.2.5.1"><a href="#section-6.5" class="auto internal xref">6.5</a>.  <a href="#name-integration-with-sctp-state" class="internal xref">Integration with SCTP State Machine</a></p>
+                <p id="section-toc.1-1.6.2.5.1"><a href="#section-6.5" class="auto internal xref">6.5</a>.  <a href="#name-integration-with-sctp-state" class="internal xref">Integration with SCTP State Diagram</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.5.2.1">
                     <p id="section-toc.1-1.6.2.5.2.1.1"><a href="#section-6.5.1" class="auto internal xref">6.5.1</a>.  <a href="#name-crypto-chunk-initialization" class="internal xref">CRYPTO CHUNK Initialization</a></p>
@@ -1547,7 +1547,7 @@ chunks identified with a dedicated Payload Protocol Identifier. The
 protection engine can specify if the transmission of any key-managment
 messages are non-reliable or reliable transmitted by SCTP.<a href="#section-2.2-3" class="pilcrow">¶</a></p>
 <p id="section-2.2-4">During initialization, that is before Association reaches the
-ESTABLISHED state (see <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> section 4), inband Key Management use
+ESTABLISHED state (see <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> Section 4), inband Key Management use
 DATA chunks that SHALL use the Protection Engine PPID (see
 <a href="#iana-payload-protection-id" class="auto internal xref">Table 9</a>). These DATA chunks SHALL be sent
 unprotected by the protection engine as no keys have been established
@@ -1623,7 +1623,7 @@ the SCTP common header.<a href="#section-2.4-3" class="pilcrow">¶</a></p>
         </h3>
 <p id="section-2.5-1">The SCTP mechanism for handling congestion control does depend on
 successful data transfer for enlarging or reducing the congestion
-window CWND (see <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> section 7.2).<a href="#section-2.5-1" class="pilcrow">¶</a></p>
+window CWND (see <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> Section 7.2).<a href="#section-2.5-1" class="pilcrow">¶</a></p>
 <p id="section-2.5-2">It may happen that protection engine discards packets due to internal
 checks or because it has detected a malicious attempt. As those
 packets do not represent what the peer sent, it is acceptable to
@@ -2188,7 +2188,7 @@ contain the Protected Association parameter towards an SCTP endpoint
 that only accepts protected associations, the responder endpoint SHALL
 raise a Missing Mandatory Parameter error. The ERROR chunk will
 contain the cause code 'Missing Mandatory Parameter' (2) (see
-<span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> section 3.3.10.7) and the protected association parameter
+<span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> Section 3.3.10.7) and the protected association parameter
 identifier <a href="#protectedassoc-parameter" class="auto internal xref">Section 4.1</a> in the missing param
 Information field.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
 <span id="name-error-missing-protected-ass"></span><div id="sctp-Crypto-init-chunk-missing-protected">
@@ -2492,10 +2492,10 @@ these errors is being described in the Protection Engine Specifications.<a href=
 <div id="new-states">
 <section id="section-6.5">
         <h3 id="name-integration-with-sctp-state">
-<a href="#section-6.5" class="section-number selfRef">6.5. </a><a href="#name-integration-with-sctp-state" class="section-name selfRef">Integration with SCTP State Machine</a>
+<a href="#section-6.5" class="section-number selfRef">6.5. </a><a href="#name-integration-with-sctp-state" class="section-name selfRef">Integration with SCTP State Diagram</a>
         </h3>
 <p id="section-6.5-1">This section describes details on how Crypto Chunk procedures
-apply to the SCTP state machine as described in <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> section 4.<a href="#section-6.5-1" class="pilcrow">¶</a></p>
+apply to the SCTP State Diagram as described in <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> Section 4.<a href="#section-6.5-1" class="pilcrow">¶</a></p>
 <div id="crypto-chunk-initialization">
 <section id="section-6.5.1">
           <h4 id="name-crypto-chunk-initialization">
@@ -2515,7 +2515,7 @@ see <a href="#t-valid-considerations" class="auto internal xref">Section 6.5.3</
 handshake with its peer and in case of failure or T-valid timeout, the
 Crypto Chunk will generate an ABORT chunk.  The ERROR handling follows
 what specified in <a href="#ekeyhandshake" class="auto internal xref">Section 6.2.2</a>.  When Handshake has been
-successfully completed, the association state machine will enter
+successfully completed, the association State Diagram will enter
 ESTABLISHED state.<a href="#section-6.5.1-3" class="pilcrow">¶</a></p>
 <p id="section-6.5.1-4">The protection engine specification MUST specify when ESTABLISHED state
 can be entered for each endpoint. If key establishment is out-of-band,
@@ -2831,13 +2831,13 @@ header. Only one CRYPTO chunk can be sent in a SCTP packet.<a href="#section-8-6
         <h3 id="name-protected-data-chunk-transm">
 <a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-protected-data-chunk-transm" class="section-name selfRef">Protected Data Chunk Transmission</a>
         </h3>
-<p id="section-8.1-1">When the association state machine (see <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> section 4)
+<p id="section-8.1-1">When the association State Diagram (see <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> Section 4)
 hasn't reached the ESTABLISHED state, it MAY perform protection
 engine key management inband depending on how the specification for the
 chosen Protection Engine has been defined.  In such case, the CRYPTO
 chunk Handler will receive plain control and DATA chunks from the SCTP chunk
 handler.<a href="#section-8.1-1" class="pilcrow">¶</a></p>
-<p id="section-8.1-2">When the association state machine (see <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> section 4)
+<p id="section-8.1-2">When the association State Diagram (see <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> Section 4)
 has reached the ESTABLISHED state, the CRYPTO chunk handler will receive
 control chunks and DATA chunks from the SCTP chunk handler as a
 complete SCTP payload with maximum size limited by PMTU reduced by the
@@ -2857,14 +2857,14 @@ without delay and SCTP bundling SHALL NOT be performed.<a href="#section-8.1-5" 
         <h3 id="name-protected-data-chunk-recept">
 <a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-protected-data-chunk-recept" class="section-name selfRef">Protected Data Chunk Reception</a>
         </h3>
-<p id="section-8.2-1">When the association state machine (see <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> section 4)
+<p id="section-8.2-1">When the association State Diagram (see <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> Section 4)
 hasn't reached the ESTABLISHED state, it MAY handle key management
 inband depending on how the specification for the chosen protection
 engine has been defined.  In such case, the CRYPTO chunk handler will
 receive plain control chunks and DATA chunks with Protection Engine
 PPID from the SCTP Header Handler. Those plain control chunks will be
 forwarded to SCTP chunk handler.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
-<p id="section-8.2-2">When the association state machine (see <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> section 4)
+<p id="section-8.2-2">When the association State Diagram (see <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> Section 4)
 has reached the ESTABLISHED state, the CRYPTO chunk handler will receive
 CRYPTO chunks from the SCTP Header Handler.  Payload from CRYPTO
 chunks will be forwarded to the protection engine in use for that
@@ -3250,7 +3250,7 @@ chunk<a href="#section-11-2.2" class="pilcrow">¶</a>
 per <a href="#iana-protection-engines" class="auto internal xref">Section 9.1</a>.<a href="#section-11-2.3" class="pilcrow">¶</a>
 </li>
         <li class="normal" id="section-11-2.4">Detail the state transition between COOKIE-ECHOED and
-ESTABLISHED state (see <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> section 4).<a href="#section-11-2.4" class="pilcrow">¶</a>
+ESTABLISHED state (see <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> Section 4).<a href="#section-11-2.4" class="pilcrow">¶</a>
 </li>
       </ul>
 </section>

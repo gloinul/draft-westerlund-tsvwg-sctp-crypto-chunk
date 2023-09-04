@@ -5,8 +5,8 @@
 TSVWG                                                      M. Westerlund
 Internet-Draft                                         J. Preuß Mattsson
 Intended status: Standards Track                              C. Porfiri
-Expires: 4 March 2024                                           Ericsson
-                                                        1 September 2023
+Expires: 7 March 2024                                           Ericsson
+                                                        4 September 2023
 
 
         Stream Control Transmission Protocol (SCTP) CRYPTO Chunk
@@ -60,7 +60,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 4 March 2024.
+   This Internet-Draft will expire on 7 March 2024.
 
 Copyright Notice
 
@@ -104,7 +104,7 @@ Table of Contents
        6.2.4.  Timeout During Protection Handshake or Validation
      6.3.  Critical Error from Protection Engine
      6.4.  Non-critical Error in the Protection Engine
-     6.5.  Integration with SCTP State Machine
+     6.5.  Integration with SCTP State Diagram
        6.5.1.  CRYPTO CHUNK Initialization
        6.5.2.  Considerations on key management
        6.5.3.  Consideration on T-valid
@@ -262,7 +262,7 @@ Table of Contents
    managment messages are non-reliable or reliable transmitted by SCTP.
 
    During initialization, that is before Association reaches the
-   ESTABLISHED state (see [RFC9260] section 4), inband Key Management
+   ESTABLISHED state (see [RFC9260] Section 4), inband Key Management
    use DATA chunks that SHALL use the Protection Engine PPID (see
    Table 9).  These DATA chunks SHALL be sent unprotected by the
    protection engine as no keys have been established yet.  As soon as
@@ -333,7 +333,7 @@ Table of Contents
 
    The SCTP mechanism for handling congestion control does depend on
    successful data transfer for enlarging or reducing the congestion
-   window CWND (see [RFC9260] section 7.2).
+   window CWND (see [RFC9260] Section 7.2).
 
    It may happen that protection engine discards packets due to internal
    checks or because it has detected a malicious attempt.  As those
@@ -630,7 +630,7 @@ Table of Contents
    that only accepts protected associations, the responder endpoint
    SHALL raise a Missing Mandatory Parameter error.  The ERROR chunk
    will contain the cause code 'Missing Mandatory Parameter' (2) (see
-   [RFC9260] section 3.3.10.7) and the protected association parameter
+   [RFC9260] Section 3.3.10.7) and the protected association parameter
    identifier Section 4.1 in the missing param Information field.
 
       0                   1                   2                   3
@@ -762,10 +762,10 @@ Table of Contents
    handled and how the protection engine will recover from these errors
    is being described in the Protection Engine Specifications.
 
-6.5.  Integration with SCTP State Machine
+6.5.  Integration with SCTP State Diagram
 
    This section describes details on how Crypto Chunk procedures apply
-   to the SCTP state machine as described in [RFC9260] section 4.
+   to the SCTP State Diagram as described in [RFC9260] Section 4.
 
 6.5.1.  CRYPTO CHUNK Initialization
 
@@ -785,7 +785,7 @@ Table of Contents
    handshake with its peer and in case of failure or T-valid timeout,
    the Crypto Chunk will generate an ABORT chunk.  The ERROR handling
    follows what specified in Section 6.2.2.  When Handshake has been
-   successfully completed, the association state machine will enter
+   successfully completed, the association State Diagram will enter
    ESTABLISHED state.
 
    The protection engine specification MUST specify when ESTABLISHED
@@ -983,14 +983,14 @@ Table of Contents
 
 8.1.  Protected Data Chunk Transmission
 
-   When the association state machine (see [RFC9260] section 4) hasn't
+   When the association State Diagram (see [RFC9260] Section 4) hasn't
    reached the ESTABLISHED state, it MAY perform protection engine key
    management inband depending on how the specification for the chosen
    Protection Engine has been defined.  In such case, the CRYPTO chunk
    Handler will receive plain control and DATA chunks from the SCTP
    chunk handler.
 
-   When the association state machine (see [RFC9260] section 4) has
+   When the association State Diagram (see [RFC9260] Section 4) has
    reached the ESTABLISHED state, the CRYPTO chunk handler will receive
    control chunks and DATA chunks from the SCTP chunk handler as a
    complete SCTP payload with maximum size limited by PMTU reduced by
@@ -1009,7 +1009,7 @@ Table of Contents
 
 8.2.  Protected Data Chunk Reception
 
-   When the association state machine (see [RFC9260] section 4) hasn't
+   When the association State Diagram (see [RFC9260] Section 4) hasn't
    reached the ESTABLISHED state, it MAY handle key management inband
    depending on how the specification for the chosen protection engine
    has been defined.  In such case, the CRYPTO chunk handler will
@@ -1017,7 +1017,7 @@ Table of Contents
    PPID from the SCTP Header Handler.  Those plain control chunks will
    be forwarded to SCTP chunk handler.
 
-   When the association state machine (see [RFC9260] section 4) has
+   When the association State Diagram (see [RFC9260] Section 4) has
    reached the ESTABLISHED state, the CRYPTO chunk handler will receive
    CRYPTO chunks from the SCTP Header Handler.  Payload from CRYPTO
    chunks will be forwarded to the protection engine in use for that
@@ -1250,7 +1250,7 @@ Table of Contents
       per Section 9.1.
 
    *  Detail the state transition between COOKIE-ECHOED and ESTABLISHED
-      state (see [RFC9260] section 4).
+      state (see [RFC9260] Section 4).
 
 12.  Acknowledgments
 

@@ -357,7 +357,7 @@ decrypted, the request for SCTP Restart SHOULD use INIT chunk in CRYPTO chunk.
 
 When the crypto context is not preserved, the SCTP Restart can only be
 accomplished by means of plain text INIT.  This opens to a man-in-the-middle
-attack where a malicious attacker may theoretcally generate an INIT chunk with
+attack where a malicious attacker may theoretically generate an INIT chunk with
 proper parameters and hijack the SCTP association.
 
 ### INIT chunk in CRYPTO chunk
@@ -380,7 +380,7 @@ consumption per packet with the number of matching SCTP associations.
 
 Note that the Association Restart will update the verification tags for both
 endpoints.  At the end of the unexpected INIT handshaking the receiver of INIT
-chunk will trigger the creation of a new DTLS connection to be executed as soon
+chunk SHALL trigger the creation of a new DTLS connection to be executed as soon
 as possible to verify the peer identity.
 
 ### INIT chunk as plain text
@@ -389,27 +389,27 @@ If the crypto context isn't preserved the peer aiming for a SCTP Restart can
 only perform an INIT in plain text. Supporting this option opens up the SCTP
 association to an availability attack, where an capable attacker may be able to
 hijack the SCTP association. Therefore an implementation should only support and
-enable this option if restart is cruical.
+enable this option if restart is crucial.
 
 To mount the attack the attacker needs to be able to process copies of packets
 sent from the target endpoint towards its peer for the targeted SCTP
 association. In addition the attacker needs to be able to send IP packets with
-an source address of the target's peer. If the attacker can send an SCTP INIT
-that appear to be from the peer, the target if allowing this option will
+a source address of the target's peer. If the attacker can send an SCTP INIT
+that appear to be from the peer, if the target is allowing this option it will
 generate an INIT ACK back, and assuming the attacker succesfully completes the
 restart handshake process the attack has managed to change the VTAG for the
-association and the peer will no longer respond, leading to a SCTP assocaitons
+association and the peer will no longer respond, leading to a SCTP associatons
 failure.
 
-A mitiagation an SCTP endpoint supporting Association Restart by means of plain
-text INIT SHOULD support is the following. The endpoint when receiving an INIT
+As mitigation an SCTP endpoint supporting Association Restart by means of plain
+text INIT SHOULD support is the following. The endpoint receiving an INIT
 should send HEARTBEATs protected by CRYPTO CHUNK to its peer to validate that
 the peer is unreachable. If the endpoint receive an HEARTBEAT ACK within a
 reasonable time (at least a couple of RTTs) the restart INIT SHOULD be discarded
 as the peer obviously can respond, and thus have no need for a restart. A
 capable attacker can still succeed in its attack supressing the HEARTBEAT(s)
 through packet filtering, congestion overload or any other method preventing the
-HEARTBEATS or there ACKs to reach their destination. If it has been valdiated
+HEARTBEATS or there ACKs to reach their destination. If it has been validated
 that the peer is unreachable, the INIT chunk will trigger the procedure
 described in {{RFC9260}} section 5.2.2
 

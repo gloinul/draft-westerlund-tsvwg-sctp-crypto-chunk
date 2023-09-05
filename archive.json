@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2023-09-03T01:01:46.714462+00:00",
+  "timestamp": "2023-09-05T00:57:56.986337+00:00",
   "repo": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
   "labels": [
     {
@@ -787,18 +787,26 @@
       "labels": [],
       "body": "",
       "createdAt": "2023-08-31T14:04:09Z",
-      "updatedAt": "2023-09-01T13:45:55Z",
+      "updatedAt": "2023-09-04T11:35:36Z",
       "baseRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
       "baseRefName": "main",
       "baseRefOid": "1be0729f4e80c97e18034c13552ca79851832308",
       "headRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
       "headRefName": "issue19",
-      "headRefOid": "c7167362012fa45b167a720d3a5158bfb5663ae3",
+      "headRefOid": "66d8c4a5e1bd196e945313844a7ec84a0e5c4877",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "emanjon",
+          "authorAssociation": "COLLABORATOR",
+          "body": "- RFC 9260 spells association without capital A.\r\n- \u201dman-in-the-middle\u201d is not PC. Also it is not a good description of the attack. Capable attacker is better.\r\n- verification tag. Could call this INIT/INIT ACK verification tag to distinguish from the tags in DTLS.\r\n- \"If the endpoint receive an HEARTBEAT ACK within a reasonable time (at least a couple of RTTs) the restart INIT SHOULD be discarded\"\r\nI think this could be \"receive an SCTP packet\". \r\n",
+          "createdAt": "2023-09-04T11:35:36Z",
+          "updatedAt": "2023-09-04T11:35:36Z"
+        }
+      ],
       "reviews": []
     },
     {
@@ -813,18 +821,26 @@
       "labels": [],
       "body": "It should be clean now and let implementors free to hack it as they like.",
       "createdAt": "2023-09-01T08:00:50Z",
-      "updatedAt": "2023-09-01T16:03:31Z",
+      "updatedAt": "2023-09-04T08:48:34Z",
       "baseRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
       "baseRefName": "main",
       "baseRefOid": "1be0729f4e80c97e18034c13552ca79851832308",
       "headRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
       "headRefName": "issue21",
-      "headRefOid": "7a57ff115087aea94da03e14d500346662af55e0",
+      "headRefOid": "1b6f54ae4ae5c4fe25f78570f5b890763886d992",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "teiclap",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Hi,\r\nI\u2019ve implemented both suggestions about State Diagram and upper case Section\r\n\r\nThanks\r\n/Claudio\r\n\r\nFrom: John Preu\u00df Mattsson ***@***.***>\r\nSent: Friday, 1 September 2023 18:04\r\nTo: gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk ***@***.***>\r\nCc: Claudio Porfiri ***@***.***>; Author ***@***.***>\r\nSubject: Re: [gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk] Removed the state machine and all tuned the text (PR #22)\r\n\r\n\r\n@emanjon commented on this pull request.\r\n\r\n________________________________\r\n\r\nIn draft-westerlund-tsvwg-sctp-crypto-chunk.md<https://protect2.fireeye.com/v1/url?k=31323334-501d5122-313273af-454445555731-c9b25f6a276d5c42&q=1&e=cb752eb5-eddc-4da3-a6e5-6f7def247eb9&u=https%3A%2F%2Fgithub.com%2Fgloinul%2Fdraft-westerlund-tsvwg-sctp-crypto-chunk%2Fpull%2F22%23discussion_r1313218079>:\r\n\r\n> @@ -713,94 +714,21 @@ an ABORT chunk SHALL NOT be sent. This way non-critical errors\r\n\r\n are handled and how the protection engine will recover from\r\n\r\n these errors is being described in the Protection Engine Specifications.\r\n\r\n\r\n\r\n-# Protected SCTP State Diagram {#state-diagram}\r\n\r\n+## Integration with SCTP State Machine {#new-states}\r\n\r\nMaybe better to call it state diagram. The term \"state machine\" is not used in 9260\r\n\r\n\u2014\r\nReply to this email directly, view it on GitHub<https://protect2.fireeye.com/v1/url?k=31323334-501d5122-313273af-454445555731-abd0da8cfa6279d7&q=1&e=cb752eb5-eddc-4da3-a6e5-6f7def247eb9&u=https%3A%2F%2Fgithub.com%2Fgloinul%2Fdraft-westerlund-tsvwg-sctp-crypto-chunk%2Fpull%2F22%23pullrequestreview-1607233741>, or unsubscribe<https://protect2.fireeye.com/v1/url?k=31323334-501d5122-313273af-454445555731-947e53d9656663f1&q=1&e=cb752eb5-eddc-4da3-a6e5-6f7def247eb9&u=https%3A%2F%2Fgithub.com%2Fnotifications%2Funsubscribe-auth%2FAQE4BRZDEPYEKKCZI5LXEG3XYIBN5ANCNFSM6AAAAAA4HF32PE>.\r\nYou are receiving this because you authored the thread.Message ID: ***@***.******@***.***>>\r\n",
+          "createdAt": "2023-09-04T08:48:33Z",
+          "updatedAt": "2023-09-04T08:48:33Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOIc8XPM5fzGyt",

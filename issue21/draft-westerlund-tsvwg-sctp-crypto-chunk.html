@@ -1540,11 +1540,11 @@ protection buffer should never exceed the possible SCTP packet size
 thus protection engine needs to be aware of the PMTU (see <a href="#pmtu" class="auto internal xref">Section 2.4</a>).<a href="#section-2.2-2" class="pilcrow">¶</a></p>
 <p id="section-2.2-3">The key management part of the protection engine is the set of data
 and procedures that take care of key distribution, verification, and
-update. SCTP CRYPTO provides support for in-band key management, on those
-cases management the Protection Engines uses SCTP DATA
-chunks identified with a dedicated Payload Protocol Identifier. The
-protection engine can specify if the transmission of any key-managment
-messages are non-reliable or reliable transmitted by SCTP.<a href="#section-2.2-3" class="pilcrow">¶</a></p>
+update. SCTP CRYPTO provides support for in-band key management, on
+those cases the Protection Engines uses SCTP DATA chunks identified
+with a dedicated Payload Protocol Identifier. The protection engine
+can specify if the transmission of any key-managment messages are
+non-reliable or reliable transmitted by SCTP.<a href="#section-2.2-3" class="pilcrow">¶</a></p>
 <p id="section-2.2-4">During protection engine initialization, that is after the SCTP
 association reaches the ESTABLISHED state (see <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> Section 4),
 but before protection engine key-management has completed and the

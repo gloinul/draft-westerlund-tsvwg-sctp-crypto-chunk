@@ -213,11 +213,11 @@ thus protection engine needs to be aware of the PMTU (see {{pmtu}}).
 
 The key management part of the protection engine is the set of data
 and procedures that take care of key distribution, verification, and
-update. SCTP CRYPTO provides support for in-band key management, on those
-cases management the Protection Engines uses SCTP DATA
-chunks identified with a dedicated Payload Protocol Identifier. The
-protection engine can specify if the transmission of any key-managment
-messages are non-reliable or reliable transmitted by SCTP.
+update. SCTP CRYPTO provides support for in-band key management, on
+those cases the Protection Engines uses SCTP DATA chunks identified
+with a dedicated Payload Protocol Identifier. The protection engine
+can specify if the transmission of any key-managment messages are
+non-reliable or reliable transmitted by SCTP.
 
 During protection engine initialization, that is after the SCTP
 association reaches the ESTABLISHED state (see {{RFC9260}} Section 4),

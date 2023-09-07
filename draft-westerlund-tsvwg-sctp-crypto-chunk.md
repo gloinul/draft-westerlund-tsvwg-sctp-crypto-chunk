@@ -825,48 +825,49 @@ in {{eengine}}.  The internal design of Protection
 Engines and their capability is out of the scope of the current
 document.
 
-## Protection Initialization State machine {#init-state-machine}
+## Protection Initialization State Machine {#init-state-machine}
 
 
 ~~~~~~~~~~~ aasvg
-   +---------------+
-   |  ESTABLISHED  |
-   +---------------+
-           |  If INIT/INIT-ACK has Protected
-           |  Association Parameter
-	   v
-+---------------------------+
-|  PROTECTION INITILIZATION |
-+----------+----------------+
-           |
-           |   start T-valid timer.
-           |
-           | [CRYPTO SETUP]
-           |-----------------
-           | send and receive
-           | protection engine handshake
-           |
-           v
-+----------------------+
-|      VALIDATION      |
-+-----------+----------+
-            |
-            | [ENDPOINT VALIDATION]
-            |------------------------
-            | send and receive
-            | PVALID by means of
-            | CRYPTO chunk.
-            |
-            v
-   +---------------+
-   |  PROTECTED    |
-   +---------------+
+     +---------------+
+     |  ESTABLISHED  |
+     +---------------+
+             |
+             |  If INIT/INIT-ACK has Protected
+             |  Association Parameter
+	     v
++--------------------------+
+| PROTECTION INITILIZATION |
++------------+-------------+
+             |
+             |  start T-valid timer.
+             |
+             | [CRYPTO SETUP]
+             |-----------------
+             | send and receive
+             | protection engine handshake
+             |
+             v
+ +----------------------+
+ |      VALIDATION      |
+ +-----------+----------+
+             |
+             | [ENDPOINT VALIDATION]
+             |------------------------
+             | send and receive
+             | PVALID by means of
+             | CRYPTO chunk.
+             |
+             v
+     +---------------+
+     |   PROTECTED   |
+     +---------------+
 ~~~~~~~~~~~
 {: #sctp-Crypto-state-diagram title="Crypto Chunk State Diagram" artwork-align="center"}
 
 
 
-## Considerations on key management {#key-management-considerations}
+## Considerations on Key Management {#key-management-considerations}
 
 When the Association is in PROTECTION INITILIZATION state, in-band key
 management shall exploit SCTP DATA chunk with the Protection Engine
@@ -1172,7 +1173,7 @@ provided when TLS 1.2 with static RSA is used. It is RECOMMENDED
 to only support a limited set of strongly profiled protection
 engines.
 
-# Requirements towards the protection engines {#requirements}
+# Requirements Towards the Protection Engines {#requirements}
 
 This section specifies what is to be specified in the description
 of a protection engine.

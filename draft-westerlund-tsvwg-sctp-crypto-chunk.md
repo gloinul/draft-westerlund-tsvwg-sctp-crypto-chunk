@@ -960,7 +960,9 @@ Besides the procedures for terminating an association explained in
 {{RFC9260}}, the protection engine SHALL ask SCTP endpoint for
 terminating an association when having an internal error or by
 detecting a security violation, using the procedure described
-in {{eengine}}.  The internal design of Protection
+in {{eengine}}.
+During the termination procedure all Control Chunks SHALL be protected
+except SHUTDOWN-COMPLETE. The internal design of Protection
 Engines and their capability is out of the scope of the current
 document.
 

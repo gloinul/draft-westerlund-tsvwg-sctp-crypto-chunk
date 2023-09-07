@@ -5,8 +5,8 @@
 TSVWG                                                      M. Westerlund
 Internet-Draft                                         J. Preuß Mattsson
 Intended status: Standards Track                              C. Porfiri
-Expires: 9 March 2024                                           Ericsson
-                                                        6 September 2023
+Expires: 10 March 2024                                          Ericsson
+                                                        7 September 2023
 
 
         Stream Control Transmission Protocol (SCTP) CRYPTO Chunk
@@ -60,7 +60,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 9 March 2024.
+   This Internet-Draft will expire on 10 March 2024.
 
 Copyright Notice
 
@@ -107,8 +107,8 @@ Table of Contents
    7.  Procedures
      7.1.  Establishment of a Protected Association
      7.2.  Termination of a Protected Association
-     7.3.  Protection Initialization State machine
-     7.4.  Considerations on key management
+     7.3.  Protection Initialization State Machine
+     7.4.  Considerations on Key Management
      7.5.  Consideration on T-valid
    8.  Protected Data Chunk Handling
      8.1.  Protected Data Chunk Transmission
@@ -124,7 +124,7 @@ Table of Contents
    10. Security Considerations
      10.1.  Privacy Considerations
      10.2.  Downgrade Attacks
-   11. Requirements towards the protection engines
+   11. Requirements Towards the Protection Engines
    12. Acknowledgments
    13. References
      13.1.  Normative References
@@ -870,26 +870,27 @@ Table of Contents
    Section 6.3.  The internal design of Protection Engines and their
    capability is out of the scope of the current document.
 
-7.3.  Protection Initialization State machine
+7.3.  Protection Initialization State Machine
 
-                  +---------------+
-                  |  ESTABLISHED  |
-                  +---------------+
-                          |  If INIT/INIT-ACK has Protected
-                          |  Association Parameter
-                          v
-               +---------------------------+
-               |  PROTECTION INITILIZATION |
-               +----------+----------------+
-                          |
-                          |   start T-valid timer.
-                          |
-                          | [CRYPTO SETUP]
-                          |-----------------
-                          | send and receive
-                          | protection engine handshake
-                          |
-                          v
+                   +---------------+
+                   |  ESTABLISHED  |
+                   +---------------+
+                           |
+                           |  If INIT/INIT-ACK has Protected
+                           |  Association Parameter
+                           v
+              +--------------------------+
+              | PROTECTION INITILIZATION |
+              +------------+-------------+
+                           |
+                           |  start T-valid timer.
+                           |
+                           | [CRYPTO SETUP]
+                           |-----------------
+                           | send and receive
+                           | protection engine handshake
+                           |
+                           v
                +----------------------+
                |      VALIDATION      |
                +-----------+----------+
@@ -901,13 +902,13 @@ Table of Contents
                            | CRYPTO chunk.
                            |
                            v
-                  +---------------+
-                  |  PROTECTED    |
-                  +---------------+
+                   +---------------+
+                   |   PROTECTED   |
+                   +---------------+
 
                     Figure 7: Crypto Chunk State Diagram
 
-7.4.  Considerations on key management
+7.4.  Considerations on Key Management
 
    When the Association is in PROTECTION INITILIZATION state, in-band
    key management shall exploit SCTP DATA chunk with the Protection
@@ -1242,7 +1243,7 @@ Table of Contents
    with static RSA is used.  It is RECOMMENDED to only support a limited
    set of strongly profiled protection engines.
 
-11.  Requirements towards the protection engines
+11.  Requirements Towards the Protection Engines
 
    This section specifies what is to be specified in the description of
    a protection engine.

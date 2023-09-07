@@ -872,39 +872,37 @@ Table of Contents
 
 7.3.  Protection Initialization State Machine
 
-                   +---------------+
-                   |  ESTABLISHED  |
-                   +---------------+
-                           |
-                           |  If INIT/INIT-ACK has Protected
-                           |  Association Parameter
-                           v
-              +--------------------------+
-              | PROTECTION INITILIZATION |
-              +------------+-------------+
-                           |
-                           |  start T-valid timer.
-                           |
-                           | [CRYPTO SETUP]
-                           |-----------------
-                           | send and receive
-                           | protection engine handshake
-                           |
-                           v
-               +----------------------+
-               |      VALIDATION      |
-               +-----------+----------+
-                           |
-                           | [ENDPOINT VALIDATION]
-                           |------------------------
-                           | send and receive
-                           | PVALID by means of
-                           | CRYPTO chunk.
-                           |
-                           v
-                   +---------------+
-                   |   PROTECTED   |
-                   +---------------+
+                    +---------------+
+                    |  ESTABLISHED  |
+                    +-------+-------+
+                            |
+                            | If INIT/INIT-ACK has Protected
+                            | Association Parameter
+                            v
+               +--------------------------+
+               | PROTECTION INITILIZATION |
+               +------------+-------------+
+                            |
+                            | start T-valid timer.
+                            |
+                            | [CRYPTO SETUP]
+                            |-----------------
+                            | send and receive
+                            | protection engine handshake
+                            v
+                +----------------------+
+                |      VALIDATION      |
+                +-----------+----------+
+                            |
+                            | [ENDPOINT VALIDATION]
+                            |------------------------
+                            | send and receive
+                            | PVALID by means of
+                            | CRYPTO chunk.
+                            v
+                    +---------------+
+                    |   PROTECTED   |
+                    +---------------+
 
                     Figure 7: Crypto Chunk State Diagram
 

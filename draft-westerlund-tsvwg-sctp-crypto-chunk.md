@@ -831,22 +831,21 @@ document.
 ~~~~~~~~~~~ aasvg
      +---------------+
      |  ESTABLISHED  |
-     +---------------+
+     +-------+-------+
              |
-             |  If INIT/INIT-ACK has Protected
-             |  Association Parameter
+             | If INIT/INIT-ACK has Protected
+             | Association Parameter
 	     v
 +--------------------------+
 | PROTECTION INITILIZATION |
 +------------+-------------+
              |
-             |  start T-valid timer.
+             | start T-valid timer.
              |
              | [CRYPTO SETUP]
              |-----------------
              | send and receive
              | protection engine handshake
-             |
              v
  +----------------------+
  |      VALIDATION      |
@@ -857,7 +856,6 @@ document.
              | send and receive
              | PVALID by means of
              | CRYPTO chunk.
-             |
              v
      +---------------+
      |   PROTECTED   |

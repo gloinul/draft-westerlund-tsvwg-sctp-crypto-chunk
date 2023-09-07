@@ -835,7 +835,7 @@ document.
              |
              | If INIT/INIT-ACK has Protected
              | Association Parameter
-	     v
+             v
 +--------------------------+
 | PROTECTION INITILIZATION |
 +------------+-------------+

@@ -784,7 +784,7 @@ find a supported protection engine, it will reply with ABORT
 containing Error in Protection with the extra cause code for "No
 Supported Protection Engine" ({{eprotlist}}).
 
-As alternative, an SCTP Endpoint acting as responder willing to
+Additionally, an SCTP Endpoint acting as responder willing to
 support only protected associations shall consider INIT chunk not
 containing the Protected Association parameter as an error, thus it
 will reply with an ABORT chunk according to what specified in
@@ -794,7 +794,7 @@ association parameter is missing.
 When initiator and responder have agreed on a protected association by
 means of handshaking INIT/INIT-ACK with a common protection engine the
 SCTP association establishment continue until it has reached the
-ESTABLISHED state. However before the SCTP assocation is protected by
+ESTABLISHED state. However, before the SCTP assocation is protected by
 the Crypto Chunk and its protection engine some additional states
 needs to be passed. First the protection engine needs be initilizied
 in the PROTECTION INTILIZATION state. When that has been accomplished
@@ -834,14 +834,15 @@ When entering the VALIDATION state, the initiator MUST send to the
 responder a PVALID chunk (see
 {{sctp-Crypto-chunk-newchunk-pvalid-chunk}}) containing the list of
 Protection Engines previously sent in the protected association
-parameter of the INIT chunk. The responder receiving the PVALID chunk
-will compare the Protection Engines list with the one previously
-received in the INIT chunk, if they are exactly the same, with the
-same Protection engine in the same position, it will reply to the
-initiator with a PVALID chunk containing the chosen Protection Engine,
-otherwise it will reply with an ABORT chunk. ERROR CAUSE will indicate
-"Failure in Protection Engines Validation" and the SCTP association
-will be terminated. If the association was not aborted the protected
+parameter of the INIT chunk. The transmission of the PVALID chunk MUST
+be done reliably. The responder receiving the PVALID chunk will
+compare the Protection Engines list with the one previously received
+in the INIT chunk, if they are exactly the same, with the same
+Protection engine in the same position, it will reply to the initiator
+with a PVALID chunk containing the chosen Protection Engine, otherwise
+it will reply with an ABORT chunk. ERROR CAUSE will indicate "Failure
+in Protection Engines Validation" and the SCTP association will be
+terminated. If the association was not aborted the protected
 association is considered successfully established and the PROTECTED
 state is entered.
 

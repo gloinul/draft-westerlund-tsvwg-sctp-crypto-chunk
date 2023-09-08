@@ -23,17 +23,17 @@ accomplished.
        Applications using SCTP CRYPTO chunk can use all transport
 features provided by SCTP and its extensions but with some limitations. 
     " name="description">
-<meta content="xml2rfc 3.17.3" name="generator">
+<meta content="xml2rfc 3.18.0" name="generator">
 <meta content="draft-westerlund-tsvwg-sctp-crypto-chunk-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.17.3
-    Python 3.11.4
-    appdirs 1.4.4
+  xml2rfc 3.18.0
+    Python 3.11.5
     ConfigArgParse 1.5.3
     google-i18n-address 3.1.0
     intervaltree 3.1.0
     Jinja2 3.1.2
-    lxml 4.9.2
+    lxml 4.9.3
+    platformdirs 3.10.0
     pycountry 22.3.5
     PyYAML 6.0
     requests 2.31.0
@@ -1060,11 +1060,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">SCTP CRYPTO Chunk</td>
-<td class="right">June 2023</td>
+<td class="right">September 2023</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Westerlund, et al.</td>
-<td class="center">Expires 29 December 2023</td>
+<td class="center">Expires 11 March 2024</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1077,12 +1077,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-westerlund-tsvwg-sctp-crypto-chunk-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2023-06-27" class="published">27 June 2023</time>
+<time datetime="2023-09-08" class="published">8 September 2023</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2023-12-29">29 December 2023</time></dd>
+<dd class="expires"><time datetime="2024-03-11">11 March 2024</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1151,7 +1151,7 @@ features provided by SCTP and its extensions but with some limitations.<a href="
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 29 December 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 11 March 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1429,7 +1429,7 @@ chunk layering in regard to SCTP and the Upper Layer Protocol (ULP).<a href="#se
 <figure id="figure-1">
           <div id="section-2.1-2.1">
             <div class="alignCenter art-svg artwork" id="section-2.1-2.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="352" width="448" viewBox="0 0 448 352" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="352" width="448" viewBox="0 0 448 352" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
                 <path d="M 8,32 L 8,336" fill="none" stroke="black"></path>
                 <path d="M 136,32 L 136,96" fill="none" stroke="black"></path>
                 <path d="M 152,32 L 152,96" fill="none" stroke="black"></path>
@@ -1788,7 +1788,7 @@ handshake.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
 <figure id="figure-2">
           <div id="section-4.1-2.1">
             <div class="alignCenter art-svg artwork" id="section-4.1-2.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="208" width="528" viewBox="0 0 528 208" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="208" width="528" viewBox="0 0 528 208" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
                 <path d="M 8,64 L 8,192" fill="none" stroke="black"></path>
                 <path d="M 264,64 L 264,96" fill="none" stroke="black"></path>
                 <path d="M 264,160 L 264,192" fill="none" stroke="black"></path>
@@ -1934,7 +1934,7 @@ packet.<a href="#section-5.1-5" class="pilcrow">¶</a></p>
 <figure id="figure-3">
           <div id="section-5.1-6.1">
             <div class="alignCenter art-svg artwork" id="section-5.1-6.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="208" width="528" viewBox="0 0 528 208" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="208" width="528" viewBox="0 0 528 208" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
                 <path d="M 8,64 L 8,192" fill="none" stroke="black"></path>
                 <path d="M 136,64 L 136,96" fill="none" stroke="black"></path>
                 <path d="M 264,64 L 264,96" fill="none" stroke="black"></path>
@@ -2071,7 +2071,7 @@ the upper bits of the chunk type.<a href="#section-5.2-3" class="pilcrow">¶</a>
 <figure id="figure-4">
           <div id="section-5.2-5.1">
             <div class="alignCenter art-svg artwork" id="section-5.2-5.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="208" width="528" viewBox="0 0 528 208" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="208" width="528" viewBox="0 0 528 208" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
                 <path d="M 8,64 L 8,192" fill="none" stroke="black"></path>
                 <path d="M 136,64 L 136,96" fill="none" stroke="black"></path>
                 <path d="M 264,64 L 264,96" fill="none" stroke="black"></path>
@@ -2203,7 +2203,7 @@ Information field.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
 <figure id="figure-5">
           <div id="section-6.1-2.1">
             <div class="alignCenter art-svg artwork" id="section-6.1-2.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="208" width="528" viewBox="0 0 528 208" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="208" width="528" viewBox="0 0 528 208" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
                 <path d="M 8,64 L 8,192" fill="none" stroke="black"></path>
                 <path d="M 264,64 L 264,96" fill="none" stroke="black"></path>
                 <path d="M 264,128 L 264,192" fill="none" stroke="black"></path>
@@ -2310,7 +2310,7 @@ the relevant Error Type and Causes.<a href="#section-6.2-3" class="pilcrow">¶</
 <figure id="figure-6">
           <div id="section-6.2-4.1">
             <div class="alignCenter art-svg artwork" id="section-6.2-4.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="176" width="528" viewBox="0 0 528 176" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="176" width="528" viewBox="0 0 528 176" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
                 <path d="M 8,64 L 8,160" fill="none" stroke="black"></path>
                 <path d="M 264,64 L 264,160" fill="none" stroke="black"></path>
                 <path d="M 520,64 L 520,160" fill="none" stroke="black"></path>
@@ -2509,7 +2509,7 @@ association state machine as described in <span>[<a href="#RFC9260" class="cite 
 <figure id="figure-7">
         <div id="section-7-2.1">
           <div class="alignCenter art-svg artwork" id="section-7-2.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="1072" width="552" viewBox="0 0 552 1072" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="1072" width="552" viewBox="0 0 552 1072" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
               <path d="M 80,528 L 80,976" fill="none" stroke="black"></path>
               <path d="M 128,544 L 128,960" fill="none" stroke="black"></path>
               <path d="M 184,64 L 184,96" fill="none" stroke="black"></path>
@@ -2871,7 +2871,9 @@ association is successfully established.<a href="#section-8.1-7" class="pilcrow"
 <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>, the protection engine SHALL ask SCTP endpoint for
 terminating an association when having an internal error or by
 detecting a security violation, using the procedure described
-in <a href="#eengine" class="auto internal xref">Section 6.3</a>.  The internal design of Protection
+in <a href="#eengine" class="auto internal xref">Section 6.3</a>.
+During the termination procedure all Control Chunks SHALL be protected
+except SHUTDOWN-COMPLETE. The internal design of Protection
 Engines and their capability is out of the scope of the current
 document.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
 </section>
@@ -2930,7 +2932,7 @@ to section 4 of <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>.
 <figure id="figure-8">
         <div id="section-9-3.1">
           <div class="alignCenter art-svg artwork" id="section-9-3.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="208" width="528" viewBox="0 0 528 208" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="208" width="528" viewBox="0 0 528 208" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
               <path d="M 8,64 L 8,192" fill="none" stroke="black"></path>
               <path d="M 520,64 L 520,192" fill="none" stroke="black"></path>
               <path d="M 8,64 L 520,64" fill="none" stroke="black"></path>
@@ -3002,7 +3004,7 @@ association.<a href="#section-9-4" class="pilcrow">¶</a></p>
 <figure id="figure-9">
         <div id="section-9-5.1">
           <div class="alignCenter art-svg artwork" id="section-9-5.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="144" width="528" viewBox="0 0 528 144" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="144" width="528" viewBox="0 0 528 144" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
               <path d="M 8,64 L 8,128" fill="none" stroke="black"></path>
               <path d="M 520,64 L 520,128" fill="none" stroke="black"></path>
               <path d="M 8,64 L 520,64" fill="none" stroke="black"></path>

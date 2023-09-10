@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2023-09-07T00:58:19.336409+00:00",
+  "timestamp": "2023-09-10T01:02:14.799652+00:00",
   "repo": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
   "labels": [
     {
@@ -55,15 +55,15 @@
       "id": "I_kwDOIc8XPM5cjWuO",
       "title": "Disallow Informational Protection Error Causes?",
       "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/issues/3",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "gloinul",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "If we allow protection engines that lack informational or temporary error exchange then there is some risk that the unknown SCTP error chunk will be propagated to the ULP rather than the protection enginge. In such cases there is a significant risk that the error chunk leads to SCTP association termination. ",
       "createdAt": "2023-01-23T09:29:38Z",
-      "updatedAt": "2023-06-08T14:26:29Z",
-      "closedAt": null,
+      "updatedAt": "2023-09-08T15:27:33Z",
+      "closedAt": "2023-09-08T15:27:32Z",
       "comments": [
         {
           "author": "gloinul",
@@ -71,6 +71,13 @@
           "body": "Likely can be closed, but @gloinul will do a review of the whole document to verify that this is no longer relevant. ",
           "createdAt": "2023-06-08T14:26:29Z",
           "updatedAt": "2023-06-08T14:26:29Z"
+        },
+        {
+          "author": "gloinul",
+          "authorAssociation": "OWNER",
+          "body": "The error handling is quite clear on the distinction between critical errors and non-critical. And that non-critical should not be reported. ",
+          "createdAt": "2023-09-08T15:27:32Z",
+          "updatedAt": "2023-09-08T15:27:32Z"
         }
       ]
     },
@@ -243,16 +250,24 @@
       "id": "I_kwDOIc8XPM5lx4Xe",
       "title": "Encryption Engine interface for internal signaling",
       "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/issues/10",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "teiclap",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "It has been raised the problem about SCTP protecting internal signaling of Encryption Engine.",
       "createdAt": "2023-05-12T12:45:58Z",
-      "updatedAt": "2023-05-12T12:45:58Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2023-09-08T08:47:34Z",
+      "closedAt": "2023-09-08T08:47:01Z",
+      "comments": [
+        {
+          "author": "teiclap",
+          "authorAssociation": "COLLABORATOR",
+          "body": "The issue is solved by defining a PPID for internal Protection Engine signaling purpose",
+          "createdAt": "2023-09-08T08:47:33Z",
+          "updatedAt": "2023-09-08T08:47:33Z"
+        }
+      ]
     },
     {
       "number": 16,
@@ -275,15 +290,15 @@
       "id": "I_kwDOIc8XPM5o8pxz",
       "title": "Expansion on Termination of a Protected Association?",
       "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/issues/17",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "gloinul",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "The section Termination of a Protected Association is not explicit about that the crypto is used for all control message except for the last one SHUTDOWN-COMPLETE. That last thing may need to be covered in this section?",
       "createdAt": "2023-06-16T14:16:13Z",
-      "updatedAt": "2023-06-16T14:16:13Z",
-      "closedAt": null,
+      "updatedAt": "2023-09-08T08:39:20Z",
+      "closedAt": "2023-09-08T08:39:20Z",
       "comments": []
     },
     {
@@ -291,15 +306,15 @@
       "id": "I_kwDOIc8XPM5vbndr",
       "title": "Association RESTART",
       "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/issues/19",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "teiclap",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "The association RESTART needs clarification. Options with plain or encrypted INIT needs to be described.",
       "createdAt": "2023-08-28T10:48:09Z",
-      "updatedAt": "2023-08-28T10:48:09Z",
-      "closedAt": null,
+      "updatedAt": "2023-09-08T08:41:06Z",
+      "closedAt": "2023-09-08T08:41:06Z",
       "comments": []
     },
     {
@@ -307,15 +322,15 @@
       "id": "I_kwDOIc8XPM5v3sbl",
       "title": "State Machine",
       "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/issues/21",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "teiclap",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "The State Machine description is unnecessary and may be implemented in a different way.\r\nRemove the State Machine and adapt the text to rfc9260 state machine.",
       "createdAt": "2023-09-01T07:06:28Z",
-      "updatedAt": "2023-09-01T07:06:28Z",
-      "closedAt": null,
+      "updatedAt": "2023-09-08T08:45:26Z",
+      "closedAt": "2023-09-08T08:45:26Z",
       "comments": []
     }
   ],
@@ -780,24 +795,26 @@
       "id": "PR_kwDOIc8XPM5ZPiu3",
       "title": "Issue19 - initial work",
       "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/pull/20",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "teiclap",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2023-08-31T14:04:09Z",
-      "updatedAt": "2023-09-04T11:35:36Z",
+      "updatedAt": "2023-09-08T08:41:05Z",
       "baseRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
       "baseRefName": "main",
       "baseRefOid": "1be0729f4e80c97e18034c13552ca79851832308",
       "headRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
       "headRefName": "issue19",
       "headRefOid": "66d8c4a5e1bd196e945313844a7ec84a0e5c4877",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2023-09-08T08:41:05Z",
+      "mergedAt": "2023-09-08T08:41:05Z",
+      "mergedBy": "teiclap",
+      "mergeCommit": {
+        "oid": "da9a06d68f29717f4da44dcc3d12a0ca517443bf"
+      },
       "comments": [
         {
           "author": "emanjon",
@@ -814,24 +831,26 @@
       "id": "PR_kwDOIc8XPM5ZUGQ3",
       "title": "Removed the state machine and all tuned the text",
       "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/pull/22",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "teiclap",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "It should be clean now and let implementors free to hack it as they like.",
       "createdAt": "2023-09-01T08:00:50Z",
-      "updatedAt": "2023-09-06T16:23:37Z",
+      "updatedAt": "2023-09-08T08:45:25Z",
       "baseRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
       "baseRefName": "main",
       "baseRefOid": "1be0729f4e80c97e18034c13552ca79851832308",
       "headRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
       "headRefName": "issue21",
-      "headRefOid": "5fded26bece104488a56ca8c6ef39a549c97e4ec",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "595c9ebc9e101c36a10b9a2fa1df0804b786e1e5",
+      "closedAt": "2023-09-08T08:45:25Z",
+      "mergedAt": "2023-09-08T08:45:25Z",
+      "mergedBy": "teiclap",
+      "mergeCommit": {
+        "oid": "2b34cfcfa4e7d3f298fd4ea4fbafed7c431d13b1"
+      },
       "comments": [
         {
           "author": "teiclap",
@@ -883,6 +902,34 @@
           ]
         }
       ]
+    },
+    {
+      "number": 23,
+      "id": "PR_kwDOIc8XPM5Zw8m6",
+      "title": "Fixed Issue 17",
+      "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/pull/23",
+      "state": "MERGED",
+      "author": "teiclap",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The chunk SHUTDOWN-COMPLETE is explicit in the Shutdown Procedure now",
+      "createdAt": "2023-09-07T09:57:47Z",
+      "updatedAt": "2023-09-08T08:39:19Z",
+      "baseRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
+      "baseRefName": "main",
+      "baseRefOid": "1be0729f4e80c97e18034c13552ca79851832308",
+      "headRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
+      "headRefName": "issue17",
+      "headRefOid": "5ce02da499fc8599a65d718780313807e65f29be",
+      "closedAt": "2023-09-08T08:39:19Z",
+      "mergedAt": "2023-09-08T08:39:19Z",
+      "mergedBy": "teiclap",
+      "mergeCommit": {
+        "oid": "b17aceca59236ab8da5fdd2ea196aa95d8e060f0"
+      },
+      "comments": [],
+      "reviews": []
     }
   ]
 }

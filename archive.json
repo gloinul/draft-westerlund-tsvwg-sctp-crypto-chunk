@@ -1,0 +1,935 @@
+{
+  "magic": "E!vIA5L86J2I",
+  "timestamp": "2024-06-18T01:07:59.032598+00:00",
+  "repo": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
+  "labels": [
+    {
+      "name": "bug",
+      "description": "Something isn't working",
+      "color": "d73a4a"
+    },
+    {
+      "name": "documentation",
+      "description": "Improvements or additions to documentation",
+      "color": "0075ca"
+    },
+    {
+      "name": "duplicate",
+      "description": "This issue or pull request already exists",
+      "color": "cfd3d7"
+    },
+    {
+      "name": "enhancement",
+      "description": "New feature or request",
+      "color": "a2eeef"
+    },
+    {
+      "name": "good first issue",
+      "description": "Good for newcomers",
+      "color": "7057ff"
+    },
+    {
+      "name": "help wanted",
+      "description": "Extra attention is needed",
+      "color": "008672"
+    },
+    {
+      "name": "invalid",
+      "description": "This doesn't seem right",
+      "color": "e4e669"
+    },
+    {
+      "name": "question",
+      "description": "Further information is requested",
+      "color": "d876e3"
+    },
+    {
+      "name": "wontfix",
+      "description": "This will not be worked on",
+      "color": "ffffff"
+    }
+  ],
+  "issues": [
+    {
+      "number": 3,
+      "id": "I_kwDOIc8XPM5cjWuO",
+      "title": "Disallow Informational Protection Error Causes?",
+      "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/issues/3",
+      "state": "CLOSED",
+      "author": "gloinul",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "If we allow protection engines that lack informational or temporary error exchange then there is some risk that the unknown SCTP error chunk will be propagated to the ULP rather than the protection enginge. In such cases there is a significant risk that the error chunk leads to SCTP association termination. ",
+      "createdAt": "2023-01-23T09:29:38Z",
+      "updatedAt": "2023-09-08T15:27:33Z",
+      "closedAt": "2023-09-08T15:27:32Z",
+      "comments": [
+        {
+          "author": "gloinul",
+          "authorAssociation": "OWNER",
+          "body": "Likely can be closed, but @gloinul will do a review of the whole document to verify that this is no longer relevant. ",
+          "createdAt": "2023-06-08T14:26:29Z",
+          "updatedAt": "2023-06-08T14:26:29Z"
+        },
+        {
+          "author": "gloinul",
+          "authorAssociation": "OWNER",
+          "body": "The error handling is quite clear on the distinction between critical errors and non-critical. And that non-critical should not be reported. ",
+          "createdAt": "2023-09-08T15:27:32Z",
+          "updatedAt": "2023-09-08T15:27:32Z"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "id": "I_kwDOIc8XPM5hlDHL",
+      "title": "Fix ordering between ABORT and ERROR",
+      "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/issues/4",
+      "state": "CLOSED",
+      "author": "gloinul",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "As Michael T\u00fcxen notices we indicate the wrong order between ABORT and ERROR chunks. For the error to reach it needs to be sent first, followed by the ABORT.",
+      "createdAt": "2023-03-23T08:55:02Z",
+      "updatedAt": "2023-06-08T14:21:53Z",
+      "closedAt": "2023-06-08T14:21:53Z",
+      "comments": [
+        {
+          "author": "gloinul",
+          "authorAssociation": "OWNER",
+          "body": "So this is not an ordering, it is a question of either using ERROR or ABORT depending of if one need to terminate the SCTP association or not. ",
+          "createdAt": "2023-03-27T01:06:20Z",
+          "updatedAt": "2023-03-27T01:06:20Z"
+        },
+        {
+          "author": "gloinul",
+          "authorAssociation": "OWNER",
+          "body": "Fixed in PR #15 ",
+          "createdAt": "2023-06-08T14:21:53Z",
+          "updatedAt": "2023-06-08T14:21:53Z"
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "id": "I_kwDOIc8XPM5hlEUT",
+      "title": "Clarify how path selection is done for protection engine packets",
+      "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/issues/5",
+      "state": "CLOSED",
+      "author": "gloinul",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Michael T\u00fcxen review noted that we does not discuss how path selection for the protection engine created packets work. This also comes with an additional issue that needs to be clarified. Namely how path failures are handled. So if no SCTP packets are sent but protection engine sends packet then the SCTP stack is not aware of these packets and do not notice that they are not acknowledged by the peer protection engine. Some mechanism will be needed here to handle this case. ",
+      "createdAt": "2023-03-23T08:58:22Z",
+      "updatedAt": "2023-06-08T14:23:29Z",
+      "closedAt": "2023-06-08T14:23:28Z",
+      "comments": [
+        {
+          "author": "teiclap",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Actually SCTP protocol helps here.\r\nSCTP stack does continuously supervise the paths either with traffic or with path probing using HB/HB-ACK.\r\nThe selection of the current path is done at SCTP thus messages belonging to protection engine will exploit that path.\r\nWe are not including CRYPTO chunks in the account for SACK assuming that the encryption engine itself is able dealing with data loss and can wait until SCTP does probe the path.\r\nA solution here may be simple, that is we do nothing so that we have a risk that the protection engine runs into timeout before SCTP switches to the alternative paths in case of multihoming. Such case would possibly happen when protection engine has internal data to be sent and the Upper Layer Application has no traffic for a long time.\r\nAlternative is complex and requires a though interaction between protection engine and SCTP, it may be that in case of SCTP is idle then protection engine forces HB chunks to be sent. \r\nA simpler solution is to tune HB properly, for instance by sending an HB every 2 seconds or so. This we can provide as recommendation for the specific protection engine. In DTLS I'd see a good choice to have HB at 2 seconds rate. ",
+          "createdAt": "2023-03-23T11:12:58Z",
+          "updatedAt": "2023-03-23T11:12:58Z"
+        },
+        {
+          "author": "gloinul",
+          "authorAssociation": "OWNER",
+          "body": "Thanks @teiclap there is clearly these trade-offs here. And I think we have to acknowledge what the impact would be if an SCTP stack runs either default timers or even known maximum on path keep-alive. As well as considering what impact of addressing this. ",
+          "createdAt": "2023-03-23T11:31:26Z",
+          "updatedAt": "2023-03-23T11:31:26Z"
+        },
+        {
+          "author": "teiclap",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Addressed in branch issue5",
+          "createdAt": "2023-04-04T12:56:15Z",
+          "updatedAt": "2023-04-04T12:56:15Z"
+        },
+        {
+          "author": "gloinul",
+          "authorAssociation": "OWNER",
+          "body": "Resolved #12 ",
+          "createdAt": "2023-06-08T14:23:28Z",
+          "updatedAt": "2023-06-08T14:23:28Z"
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "id": "I_kwDOIc8XPM5h0o77",
+      "title": "Bundling of Crypto chunk",
+      "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/issues/6",
+      "state": "CLOSED",
+      "author": "gloinul",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "So Michael T\u00fcxen raised the question if disallowing bundling of CRYPTO chunks is an unnecessary. We authors disallowed this to make things simpler, but at the same time receiving bundled CRYPTO chunks with control chunks. Like handshake in CRYPTO bundled with any control chunks would not be a real problem as handling of these cases will anyway be needed to handled. \r\n\r\nThis may need additional discussion. ",
+      "createdAt": "2023-03-27T01:12:44Z",
+      "updatedAt": "2023-06-08T14:28:20Z",
+      "closedAt": "2023-06-08T14:28:19Z",
+      "comments": [
+        {
+          "author": "gloinul",
+          "authorAssociation": "OWNER",
+          "body": "With the change to use DATA chunk when doing key-exchange bundling can occurr prior to Established state between control and Data per regular SCTP rules. ",
+          "createdAt": "2023-06-08T14:28:19Z",
+          "updatedAt": "2023-06-08T14:28:19Z"
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "id": "I_kwDOIc8XPM5iMFYh",
+      "title": "SCTP Restart Handling",
+      "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/issues/7",
+      "state": "CLOSED",
+      "author": "teiclap",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "SCTP Restart allows an SCTP Endpoint that has experienced a restart to resume an Association towards a remote Endpoint.\r\nIn case of Crypto Chunk that would need sending unencrypted INIT chunk, but such traffic will be discarded at the remote Endpoint thus there's no way to handle SCTP Restart.\r\nOn the other hand once an SCTP Endpoint has a restart, all the resources are lost including the Protection Engine and its state.\r\nLast but not the least, permitting SCTP Restart would in some way open up to association hijacking.\r\nThe proposal is to explicitly state that SCTP Restart case is not supported.",
+      "createdAt": "2023-03-30T10:23:25Z",
+      "updatedAt": "2023-06-08T14:22:29Z",
+      "closedAt": "2023-06-08T14:22:29Z",
+      "comments": [
+        {
+          "author": "gloinul",
+          "authorAssociation": "OWNER",
+          "body": "Fixed in PR #14 ",
+          "createdAt": "2023-06-08T14:22:29Z",
+          "updatedAt": "2023-06-08T14:22:29Z"
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "id": "I_kwDOIc8XPM5iMK4w",
+      "title": "ASCONF support",
+      "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/issues/8",
+      "state": "CLOSED",
+      "author": "teiclap",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "ASCONF chunk transports information that are used for the identification of the Association, this allows the SCTP Endpoint to recognize the SCTP packet even if it comes from an unknown IP address.\r\nSCTP Crypto chunk doesn't allow reading the ASCONF chunk before being decrypted, thus SCTP Endpoint has no criteria for accepting the SCTP packet based on ASCONF information.\r\nIt's suggested to fix that problem by describing the procedure to be used when as SCTP Endpoint supports ASCONF.\r\nIn case ASCONF is supported, the SCTP Endpoint will use the VTAG for giving a first criteria of acceptability, if the VTAG is known the Crypto Chunk will be sent to the Protection Engine for processing.",
+      "createdAt": "2023-03-30T10:39:09Z",
+      "updatedAt": "2023-06-08T14:20:53Z",
+      "closedAt": "2023-06-08T14:20:53Z",
+      "comments": [
+        {
+          "author": "gloinul",
+          "authorAssociation": "OWNER",
+          "body": "Resolved in PR #13 ",
+          "createdAt": "2023-06-08T14:20:53Z",
+          "updatedAt": "2023-06-08T14:20:53Z"
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "id": "I_kwDOIc8XPM5ikezt",
+      "title": "Support for Kernel implementation of SCTP",
+      "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/issues/9",
+      "state": "OPEN",
+      "author": "teiclap",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "OpenSSL relies on a lot of things that exist only in userspace such as [use of PThreads library] and [custom memory allocation].\r\nThe implementation of Crypto Chunks in kernel space is challenging for kernel SCTP implementations as it can do encryption/decryption using kernel crypto API but it cannot handle the SSL protocols such as DTLS.\r\nIt should be possible to redesign Crypto Chunks in a way that allows kernel SCTP implementation exploiting SSL protocols running in user space and crypto libraries in kernel space.",
+      "createdAt": "2023-04-04T11:45:34Z",
+      "updatedAt": "2023-04-04T11:45:53Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 10,
+      "id": "I_kwDOIc8XPM5lx4Xe",
+      "title": "Encryption Engine interface for internal signaling",
+      "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/issues/10",
+      "state": "CLOSED",
+      "author": "teiclap",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "It has been raised the problem about SCTP protecting internal signaling of Encryption Engine.",
+      "createdAt": "2023-05-12T12:45:58Z",
+      "updatedAt": "2023-09-08T08:47:34Z",
+      "closedAt": "2023-09-08T08:47:01Z",
+      "comments": [
+        {
+          "author": "teiclap",
+          "authorAssociation": "COLLABORATOR",
+          "body": "The issue is solved by defining a PPID for internal Protection Engine signaling purpose",
+          "createdAt": "2023-09-08T08:47:33Z",
+          "updatedAt": "2023-09-08T08:47:33Z"
+        }
+      ]
+    },
+    {
+      "number": 16,
+      "id": "I_kwDOIc8XPM5oLm8_",
+      "title": "ASCONF requires SCTP-AUTH",
+      "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/issues/16",
+      "state": "OPEN",
+      "author": "gloinul",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "RFC 5061 requires that the ASCONF chunk is protected by SCTP-AUTH. That is unnecessary strict as source-authenticity is what is required. Thus, we will need to discuss with the WG if we should let Crypto Chunk simply update RFC 5061 Section 4.1.1 text:\r\n\r\n> This chunk MUST be sent in an authenticated way by using the mechanism defined in [RFC4895]. \r\n\r\n",
+      "createdAt": "2023-06-08T13:13:13Z",
+      "updatedAt": "2023-06-08T13:13:13Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 17,
+      "id": "I_kwDOIc8XPM5o8pxz",
+      "title": "Expansion on Termination of a Protected Association?",
+      "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/issues/17",
+      "state": "CLOSED",
+      "author": "gloinul",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "The section Termination of a Protected Association is not explicit about that the crypto is used for all control message except for the last one SHUTDOWN-COMPLETE. That last thing may need to be covered in this section?",
+      "createdAt": "2023-06-16T14:16:13Z",
+      "updatedAt": "2023-09-08T08:39:20Z",
+      "closedAt": "2023-09-08T08:39:20Z",
+      "comments": []
+    },
+    {
+      "number": 19,
+      "id": "I_kwDOIc8XPM5vbndr",
+      "title": "Association RESTART",
+      "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/issues/19",
+      "state": "CLOSED",
+      "author": "teiclap",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The association RESTART needs clarification. Options with plain or encrypted INIT needs to be described.",
+      "createdAt": "2023-08-28T10:48:09Z",
+      "updatedAt": "2023-09-08T08:41:06Z",
+      "closedAt": "2023-09-08T08:41:06Z",
+      "comments": []
+    },
+    {
+      "number": 21,
+      "id": "I_kwDOIc8XPM5v3sbl",
+      "title": "State Machine",
+      "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/issues/21",
+      "state": "CLOSED",
+      "author": "teiclap",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The State Machine description is unnecessary and may be implemented in a different way.\r\nRemove the State Machine and adapt the text to rfc9260 state machine.",
+      "createdAt": "2023-09-01T07:06:28Z",
+      "updatedAt": "2023-09-08T08:45:26Z",
+      "closedAt": "2023-09-08T08:45:26Z",
+      "comments": []
+    }
+  ],
+  "pulls": [
+    {
+      "number": 1,
+      "id": "PR_kwDOIc8XPM5DdgUU",
+      "title": "Abstract and first draft of the document",
+      "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/pull/1",
+      "state": "MERGED",
+      "author": "teiclap",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "We have all data structures in and possibly also the basic for the procedures.\r\nThere's nothing in the Buffering part but I think we need some work there.",
+      "createdAt": "2022-11-22T13:34:51Z",
+      "updatedAt": "2023-01-18T13:05:05Z",
+      "baseRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
+      "baseRefName": "main",
+      "baseRefOid": "b18ffad858b836827a2d70bb63d1c0abc623b009",
+      "headRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
+      "headRefName": "abstract",
+      "headRefOid": "dc23cc49c938da5ad4084b410b60bebfb1eca4b1",
+      "closedAt": "2022-11-28T13:11:23Z",
+      "mergedAt": "2022-11-28T13:11:23Z",
+      "mergedBy": "teiclap",
+      "mergeCommit": {
+        "oid": "dc23cc49c938da5ad4084b410b60bebfb1eca4b1"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 2,
+      "id": "PR_kwDOIc8XPM5HazYR",
+      "title": "John review",
+      "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/pull/2",
+      "state": "MERGED",
+      "author": "emanjon",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2023-01-15T22:32:07Z",
+      "updatedAt": "2023-01-18T13:04:44Z",
+      "baseRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
+      "baseRefName": "main",
+      "baseRefOid": "d67f2434b56758c2a3b2d5ae6a4a0313f8970fd9",
+      "headRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
+      "headRefName": "emanjon-patch-1",
+      "headRefOid": "f16556cffad86665b753992a7c6bcf61f343b4bf",
+      "closedAt": "2023-01-16T14:07:51Z",
+      "mergedAt": "2023-01-16T14:07:51Z",
+      "mergedBy": "teiclap",
+      "mergeCommit": {
+        "oid": "9db779b1fd8a48a4c74537d6d8f121fd72e858aa"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 11,
+      "id": "PR_kwDOIc8XPM5SKpuI",
+      "title": "Addressed the problem with inband key management",
+      "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/pull/11",
+      "state": "MERGED",
+      "author": "teiclap",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2023-06-05T08:22:34Z",
+      "updatedAt": "2023-06-08T14:16:34Z",
+      "baseRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
+      "baseRefName": "main",
+      "baseRefOid": "cff39192aee6d55cd89a8def5e7058045b859a56",
+      "headRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
+      "headRefName": "issue10",
+      "headRefOid": "dcdc3fdc6a1ddc44e423be5306f27c45f600a124",
+      "closedAt": "2023-06-08T14:16:34Z",
+      "mergedAt": "2023-06-08T14:16:34Z",
+      "mergedBy": "gloinul",
+      "mergeCommit": {
+        "oid": "214386a9f7c9f04ceb9e110a16335b499f992d09"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOIc8XPM5Xkxdh",
+          "commit": {
+            "abbreviatedOid": "f166efd"
+          },
+          "author": "gloinul",
+          "authorAssociation": "OWNER",
+          "state": "CHANGES_REQUESTED",
+          "body": "",
+          "createdAt": "2023-06-08T08:01:49Z",
+          "updatedAt": "2023-06-08T08:15:55Z",
+          "comments": [
+            {
+              "originalPosition": 13,
+              "body": "I think the Data Management part should likely be called \"Protection Opertions\" or something similar. I am also uncertain about the box. I would think that having the protection engine on the top. And then have the box Protection operations that exchange protected data and clear text with the crypto block, and then have keys being pushed down from the upper layers. One realization the protection operations happens embedded in the crypto block. ",
+              "createdAt": "2023-06-08T08:01:49Z",
+              "updatedAt": "2023-06-08T08:15:56Z"
+            },
+            {
+              "originalPosition": 47,
+              "body": "So, that this is true as soon one has reached \"Established\" state is fine. But what about before that? Should it use just plain text DATA chunks, however only the key-management PPID is allowed to be sent by the upper layers? Or should we like SCTP-AUTH have a null key? I think just using DATA until Established for the key-managment messages is the better operations and avoids opening up for using non-encrypted when you have reached established state. ",
+              "createdAt": "2023-06-08T08:05:18Z",
+              "updatedAt": "2023-06-08T08:15:56Z"
+            },
+            {
+              "originalPosition": 122,
+              "body": "Just checking that it is fine to throw away all plain text CHUNKS. Including ASCONF? ",
+              "createdAt": "2023-06-08T08:07:28Z",
+              "updatedAt": "2023-06-08T08:15:56Z"
+            },
+            {
+              "originalPosition": 170,
+              "body": "SHALL",
+              "createdAt": "2023-06-08T08:08:19Z",
+              "updatedAt": "2023-06-08T08:15:56Z"
+            },
+            {
+              "originalPosition": 15,
+              "body": "More changes are needed a couple of paragraphs below this figure as it describes the protection engine initilization as sending crypto frames, not DATA chunks with a special PPID. ",
+              "createdAt": "2023-06-08T08:15:08Z",
+              "updatedAt": "2023-06-08T08:15:56Z"
+            },
+            {
+              "originalPosition": 122,
+              "body": "Also section 2.1 mentions SHUTDOWN-COMPLETE chunk. Is that wrong or do that need to be mentioned here?",
+              "createdAt": "2023-06-08T08:15:45Z",
+              "updatedAt": "2023-06-08T08:15:56Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOIc8XPM5Xnrso",
+          "commit": {
+            "abbreviatedOid": "dcdc3fd"
+          },
+          "author": "gloinul",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2023-06-08T14:16:27Z",
+          "updatedAt": "2023-06-08T14:16:27Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 12,
+      "id": "PR_kwDOIc8XPM5SKpzQ",
+      "title": "Issue5",
+      "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/pull/12",
+      "state": "MERGED",
+      "author": "teiclap",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2023-06-05T08:22:50Z",
+      "updatedAt": "2023-06-08T14:19:53Z",
+      "baseRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
+      "baseRefName": "main",
+      "baseRefOid": "214386a9f7c9f04ceb9e110a16335b499f992d09",
+      "headRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
+      "headRefName": "issue5",
+      "headRefOid": "7b4b75af3b0b1047fd4876fe24865b9ebcf4efb4",
+      "closedAt": "2023-06-08T14:19:46Z",
+      "mergedAt": "2023-06-08T14:19:46Z",
+      "mergedBy": "emanjon",
+      "mergeCommit": {
+        "oid": "7346e05c2ec3b64b929bbb8a5f0683537faa8493"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOIc8XPM5Xk541",
+          "commit": {
+            "abbreviatedOid": "582093f"
+          },
+          "author": "gloinul",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2023-06-08T08:20:19Z",
+          "updatedAt": "2023-06-08T08:20:19Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOIc8XPM5XnphK",
+          "commit": {
+            "abbreviatedOid": "582093f"
+          },
+          "author": "gloinul",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2023-06-08T14:12:24Z",
+          "updatedAt": "2023-06-08T14:12:24Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 13,
+      "id": "PR_kwDOIc8XPM5SKp68",
+      "title": "Added ASCONF considerations",
+      "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/pull/13",
+      "state": "MERGED",
+      "author": "teiclap",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2023-06-05T08:23:13Z",
+      "updatedAt": "2023-06-08T14:11:21Z",
+      "baseRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
+      "baseRefName": "main",
+      "baseRefOid": "cff39192aee6d55cd89a8def5e7058045b859a56",
+      "headRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
+      "headRefName": "issue8",
+      "headRefOid": "e0d70c5faff0a9b4556e29e57f7eb75934f8f3fd",
+      "closedAt": "2023-06-08T14:11:21Z",
+      "mergedAt": "2023-06-08T14:11:21Z",
+      "mergedBy": "gloinul",
+      "mergeCommit": {
+        "oid": "1114de2461312e31f7407bdcf1a93b45c3365a20"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOIc8XPM5Xk6Pw",
+          "commit": {
+            "abbreviatedOid": "e0d70c5"
+          },
+          "author": "gloinul",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2023-06-08T08:21:12Z",
+          "updatedAt": "2023-06-08T14:11:12Z",
+          "comments": [
+            {
+              "originalPosition": 20,
+              "body": "SCTP Crypto chunk",
+              "createdAt": "2023-06-08T08:21:12Z",
+              "updatedAt": "2023-06-08T14:11:13Z"
+            },
+            {
+              "originalPosition": 28,
+              "body": "This section likely need to update RFC 5061 to allow Crypto chunks using a protection engine with a cryptographic authentication of the packet to be used in stead of SCTP-AUTH as the mechanism to ensure source authenticity of the ASCONF chunk. Section 4.1.1 of RFC 5061 states: \r\n\"This\r\n   chunk MUST be sent in an authenticated way by using the mechanism\r\n   defined in [RFC4895].\"\r\n   ",
+              "createdAt": "2023-06-08T08:35:39Z",
+              "updatedAt": "2023-06-08T14:11:13Z"
+            },
+            {
+              "originalPosition": 20,
+              "body": "I think this sentence is incorrect. To my understanding if one supports ASCONF and CRYPTO what will happen is that the arriving packet with the ASCONF chunk will first be looked up based on VTAG, then have the protection operation being run on it. Then the SCTP stacks chunk processing will take care of this ASCONF chunk that arrived in a autheticated packet. Noted that meta data about the arriving packet's source IP address may be required when the Address field in the ASCONF is null. And the Address field can't be used to locate the association context. Thus SCTP stacks with CRYPTO chunk support will have to use the VTAG + arrival port as the method for finding the right association and can't rely on source IP, which anyway ASCONF in some usages can't do either. ",
+              "createdAt": "2023-06-08T08:40:00Z",
+              "updatedAt": "2023-06-08T14:11:13Z"
+            },
+            {
+              "originalPosition": 27,
+              "body": "Can really duplicate VTAG occur on a set of ports? The SCTP endpoint will indicate the VTAG to use to identify the created association. That should never have duplicates. Only in cases when packets from an old association show up could this happen, and they will have different security context, thus the old packet will be dropped. ",
+              "createdAt": "2023-06-08T08:42:28Z",
+              "updatedAt": "2023-06-08T14:11:13Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 14,
+      "id": "PR_kwDOIc8XPM5SKqGT",
+      "title": "Added description of SCTP Restart",
+      "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/pull/14",
+      "state": "MERGED",
+      "author": "teiclap",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2023-06-05T08:23:37Z",
+      "updatedAt": "2023-06-08T14:09:49Z",
+      "baseRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
+      "baseRefName": "main",
+      "baseRefOid": "cff39192aee6d55cd89a8def5e7058045b859a56",
+      "headRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
+      "headRefName": "issue7",
+      "headRefOid": "b039e9d8a4471f61b92d46cf94109148a485f0f4",
+      "closedAt": "2023-06-08T14:09:45Z",
+      "mergedAt": "2023-06-08T14:09:45Z",
+      "mergedBy": "gloinul",
+      "mergeCommit": {
+        "oid": "067079fbd64b22bdea0bc24b7825fd3026af3695"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOIc8XPM5XlEuk",
+          "commit": {
+            "abbreviatedOid": "1c47308"
+          },
+          "author": "gloinul",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2023-06-08T08:46:01Z",
+          "updatedAt": "2023-06-08T08:46:01Z",
+          "comments": [
+            {
+              "originalPosition": 15,
+              "body": "I think this likely can be better formulated. The core of the issue is that a restarting SCTP endpoint that want to recover the association would need to have the protection engine security context preserved over that restart so that it can send Crypto chunks which will be determined authentic with by the peer and also be capable of receiving that peers protected SCTP crypto chunks. ",
+              "createdAt": "2023-06-08T08:46:01Z",
+              "updatedAt": "2023-06-08T08:46:01Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOIc8XPM5XnoD0",
+          "commit": {
+            "abbreviatedOid": "b039e9d"
+          },
+          "author": "gloinul",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2023-06-08T14:09:38Z",
+          "updatedAt": "2023-06-08T14:09:38Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 15,
+      "id": "PR_kwDOIc8XPM5SKqQz",
+      "title": "M tuxen2",
+      "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/pull/15",
+      "state": "MERGED",
+      "author": "teiclap",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2023-06-05T08:23:57Z",
+      "updatedAt": "2023-06-08T14:07:13Z",
+      "baseRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
+      "baseRefName": "main",
+      "baseRefOid": "cff39192aee6d55cd89a8def5e7058045b859a56",
+      "headRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
+      "headRefName": "mTuxen2",
+      "headRefOid": "8bb5ff66f91ec1c12032130025b8e7d3d8b3d3fc",
+      "closedAt": "2023-06-08T14:07:01Z",
+      "mergedAt": "2023-06-08T14:07:01Z",
+      "mergedBy": "gloinul",
+      "mergeCommit": {
+        "oid": "c87669c137884df7a79197a7a35b6b6ff5dcdf49"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOIc8XPM5XlSf3",
+          "commit": {
+            "abbreviatedOid": "8bb5ff6"
+          },
+          "author": "gloinul",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "Need to discuss the \"No Supported Protection\" if that is Error or ABORT",
+          "createdAt": "2023-06-08T09:17:11Z",
+          "updatedAt": "2023-06-08T09:33:03Z",
+          "comments": [
+            {
+              "originalPosition": 16,
+              "body": "So is this really an ABORT? I think it might be an error and the INIT-ACK will simply include the error saying, although I support the Crypto chunk we have no common engines. ",
+              "createdAt": "2023-06-08T09:17:11Z",
+              "updatedAt": "2023-06-08T09:33:03Z"
+            },
+            {
+              "originalPosition": 25,
+              "body": "This is also a change from just an Error to an Abort. However, this change is likely correct as I don't see a path of continuing if the key-handshake failed. ",
+              "createdAt": "2023-06-08T09:18:55Z",
+              "updatedAt": "2023-06-08T09:33:03Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOIc8XPM5Xnmmc",
+          "commit": {
+            "abbreviatedOid": "8bb5ff6"
+          },
+          "author": "gloinul",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2023-06-08T14:06:46Z",
+          "updatedAt": "2023-06-08T14:06:46Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 18,
+      "id": "PR_kwDOIc8XPM5TMqD1",
+      "title": "Mw edits",
+      "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/pull/18",
+      "state": "MERGED",
+      "author": "gloinul",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Edits to address inconsistencies and unclarities.",
+      "createdAt": "2023-06-16T14:27:39Z",
+      "updatedAt": "2023-06-20T08:27:36Z",
+      "baseRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
+      "baseRefName": "main",
+      "baseRefOid": "4daadf450e20879d531ad2780e60dd6474360c13",
+      "headRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
+      "headRefName": "mw-edits",
+      "headRefOid": "3ac25bf73380e1969047a8f53350152e5aafcb25",
+      "closedAt": "2023-06-20T08:27:33Z",
+      "mergedAt": "2023-06-20T08:27:33Z",
+      "mergedBy": "gloinul",
+      "mergeCommit": {
+        "oid": "53ff975b4c50e975aace18dfece9e4d088b2150d"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOIc8XPM5Yijls",
+          "commit": {
+            "abbreviatedOid": "8b47fdb"
+          },
+          "author": "teiclap",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2023-06-19T05:55:38Z",
+          "updatedAt": "2023-06-19T05:55:38Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOIc8XPM5Yqre6",
+          "commit": {
+            "abbreviatedOid": "3ac25bf"
+          },
+          "author": "emanjon",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2023-06-20T08:16:58Z",
+          "updatedAt": "2023-06-20T08:16:58Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 20,
+      "id": "PR_kwDOIc8XPM5ZPiu3",
+      "title": "Issue19 - initial work",
+      "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/pull/20",
+      "state": "MERGED",
+      "author": "teiclap",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2023-08-31T14:04:09Z",
+      "updatedAt": "2023-09-08T08:41:05Z",
+      "baseRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
+      "baseRefName": "main",
+      "baseRefOid": "1be0729f4e80c97e18034c13552ca79851832308",
+      "headRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
+      "headRefName": "issue19",
+      "headRefOid": "66d8c4a5e1bd196e945313844a7ec84a0e5c4877",
+      "closedAt": "2023-09-08T08:41:05Z",
+      "mergedAt": "2023-09-08T08:41:05Z",
+      "mergedBy": "teiclap",
+      "mergeCommit": {
+        "oid": "da9a06d68f29717f4da44dcc3d12a0ca517443bf"
+      },
+      "comments": [
+        {
+          "author": "emanjon",
+          "authorAssociation": "COLLABORATOR",
+          "body": "- RFC 9260 spells association without capital A.\r\n- \u201dman-in-the-middle\u201d is not PC. Also it is not a good description of the attack. Capable attacker is better.\r\n- verification tag. Could call this INIT/INIT ACK verification tag to distinguish from the tags in DTLS.\r\n- \"If the endpoint receive an HEARTBEAT ACK within a reasonable time (at least a couple of RTTs) the restart INIT SHOULD be discarded\"\r\nI think this could be \"receive an SCTP packet\". \r\n",
+          "createdAt": "2023-09-04T11:35:36Z",
+          "updatedAt": "2023-09-04T11:35:36Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 22,
+      "id": "PR_kwDOIc8XPM5ZUGQ3",
+      "title": "Removed the state machine and all tuned the text",
+      "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/pull/22",
+      "state": "MERGED",
+      "author": "teiclap",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "It should be clean now and let implementors free to hack it as they like.",
+      "createdAt": "2023-09-01T08:00:50Z",
+      "updatedAt": "2023-09-08T08:45:25Z",
+      "baseRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
+      "baseRefName": "main",
+      "baseRefOid": "1be0729f4e80c97e18034c13552ca79851832308",
+      "headRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
+      "headRefName": "issue21",
+      "headRefOid": "595c9ebc9e101c36a10b9a2fa1df0804b786e1e5",
+      "closedAt": "2023-09-08T08:45:25Z",
+      "mergedAt": "2023-09-08T08:45:25Z",
+      "mergedBy": "teiclap",
+      "mergeCommit": {
+        "oid": "2b34cfcfa4e7d3f298fd4ea4fbafed7c431d13b1"
+      },
+      "comments": [
+        {
+          "author": "teiclap",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Hi,\r\nI\u2019ve implemented both suggestions about State Diagram and upper case Section\r\n\r\nThanks\r\n/Claudio\r\n\r\nFrom: John Preu\u00df Mattsson ***@***.***>\r\nSent: Friday, 1 September 2023 18:04\r\nTo: gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk ***@***.***>\r\nCc: Claudio Porfiri ***@***.***>; Author ***@***.***>\r\nSubject: Re: [gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk] Removed the state machine and all tuned the text (PR #22)\r\n\r\n\r\n@emanjon commented on this pull request.\r\n\r\n________________________________\r\n\r\nIn draft-westerlund-tsvwg-sctp-crypto-chunk.md<https://protect2.fireeye.com/v1/url?k=31323334-501d5122-313273af-454445555731-c9b25f6a276d5c42&q=1&e=cb752eb5-eddc-4da3-a6e5-6f7def247eb9&u=https%3A%2F%2Fgithub.com%2Fgloinul%2Fdraft-westerlund-tsvwg-sctp-crypto-chunk%2Fpull%2F22%23discussion_r1313218079>:\r\n\r\n> @@ -713,94 +714,21 @@ an ABORT chunk SHALL NOT be sent. This way non-critical errors\r\n\r\n are handled and how the protection engine will recover from\r\n\r\n these errors is being described in the Protection Engine Specifications.\r\n\r\n\r\n\r\n-# Protected SCTP State Diagram {#state-diagram}\r\n\r\n+## Integration with SCTP State Machine {#new-states}\r\n\r\nMaybe better to call it state diagram. The term \"state machine\" is not used in 9260\r\n\r\n\u2014\r\nReply to this email directly, view it on GitHub<https://protect2.fireeye.com/v1/url?k=31323334-501d5122-313273af-454445555731-abd0da8cfa6279d7&q=1&e=cb752eb5-eddc-4da3-a6e5-6f7def247eb9&u=https%3A%2F%2Fgithub.com%2Fgloinul%2Fdraft-westerlund-tsvwg-sctp-crypto-chunk%2Fpull%2F22%23pullrequestreview-1607233741>, or unsubscribe<https://protect2.fireeye.com/v1/url?k=31323334-501d5122-313273af-454445555731-947e53d9656663f1&q=1&e=cb752eb5-eddc-4da3-a6e5-6f7def247eb9&u=https%3A%2F%2Fgithub.com%2Fnotifications%2Funsubscribe-auth%2FAQE4BRZDEPYEKKCZI5LXEG3XYIBN5ANCNFSM6AAAAAA4HF32PE>.\r\nYou are receiving this because you authored the thread.Message ID: ***@***.******@***.***>>\r\n",
+          "createdAt": "2023-09-04T08:48:33Z",
+          "updatedAt": "2023-09-04T08:48:33Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOIc8XPM5fzGyt",
+          "commit": {
+            "abbreviatedOid": "7a57ff1"
+          },
+          "author": "emanjon",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2023-09-01T16:02:44Z",
+          "updatedAt": "2023-09-01T16:02:44Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "I think RFCs uses capital \"Section\"",
+              "createdAt": "2023-09-01T16:02:44Z",
+              "updatedAt": "2023-09-01T16:02:44Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOIc8XPM5fzHDN",
+          "commit": {
+            "abbreviatedOid": "7a57ff1"
+          },
+          "author": "emanjon",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2023-09-01T16:03:31Z",
+          "updatedAt": "2023-09-01T16:03:31Z",
+          "comments": [
+            {
+              "originalPosition": 31,
+              "body": "Maybe better to call it state diagram. The term \"state machine\" is not used in 9260",
+              "createdAt": "2023-09-01T16:03:31Z",
+              "updatedAt": "2023-09-01T16:03:32Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 23,
+      "id": "PR_kwDOIc8XPM5Zw8m6",
+      "title": "Fixed Issue 17",
+      "url": "https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk/pull/23",
+      "state": "MERGED",
+      "author": "teiclap",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The chunk SHUTDOWN-COMPLETE is explicit in the Shutdown Procedure now",
+      "createdAt": "2023-09-07T09:57:47Z",
+      "updatedAt": "2023-09-08T08:39:19Z",
+      "baseRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
+      "baseRefName": "main",
+      "baseRefOid": "1be0729f4e80c97e18034c13552ca79851832308",
+      "headRepository": "gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk",
+      "headRefName": "issue17",
+      "headRefOid": "5ce02da499fc8599a65d718780313807e65f29be",
+      "closedAt": "2023-09-08T08:39:19Z",
+      "mergedAt": "2023-09-08T08:39:19Z",
+      "mergedBy": "teiclap",
+      "mergeCommit": {
+        "oid": "b17aceca59236ab8da5fdd2ea196aa95d8e060f0"
+      },
+      "comments": [],
+      "reviews": []
+    }
+  ]
+}

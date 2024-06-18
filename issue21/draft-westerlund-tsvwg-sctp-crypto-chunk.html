@@ -1,0 +1,3400 @@
+<!DOCTYPE html>
+<html lang="en" class="Internet-Draft">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>Stream Control Transmission Protocol (SCTP) CRYPTO Chunk</title>
+<meta content="Magnus Westerlund" name="author">
+<meta content="John Preuß Mattsson" name="author">
+<meta content="Claudio Porfiri" name="author">
+<meta content="
+       This document describes a method for adding cryptographic protection
+to the Stream Control Transmission Protocol (SCTP). The SCTP CRYPTO
+chunk defined in this document is intended to enable communications
+privacy for applications that use SCTP as their transport protocol and
+allows applications to communicate in a way that is designed to
+prevent eavesdropping and detect tampering or message forgery. 
+       The CRYPTO chunk defined here in is one half of a complete
+solution. Where a companion specification is required to define how
+the content of the CRYPTO chunk is protected, authenticated, and
+protected against replay, as well as how key management is
+accomplished. 
+       Applications using SCTP CRYPTO chunk can use all transport
+features provided by SCTP and its extensions but with some limitations. 
+    " name="description">
+<meta content="xml2rfc 3.18.0" name="generator">
+<meta content="draft-westerlund-tsvwg-sctp-crypto-chunk-latest" name="ietf.draft">
+<!-- Generator version information:
+  xml2rfc 3.18.0
+    Python 3.11.5
+    ConfigArgParse 1.5.3
+    google-i18n-address 3.1.0
+    intervaltree 3.1.0
+    Jinja2 3.1.2
+    lxml 4.9.3
+    platformdirs 3.10.0
+    pycountry 22.3.5
+    PyYAML 6.0
+    requests 2.31.0
+    setuptools 67.7.2
+    six 1.16.0
+    wcwidth 0.2.6
+-->
+<link href="draft-westerlund-tsvwg-sctp-crypto-chunk.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Lora SemiBold'), local('Lora-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Cabin Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Cabin Condensed SemiBold'), local('CabinCondensed-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/cabincondensed-semibold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Cabin Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Cabin Condensed SemiBold'), local('CabinCondensed-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/cabincondensed-semibold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Cabin Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Cabin Condensed SemiBold'), local('CabinCondensed-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/cabincondensed-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  color-scheme: light dark;
+  --background-color: #fff;
+  --text-color: #222;
+  --title-color: #191919;
+  --link-color: #2a6496;
+  --highlight-color: #f9f9f9;
+  --line-color: #eee;
+  --pilcrow-weak: #ddd;
+  --pilcrow-strong: #bbb;
+  --small-font-size: 14.5px;
+  --font-mono: 'Oxygen Mono', monospace;
+  scrollbar-color: #bbb #eee;
+}
+body {
+  max-width: 600px;
+  margin: 75px auto;
+  padding: 0 5px;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  font: 16px/22px "Lora", serif;
+  scroll-behavior: smooth;
+}
+
+.ears {
+  display: none;
+}
+
+/* headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Cabin Condensed", sans-serif;
+  font-weight: 600;
+  margin: 0.8em 0 0.3em;
+  font-size-adjust: 0.5;
+  color: var(--title-color);
+}
+h1#title {
+  font-size: 32px;
+  line-height: 40px;
+  clear: both;
+}
+h1#title, h1#rfcnum {
+  margin: 1.5em 0 0.2em;
+}
+h1#rfcnum + h1#title {
+  margin: 0.2em 0;
+}
+
+h1, h2, h3 {
+  font-size: 22px;
+  line-height: 27px;
+}
+h4, h5, h6 {
+  font-size: 20px;
+  line-height: 24px;
+}
+
+/* general structure */
+.author {
+  padding-bottom: 0.3em;
+}
+#abstract+p {
+  font-size: 18px;
+  line-height: 24px;
+}
+#abstract+p code, #abstract+p samp, #abstract+p tt {
+  font-size: 16px;
+  line-height: 0;
+}
+
+p {
+  padding: 0;
+  margin: 0.5em 0;
+  text-align: left;
+}
+div {
+  margin: 0;
+}
+.alignRight.art-text {
+  background-color: var(--highlight-color);
+  border: 1px solid var(--line-color);
+  border-radius: 3px;
+  padding: 0.5em 1em 0;
+  margin-bottom: 0.5em;
+}
+.alignRight.art-text pre {
+  padding: 0;
+  width: auto;
+}
+.alignRight {
+  margin: 1em 0;
+}
+.alignRight > *:first-child {
+  border: none;
+  margin: 0;
+  float: right;
+  clear: both;
+}
+.alignRight > *:nth-child(2) {
+  clear: both;
+  display: block;
+  border: none;
+}
+svg {
+  display: block;
+}
+/* font-family isn't space-separated, but =~ will have to do */
+svg[font-family~="monospace" i], svg [font-family~="monospace" i] {
+  font-family: var(--font-mono);
+}
+.alignCenter.art-text {
+  background-color: var(--highlight-color);
+  border: 1px solid var(--line-color);
+  border-radius: 3px;
+  padding: 0.5em 1em 0;
+  margin-bottom: 0.5em;
+}
+.alignCenter.art-text pre {
+  padding: 0;
+  width: auto;
+}
+.alignCenter {
+  margin: 1em 0;
+}
+.alignCenter > *:first-child {
+  border: none;
+  /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+     support flexbox yet.
+  */
+  display: table;
+  margin: 0 auto;
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 0.5em 2em;
+}
+:is(ol, ul) :is(ol, ul) {
+  margin-left: 1em;
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+.ulCompact li {
+  margin: 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+}
+ul.empty li, .ulEmpty li {
+  margin-top: 0.5em;
+}
+:is(ul, ol).compact, .ulCompact, .olCompact {
+  line-height: 1;
+  margin: 0 0 0 2em;
+}
+
+/* definition lists */
+dl {
+  clear: left;
+  --indent: 3ch;
+  /* --indent: attr(indent ch); not supported in any browser, but we can dream */
+}
+dl.olPercent {
+  --indent: 5ch;
+}
+dl > dt {
+  float: left;
+  margin-right: 2ch;
+  min-width: 8ch;
+}
+dl.dlNewline > dt {
+  float: none;
+}
+dl > dd {
+  margin-bottom: .8em;
+  margin-left: var(--indent) !important; /* stupid element overrides */
+  min-height: 2ex;
+}
+dl.olPercent > dt {
+  min-width: calc(var(--indent) - 2ch);
+}
+:is(dl.compact, .dlCompact) > dd {
+  margin-bottom: 0;
+}
+:is(dl.compact, .dlCompact) > dd > :is(:first-child, .break:first-child + *) {
+  margin-top: 0;
+}
+:is(dl.compact, .dlCompact) > dd > :is(:last-child) {
+  margin-bottom: 0;
+}
+dl > dd > dl {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+}
+:is(dd, span).break {
+  display: none;
+}
+
+/* links */
+a, a[href].selfRef:hover {
+  text-decoration: none;
+}
+a[href] {
+  color: var(--link-color);
+}
+a[href].selfRef, .iref + a[href].internal {
+  color: var(--text-color);
+}
+a[href]:hover {
+  text-decoration: underline;
+}
+a[href].selfRef:hover {
+  background-color: var(--highlight-color);
+}
+a.xref:is(.cite, .auto), :is(#status-of-memo, #copyright) a {
+  white-space: nowrap;
+}
+
+/* Figures */
+tt, code, pre {
+  background-color: var(--highlight-color);
+  font: 14px/22px var(--font-mono);
+}
+tt, code {
+  /* changing the font for inline elements leads to different ascender
+     and descender heights; as we want to retain baseline alignment,
+     remove leading to avoid altering the final height of lines
+     note: this fails if these blocks take an entire line,
+     a different solution would be great */
+  line-height: 0;
+}
+:is(h1, h2, h3, h4, h5, h6) :is(tt, code) {
+  font-size: 84%;
+}
+pre {
+  border: 1px solid var(--line-color);
+  font-size: 13.5px;
+  line-height: 16px;
+  letter-spacing: -0.2px;
+  margin: 5px;
+  padding: 5px;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0.5em 0;
+  padding: 0;
+}
+figure blockquote {
+  margin: 0.8em 0.4em 0.4em;
+}
+figcaption, caption {
+  font-style: italic;
+  margin: 0.5em 1.5em;
+  text-align: left;
+}
+@media screen {
+  /* Auto-collapse boilerplate. */
+  :is(#status-of-memo, #copyright) p {
+    margin: -2px 0;
+    max-height: 0;
+    transition: max-height 2s ease, margin 0.5s ease 0.5s;
+    overflow: hidden;
+  }
+  :is(#status-of-memo, #copyright):hover p,
+  :is(#status-of-memo, #copyright) h2:target ~ p {
+    margin: 0.5em 0;
+    max-height: 500px;
+    overflow: auto;
+  }
+  pre, svg {
+    display: inline-block;
+    overflow-x: auto;
+  }
+  pre {
+    max-width: 100%;
+    width: calc(100% - 22px - 1em);
+  }
+  svg {
+    max-width: calc(100% - 22px - 1em);
+  }
+  figure pre {
+    display: block;
+    width: calc(100% - 25px);
+  }
+  :is(pre, svg) + .pilcrow {
+    display: inline-block;
+    vertical-align: text-bottom;
+    padding-bottom: 8px;
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 0 2em;
+  font-style: italic;
+}
+blockquote {
+  margin: 1em 0;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+
+/* tables */
+table {
+  max-width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+}
+table.right {
+  margin-left: auto;
+}
+table.center {
+  margin-left: auto;
+  margin-right: auto;
+}
+table.left {
+  margin-right: auto;
+}
+thead, tbody {
+  border: 1px solid var(--line-color);
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 5px 10px;
+}
+th {
+  background-color: var(--line-color);
+}
+:is(tr:nth-child(2n), thead+tbody > tr:nth-child(2n+1)) > td {
+  background-color: var(--background-color);
+}
+:is(tr:nth-child(2n+1), thead+tbody > tr:nth-child(2n)) > td {
+  background-color: var(--highlight-color);
+}
+table caption {
+  margin: 0;
+  padding: 3px 0 3px 1em;
+}
+table p {
+  margin: 0;
+}
+
+/* pilcrow */
+a.pilcrow {
+  margin-left: 3px;
+  opacity: 0.2;
+  user-select: none;
+}
+a.pilcrow[href] { color: var(--pilcrow-weak); }
+a.pilcrow[href]:hover { text-decoration: none; }
+@media not print {
+  :hover > a.pilcrow {
+    opacity: 1;
+  }
+  a.pilcrow[href]:hover {
+    color: var(--pilcrow-strong);
+    background-color: transparent;
+  }
+}
+@media print {
+  a.pilcrow {
+    display: none;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid var(--line-color);
+}
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: 600;
+  font-size: var(--small-font-size);
+}
+.role {
+  font-variant: all-small-caps;
+}
+sub, sup {
+  line-height: 1;
+  font-size: 80%;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: var(--small-font-size);
+  line-height: 18px;
+  --identifier-width: 15ch;
+}
+#identifiers dt {
+  width: var(--identifier-width);
+  min-width: var(--identifier-width);
+  clear: left;
+  float: left;
+  text-align: right;
+  margin-right: 1ch;
+}
+#identifiers dd {
+  margin: 0;
+  margin-left: calc(1em + var(--identifier-width)) !important;
+  min-width: 5em;
+}
+#identifiers .authors .author {
+  display: inline-block;
+  margin-right: 1.5em;
+}
+#identifiers .authors .org {
+  font-style: italic;
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #999;
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+}
+.docInfo .prepared {
+  float: left;
+}
+.docInfo .prepared {
+  float: right;
+}
+
+/* table of contents */
+#toc {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+}
+#toc nav ul {
+  margin: 0 0.5em 0 0;
+  padding: 0;
+  list-style: none;
+}
+#toc nav li {
+  line-height: 1.3em;
+  margin: 0.75em 0;
+  padding-left: 1.2em;
+  text-indent: -1.2em;
+}
+#toc a.xref {
+  white-space: normal;
+}
+/* references */
+.references dt {
+  text-align: right;
+  font-weight: bold;
+  min-width: 10ch;
+  margin-right: 1.5ch;
+}
+.references dt:target::before {
+  content: "⇒";
+  width: 15px;
+  margin: 0 10px 0 -25px;
+}
+.references dd {
+  margin-left: 12ch !important;
+  overflow: auto;
+}
+
+.refInstance {
+  margin-bottom: 1.25em;
+}
+
+.references .ascii {
+  margin-bottom: 0.25em;
+}
+
+/* index */
+#rfc\.index\.index + ul {
+  margin-left: 0;
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  margin: 1em 0;
+}
+address.vcard .nameRole {
+  font-weight: 700;
+  margin-left: 0;
+}
+address.vcard .label {
+  margin: 0.5em 0;
+}
+address.vcard .type {
+  display: none;
+}
+.alternative-contact {
+  margin: 1.5em 0 1em;
+}
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+@media (min-width: 500px) {
+  #authors-addresses > section {
+    column-count: 2;
+    column-gap: 20px;
+  }
+  #authors-addresses > section > h2 {
+    column-span: all;
+  }
+  /* hack for break-inside: avoid-column */
+  #authors-addresses address {
+    display: inline-block;
+    break-inside: avoid-column;
+  }
+}
+
+.rfcEditorRemove p:first-of-type {
+  font-style: italic;
+}
+.cref {
+  background-color: rgba(249, 232, 105, 0.3);
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+/* alternative layout for smaller screens */
+@media screen and (max-width: 929px) {
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 0;
+    margin: 0;
+    border-bottom: 1px solid #ccc;
+    opacity: 0.6;
+  }
+  #toc.active {
+      opacity: 1;
+  }
+  #toc h2 {
+    margin: 0;
+    padding: 2px 0 2px 6px;
+    padding-right: 1em;
+    font-size: 18px;
+    line-height: 24px;
+    min-width: 190px;
+    text-align: right;
+    background-color: #444;
+    color: white;
+    cursor: pointer;
+  }
+  #toc h2::before { /* css hamburger */
+    float: right;
+    position: relative;
+    width: 1em;
+    height: 1px;
+    left: -164px;
+    margin: 8px 0 0 0;
+    background: white none repeat scroll 0 0;
+    box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+    content: "";
+  }
+  #toc nav {
+    display: none;
+    background-color: var(--background-color);
+    padding: 0.5em 1em 1em;
+    overflow: auto;
+    overscroll-behavior: contain;
+    height: calc(100vh - 48px);
+    border-left: 1px solid #ddd;
+  }
+  #toc.active nav {
+    display: block;
+  }
+  /* Make the collapsed ToC header render white on gray also when it's a link */
+  #toc h2 a,
+  #toc h2 a:link,
+  #toc h2 a:focus,
+  #toc h2 a:hover,
+  #toc a.toplink,
+  #toc a.toplink:hover {
+    color: white;
+    background-color: #444;
+    text-decoration: none;
+  }
+  #toc a.toplink {
+    margin-top: 2px;
+  }
+}
+
+/* alternative layout for wide screens */
+@media screen and (min-width: 930px) {
+  body {
+    padding-right: 360px;
+    padding-right: calc(min(180px + 20%, 500px));
+  }
+  #toc {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    right: calc(50vw - 480px);
+    width: 312px;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
+  }
+  #toc h2 {
+    margin: 0;
+    padding: 0.25em 1em 1em 0;
+  }
+  #toc nav {
+    display: block;
+    height: calc(90vh - 84px);
+    bottom: 0;
+    padding: 0.5em 0 2em;
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+  #toc nav > ul  {
+    margin-bottom: 2em;
+  }
+  #toc ul {
+    margin: 0 0 0 4px;
+    font-size: var(--small-font-size);
+  }
+  #toc ul :is(p, li) {
+    margin: 2px 0;
+    line-height: 22px;
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc, #n-introduction {
+    page-break-before: always;
+  }
+  #toc {
+    border-top: none;
+    padding-top: 0;
+  }
+  figure, pre {
+    page-break-inside: avoid;
+  }
+  figure {
+    overflow: scroll;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  h2+*, h3+*, h4+*, h5+*, h6+* {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+}
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+}
+
+/* Changes introduced to fix issues found during implementation */
+
+/* Separate body from document info even without intervening H1 */
+section {
+  clear: both;
+}
+
+/* Top align author divs, to avoid names without organization dropping level with org names */
+.author {
+  vertical-align: top;
+}
+
+/* Style section numbers with more space between number and title */
+.section-number {
+  padding-right: 0.5em;
+}
+
+/* Add styling for a link in the ToC that points to the top of the document */
+a.toplink {
+  float: right;
+  margin: 8px 0.5em 0;
+}
+
+/* Provide styling for table cell text alignment */
+table .text-left {
+  text-align: left;
+}
+table .text-center {
+  text-align: center;
+}
+table .text-right {
+  text-align: right;
+}
+
+/* Make the alternative author contact information look less like just another
+   author, and group it closer with the primary author contact information */
+.alternative-contact {
+  margin: 0.5em 0 0.25em 0;
+}
+address .non-ascii {
+  margin: 0 0 0 2em;
+}
+
+/* With it being possible to set tables with alignment
+  left, center, and right, { width: 100%; } does not make sense */
+table {
+  width: auto;
+}
+
+/* Avoid reference text that sits in a block with very wide left margin,
+   because of a long floating dt label.*/
+.references dd {
+  overflow: visible;
+}
+
+/* Control caption placement */
+caption {
+  caption-side: bottom;
+}
+
+/* Limit the width of the author address vcard, so names in right-to-left
+   script don't end up on the other side of the page. */
+
+address.vcard {
+  max-width: 20em;
+  margin-right: auto;
+}
+
+/* For address alignment dependent on LTR or RTL scripts */
+address div.left {
+  text-align: left;
+}
+address div.right {
+  text-align: right;
+}
+
+/* Give the table caption label the same styling as the figcaption */
+
+@media print {
+  .toplink {
+    display: none;
+  }
+
+  /* avoid overwriting the top border line with the ToC header */
+  #toc {
+    padding-top: 1px;
+  }
+
+  /* Avoid page breaks inside dl and author address entries */
+  dd {
+    page-break-before: avoid;
+  }
+  .vcard {
+    page-break-inside: avoid;
+  }
+
+}
+
+/* Dark mode. */
+@media (prefers-color-scheme: dark) {
+:root {
+  --background-color: #121212;
+  --text-color: #f0f0f0;
+  --title-color: #fff;
+  --link-color: #4da4f0;
+  --highlight-color: #282828;
+  --line-color: #444;
+  --pilcrow-weak: #444;
+  --pilcrow-strong: #666;
+  scrollbar-color: #777 #333;
+}
+}
+
+/* SVG Trick: a prefix match works because only black and white are allowed */
+svg :is([stroke="black"], [stroke^="#000"]) {
+  stroke: var(--text-color);
+}
+svg :is([stroke="white"], [stroke^="#fff"]) {
+  stroke: var(--background-color);
+}
+svg :is([fill="black"], [fill^="#000"], :not([fill])) {
+  fill: var(--text-color);
+}
+svg :is([fill="white"], [fill^="#fff"]) {
+  fill: var(--background-color);
+}
+</style>
+
+</head>
+<body class="xml2rfc">
+<table class="ears">
+<thead><tr>
+<td class="left">Internet-Draft</td>
+<td class="center">SCTP CRYPTO Chunk</td>
+<td class="right">September 2023</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Westerlund, et al.</td>
+<td class="center">Expires 10 March 2024</td>
+<td class="right">[Page]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-workgroup">Workgroup:</dt>
+<dd class="workgroup">TSVWG</dd>
+<dt class="label-internet-draft">Internet-Draft:</dt>
+<dd class="internet-draft">draft-westerlund-tsvwg-sctp-crypto-chunk-latest</dd>
+<dt class="label-published">Published:</dt>
+<dd class="published">
+<time datetime="2023-09-07" class="published">7 September 2023</time>
+    </dd>
+<dt class="label-intended-status">Intended Status:</dt>
+<dd class="intended-status">Standards Track</dd>
+<dt class="label-expires">Expires:</dt>
+<dd class="expires"><time datetime="2024-03-10">10 March 2024</time></dd>
+<dt class="label-authors">Authors:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">M. Westerlund</div>
+<div class="org">Ericsson</div>
+</div>
+<div class="author">
+      <div class="author-name">J. Preuß Mattsson</div>
+<div class="org">Ericsson</div>
+</div>
+<div class="author">
+      <div class="author-name">C. Porfiri</div>
+<div class="org">Ericsson</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="title">Stream Control Transmission Protocol (SCTP) CRYPTO Chunk</h1>
+<section id="section-abstract">
+      <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
+<p id="section-abstract-1">This document describes a method for adding cryptographic protection
+to the Stream Control Transmission Protocol (SCTP). The SCTP CRYPTO
+chunk defined in this document is intended to enable communications
+privacy for applications that use SCTP as their transport protocol and
+allows applications to communicate in a way that is designed to
+prevent eavesdropping and detect tampering or message forgery.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-2">The CRYPTO chunk defined here in is one half of a complete
+solution. Where a companion specification is required to define how
+the content of the CRYPTO chunk is protected, authenticated, and
+protected against replay, as well as how key management is
+accomplished.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
+<p id="section-abstract-3">Applications using SCTP CRYPTO chunk can use all transport
+features provided by SCTP and its extensions but with some limitations.<a href="#section-abstract-3" class="pilcrow">¶</a></p>
+</section>
+<section class="note rfcEditorRemove" id="section-note.1">
+      <h2 id="name-about-this-document">
+<a href="#name-about-this-document" class="section-name selfRef">About This Document</a>
+      </h2>
+<p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
+<p id="section-note.1-2">
+        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-westerlund-tsvwg-sctp-crypto-chunk/">https://datatracker.ietf.org/doc/draft-westerlund-tsvwg-sctp-crypto-chunk/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+<p id="section-note.1-3">
+        Discussion of this document takes place on the
+        Transport Area Working Group (tsvwg) Working Group mailing list (<span><a href="mailto:tsvwg@ietf.org">mailto:tsvwg@ietf.org</a></span>),
+        which is archived at <span><a href="https://mailarchive.ietf.org/arch/browse/tsvwg/">https://mailarchive.ietf.org/arch/browse/tsvwg/</a></span>.
+        Subscribe at <span><a href="https://www.ietf.org/mailman/listinfo/tsvwg/">https://www.ietf.org/mailman/listinfo/tsvwg/</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+<p id="section-note.1-4">Source for this draft and an issue tracker can be found at
+        <span><a href="https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk">https://github.com/gloinul/draft-westerlund-tsvwg-sctp-crypto-chunk</a></span>.<a href="#section-note.1-4" class="pilcrow">¶</a></p>
+</section>
+<div id="status-of-memo">
+<section id="section-boilerplate.1">
+        <h2 id="name-status-of-this-memo">
+<a href="#name-status-of-this-memo" class="section-name selfRef">Status of This Memo</a>
+        </h2>
+<p id="section-boilerplate.1-1">
+        This Internet-Draft is submitted in full conformance with the
+        provisions of BCP 78 and BCP 79.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-2">
+        Internet-Drafts are working documents of the Internet Engineering Task
+        Force (IETF). Note that other groups may also distribute working
+        documents as Internet-Drafts. The list of current Internet-Drafts is
+        at <span><a href="https://datatracker.ietf.org/drafts/current/">https://datatracker.ietf.org/drafts/current/</a></span>.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-3">
+        Internet-Drafts are draft documents valid for a maximum of six months
+        and may be updated, replaced, or obsoleted by other documents at any
+        time. It is inappropriate to use Internet-Drafts as reference
+        material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-4">
+        This Internet-Draft will expire on 10 March 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="copyright">
+<section id="section-boilerplate.2">
+        <h2 id="name-copyright-notice">
+<a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+        </h2>
+<p id="section-boilerplate.2-1">
+            Copyright (c) 2023 IETF Trust and the persons identified as the
+            document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.2-2">
+            This document is subject to BCP 78 and the IETF Trust's Legal
+            Provisions Relating to IETF Documents
+            (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>) in effect on the date of
+            publication of this document. Please review these documents
+            carefully, as they describe your rights and restrictions with
+            respect to this document. Code Components extracted from this
+            document must include Revised BSD License text as described in
+            Section 4.e of the Trust Legal Provisions and are provided without
+            warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
+        </h2>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-overview" class="internal xref">Overview</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.1">
+                <p id="section-toc.1-1.2.2.1.1" class="keepWithNext"><a href="#section-2.1" class="auto internal xref">2.1</a>.  <a href="#name-protocol-overview" class="internal xref">Protocol Overview</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.2">
+                <p id="section-toc.1-1.2.2.2.1" class="keepWithNext"><a href="#section-2.2" class="auto internal xref">2.2</a>.  <a href="#name-protection-engines-consider" class="internal xref">Protection Engines Considerations</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.3">
+                <p id="section-toc.1-1.2.2.3.1"><a href="#section-2.3" class="auto internal xref">2.3</a>.  <a href="#name-sctp-crypto-chunk-buffering" class="internal xref">SCTP CRYPTO Chunk Buffering and Flow Control</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.4">
+                <p id="section-toc.1-1.2.2.4.1"><a href="#section-2.4" class="auto internal xref">2.4</a>.  <a href="#name-pmtu-considerations" class="internal xref">PMTU Considerations</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.5">
+                <p id="section-toc.1-1.2.2.5.1"><a href="#section-2.5" class="auto internal xref">2.5</a>.  <a href="#name-congestion-control-consider" class="internal xref">Congestion Control Considerations</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.6">
+                <p id="section-toc.1-1.2.2.6.1"><a href="#section-2.6" class="auto internal xref">2.6</a>.  <a href="#name-icmp-considerations" class="internal xref">ICMP Considerations</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.7">
+                <p id="section-toc.1-1.2.2.7.1"><a href="#section-2.7" class="auto internal xref">2.7</a>.  <a href="#name-path-selection-consideratio" class="internal xref">Path Selection Considerations</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.8">
+                <p id="section-toc.1-1.2.2.8.1"><a href="#section-2.8" class="auto internal xref">2.8</a>.  <a href="#name-dynamic-address-reconfigura" class="internal xref">Dynamic Address Reconfiguration Considerations</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.9">
+                <p id="section-toc.1-1.2.2.9.1"><a href="#section-2.9" class="auto internal xref">2.9</a>.  <a href="#name-sctp-restart-considerations" class="internal xref">SCTP Restart Considerations</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-conventions" class="internal xref">Conventions</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-new-parameter-type" class="internal xref">New Parameter Type</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-protected-association-param" class="internal xref">Protected Association Parameter</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-new-chunk-types" class="internal xref">New Chunk Types</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-crypto-chunk-crypto" class="internal xref">Crypto Chunk (CRYPTO)</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-protected-association-paramet" class="internal xref">Protected Association Parameter Validation Chunk (PVALID)</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-error-handling" class="internal xref">Error Handling</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-mandatory-protected-associa" class="internal xref">Mandatory Protected Association Parameter Missing</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-error-in-protection" class="internal xref">Error in Protection</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2.2.1">
+                    <p id="section-toc.1-1.6.2.2.2.1.1"><a href="#section-6.2.1" class="auto internal xref">6.2.1</a>.  <a href="#name-no-supported-protection-eng" class="internal xref">No Supported Protection Engine</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2.2.2">
+                    <p id="section-toc.1-1.6.2.2.2.2.1"><a href="#section-6.2.2" class="auto internal xref">6.2.2</a>.  <a href="#name-error-during-protection-han" class="internal xref">Error During Protection Handshake</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2.2.3">
+                    <p id="section-toc.1-1.6.2.2.2.3.1"><a href="#section-6.2.3" class="auto internal xref">6.2.3</a>.  <a href="#name-failure-in-protection-engin" class="internal xref">Failure in Protection Engines Validation</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2.2.4">
+                    <p id="section-toc.1-1.6.2.2.2.4.1"><a href="#section-6.2.4" class="auto internal xref">6.2.4</a>.  <a href="#name-timeout-during-protection-h" class="internal xref">Timeout During Protection Handshake or Validation</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3">
+                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-critical-error-from-protect" class="internal xref">Critical Error from Protection Engine</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.4">
+                <p id="section-toc.1-1.6.2.4.1"><a href="#section-6.4" class="auto internal xref">6.4</a>.  <a href="#name-non-critical-error-in-the-p" class="internal xref">Non-critical Error in the Protection Engine</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-procedures" class="internal xref">Procedures</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
+                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-establishment-of-a-protecte" class="internal xref">Establishment of a Protected Association</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
+                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-termination-of-a-protected-" class="internal xref">Termination of a Protected Association</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3">
+                <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="auto internal xref">7.3</a>.  <a href="#name-protection-initialization-s" class="internal xref">Protection Initialization State Machine</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.4">
+                <p id="section-toc.1-1.7.2.4.1"><a href="#section-7.4" class="auto internal xref">7.4</a>.  <a href="#name-considerations-on-key-manag" class="internal xref">Considerations on Key Management</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.5">
+                <p id="section-toc.1-1.7.2.5.1"><a href="#section-7.5" class="auto internal xref">7.5</a>.  <a href="#name-consideration-on-t-valid" class="internal xref">Consideration on T-valid</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-protected-data-chunk-handli" class="internal xref">Protected Data Chunk Handling</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
+                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-protected-data-chunk-transm" class="internal xref">Protected Data Chunk Transmission</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
+                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-protected-data-chunk-recept" class="internal xref">Protected Data Chunk Reception</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2.2.1">
+                    <p id="section-toc.1-1.8.2.2.2.1.1"><a href="#section-8.2.1" class="auto internal xref">8.2.1</a>.  <a href="#name-sctp-header-handler" class="internal xref">SCTP Header Handler</a></p>
+</li>
+                </ul>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
+                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="auto internal xref">9.1</a>.  <a href="#name-protection-engine-identifie" class="internal xref">Protection Engine Identifier Registry</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
+                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-protection-error-cause-code" class="internal xref">Protection Error Cause Codes Registry</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.3">
+                <p id="section-toc.1-1.9.2.3.1"><a href="#section-9.3" class="auto internal xref">9.3</a>.  <a href="#name-sctp-chunk-types" class="internal xref">SCTP Chunk Types</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.4">
+                <p id="section-toc.1-1.9.2.4.1"><a href="#section-9.4" class="auto internal xref">9.4</a>.  <a href="#name-sctp-chunk-parameter-types" class="internal xref">SCTP Chunk Parameter Types</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.5">
+                <p id="section-toc.1-1.9.2.5.1"><a href="#section-9.5" class="auto internal xref">9.5</a>.  <a href="#name-sctp-error-cause-codes" class="internal xref">SCTP Error Cause Codes</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.6">
+                <p id="section-toc.1-1.9.2.6.1"><a href="#section-9.6" class="auto internal xref">9.6</a>.  <a href="#name-sctp-payload-protocol-ident" class="internal xref">SCTP Payload Protocol Identifier</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.1">
+                <p id="section-toc.1-1.10.2.1.1"><a href="#section-10.1" class="auto internal xref">10.1</a>.  <a href="#name-privacy-considerations" class="internal xref">Privacy Considerations</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.2">
+                <p id="section-toc.1-1.10.2.2.1"><a href="#section-10.2" class="auto internal xref">10.2</a>.  <a href="#name-downgrade-attacks" class="internal xref">Downgrade Attacks</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
+            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-requirements-towards-the-pr" class="internal xref">Requirements Towards the Protection Engines</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
+            <p id="section-toc.1-1.12.1"><a href="#section-12" class="auto internal xref">12</a>. <a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
+            <p id="section-toc.1-1.13.1"><a href="#section-13" class="auto internal xref">13</a>. <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.1">
+                <p id="section-toc.1-1.13.2.1.1"><a href="#section-13.1" class="auto internal xref">13.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.2">
+                <p id="section-toc.1-1.13.2.2.1"><a href="#section-13.2" class="auto internal xref">13.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
+            <p id="section-toc.1-1.14.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<div id="introduction">
+<section id="section-1">
+      <h2 id="name-introduction">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
+      </h2>
+<p id="section-1-1">This document defines a CRYPTO chunk for the Stream Control
+   Transmission Protocol (SCTP), as defined in <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">This specification defines the actual CRYPTO chunk. How to enable
+   it usage, how it interacts with the SCTP association establishment
+   to enable endpoint authentication, key-establishment, and other
+   features require a separate protection engine specification.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">This specification is intended to be capable of enabling mutual
+   authentication of endpoints, data confidentiality, data origin
+   authentication, data integrity protection, and data replay
+   protection for SCTP packets after the SCTP association has been
+   established. The exact properties will depend on the companion
+   specification defining the protection engine used with the CRYPTO
+   chunk. The protection engine specification might be based on an
+   existing security protocol.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">Applications using SCTP CRYPTO chunk can use most transport features
+   provided by SCTP and its extensions. However, there can be some
+   limitations or additional requirements for them to function such as
+   those noted for SCTP restart and use of Dynamic Address
+   Reconfiguration, see <a href="#sec-asconf" class="auto internal xref">Section 2.8</a> and <a href="#sec-restart" class="auto internal xref">Section 2.9</a>. Due to its
+   level of integration as discussed in next section it will provide
+   its security functions on all content of the SCTP packet, and will
+   thus not impact the potential to utilize any SCTP functionalities
+   or extensions that are possible to use between two SCTP peers with
+   full security and SCTP association state.<a href="#section-1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="overview">
+<section id="section-2">
+      <h2 id="name-overview">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-overview" class="section-name selfRef">Overview</a>
+      </h2>
+<div id="protocol-overview">
+<section id="section-2.1">
+        <h3 id="name-protocol-overview">
+<a href="#section-2.1" class="section-number selfRef">2.1. </a><a href="#name-protocol-overview" class="section-name selfRef">Protocol Overview</a>
+        </h3>
+<p id="section-2.1-1">The CRYPTO chunk is defined as a method for secure and confidential
+transfer for SCTP packets.  This is implemented inside the SCTP
+protocol, in a sublayer between the SCTP common header handling and
+the SCTP chunk handling.  Once an SCTP packet has been received and
+the SCTP common header has been used to identify the SCTP association,
+the CRYPTO chunk is sent to the chosen protection engine that will
+return the SCTP payload containing the unprotected SCTP chunks, those
+chunks will then be handled according to their SCTP protocol
+specifications. <a href="#sctp-Crypto-chunk-layering" class="auto internal xref">Figure 1</a> illustrates the CRYPTO
+chunk layering in regard to SCTP and the Upper Layer Protocol (ULP).<a href="#section-2.1-1" class="pilcrow">¶</a></p>
+<span id="name-crypto-chunk-layering-in-re"></span><div id="sctp-Crypto-chunk-layering">
+<figure id="figure-1">
+          <div id="section-2.1-2.1">
+            <div class="alignCenter art-svg artwork" id="section-2.1-2.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="352" width="448" viewBox="0 0 448 352" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 8,32 L 8,336" fill="none" stroke="black"></path>
+                <path d="M 136,32 L 136,96" fill="none" stroke="black"></path>
+                <path d="M 152,32 L 152,96" fill="none" stroke="black"></path>
+                <path d="M 184,96 L 184,336" fill="none" stroke="black"></path>
+                <path d="M 224,208 L 224,272" fill="none" stroke="black"></path>
+                <path d="M 320,32 L 320,96" fill="none" stroke="black"></path>
+                <path d="M 400,208 L 400,272" fill="none" stroke="black"></path>
+                <path d="M 440,80 L 440,224" fill="none" stroke="black"></path>
+                <path d="M 8,32 L 136,32" fill="none" stroke="black"></path>
+                <path d="M 152,32 L 320,32" fill="none" stroke="black"></path>
+                <path d="M 320,64 L 424,64" fill="none" stroke="black"></path>
+                <path d="M 8,96 L 320,96" fill="none" stroke="black"></path>
+                <path d="M 336,128 L 352,128" fill="none" stroke="black"></path>
+                <path d="M 200,176 L 216,176" fill="none" stroke="black"></path>
+                <path d="M 8,208 L 184,208" fill="none" stroke="black"></path>
+                <path d="M 224,208 L 400,208" fill="none" stroke="black"></path>
+                <path d="M 192,240 L 216,240" fill="none" stroke="black"></path>
+                <path d="M 408,240 L 424,240" fill="none" stroke="black"></path>
+                <path d="M 8,272 L 184,272" fill="none" stroke="black"></path>
+                <path d="M 224,272 L 400,272" fill="none" stroke="black"></path>
+                <path d="M 200,304 L 216,304" fill="none" stroke="black"></path>
+                <path d="M 8,336 L 184,336" fill="none" stroke="black"></path>
+                <path d="M 184,272 L 200,304" fill="none" stroke="black"></path>
+                <path d="M 320,96 L 336,128" fill="none" stroke="black"></path>
+                <path d="M 184,208 L 200,176" fill="none" stroke="black"></path>
+                <path d="M 424,64 C 432.83064,64 440,71.16936 440,80" fill="none" stroke="black"></path>
+                <path d="M 424,240 C 432.83064,240 440,232.83064 440,224" fill="none" stroke="black"></path>
+                <polygon class="arrowhead" points="416,240 404,234.4 404,245.6" fill="black" transform="rotate(180,408,240)"></polygon>
+                <polygon class="arrowhead" points="224,240 212,234.4 212,245.6" fill="black" transform="rotate(0,216,240)"></polygon>
+                <polygon class="arrowhead" points="200,240 188,234.4 188,245.6" fill="black" transform="rotate(180,192,240)"></polygon>
+                <g class="text">
+                  <text x="204" y="52">Protection</text>
+                  <text x="276" y="52">Engine</text>
+                  <text x="356" y="52">Keys</text>
+                  <text x="72" y="68">ULP</text>
+                  <text x="192" y="84">Key</text>
+                  <text x="252" y="84">Management</text>
+                  <text x="380" y="116">User</text>
+                  <text x="384" y="132">Level</text>
+                  <text x="36" y="148">SCTP</text>
+                  <text x="84" y="148">Chunks</text>
+                  <text x="144" y="148">Handler</text>
+                  <text x="396" y="148">Messages</text>
+                  <text x="244" y="180">SCTP</text>
+                  <text x="312" y="180">Unprotected</text>
+                  <text x="392" y="180">Payload</text>
+                  <text x="100" y="228">CRYPTO</text>
+                  <text x="276" y="228">Protection</text>
+                  <text x="348" y="228">Engine</text>
+                  <text x="96" y="244">Chunk</text>
+                  <text x="96" y="260">Handler</text>
+                  <text x="276" y="260">Protection</text>
+                  <text x="356" y="260">Operator</text>
+                  <text x="36" y="308">SCTP</text>
+                  <text x="84" y="308">Header</text>
+                  <text x="144" y="308">Handler</text>
+                  <text x="244" y="308">SCTP</text>
+                  <text x="304" y="308">Protected</text>
+                  <text x="376" y="308">Payload</text>
+                </g>
+              </svg><a href="#section-2.1-2.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
+<a href="#name-crypto-chunk-layering-in-re" class="selfRef">CRYPTO Chunk Layering in Regard to SCTP and ULP</a>
+          </figcaption></figure>
+</div>
+<p id="section-2.1-3">Use of the CRYPTO chunk is defined per SCTP association and a SCTP
+association uses a single protection engine. Different associations
+within the same SCTP endpoint may use or not use the CRYPTO chunk, and
+different associations may use different protection engines.<a href="#section-2.1-3" class="pilcrow">¶</a></p>
+<p id="section-2.1-4">On the outgoing direction, once the SCTP stack has created the
+unprotected SCTP packet payload containing control and/or DATA chunks,
+that payload will be sent to the protection engine to be
+protected. The format of the protected payload depends on the
+protection engine but the unprotected payload will typically be
+encrypted and integrity tagged before being encapsulated in a CRYPTO
+chunk.<a href="#section-2.1-4" class="pilcrow">¶</a></p>
+<p id="section-2.1-5">The SCTP protection engine performs protection operations on the whole
+unprotected SCTP packet payload, i.e., all chunks after the SCTP
+common header. Information protection is kept during the lifetime of
+the association and no information is sent unprotected except than the
+initial SCTP handshake, the SCTP common header, the SCTP CRYPTO chunk
+header and the SHUTDOWN-COMPLETE chunk.<a href="#section-2.1-5" class="pilcrow">¶</a></p>
+<p id="section-2.1-6">SCTP CRYPTO chunk capability is agreed by the peers at the
+initialization of the SCTP association, during that phase the peers
+exchange information about the protection engines available. Once the
+SCTP association is established and the peers have agreed on what
+protection to use, the SCTP endpoints may start sending Protection
+Engine's payloads in SCTP DATA chunks containing the initialization
+information related to the protection engine including key agreement
+and endpoint authentication. This is depending on the chosen
+protection engine thus is not being detailed in the current
+specification and may be done out-of-band of the SCTP association.<a href="#section-2.1-6" class="pilcrow">¶</a></p>
+<p id="section-2.1-7">When the endpoint authentication and key establishment has been
+completed, the association is considered to be secured and the ULP is
+informed about that. From this time on it's possible for the ULPs to
+exchange data securely.<a href="#section-2.1-7" class="pilcrow">¶</a></p>
+<p id="section-2.1-8">CRYPTO chunks will never be retransmitted, retransmission is
+implemented by SCTP endpoint at chunk level as in the legacy.  Duplicated
+CRYPTO chunks, whenever they will be accepted by the protection
+engine, will result in duplicated SCTP chunks and will be handled as
+duplicated chunks by SCTP endpoint in the same way a duplicated SCTP packet
+with those SCTP chunks would have been.<a href="#section-2.1-8" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="protection-engines">
+<section id="section-2.2">
+        <h3 id="name-protection-engines-consider">
+<a href="#section-2.2" class="section-number selfRef">2.2. </a><a href="#name-protection-engines-consider" class="section-name selfRef">Protection Engines Considerations</a>
+        </h3>
+<p id="section-2.2-1">The protection engine, independently from the security
+characteristics, needs to be capable working on an unreliable
+transport mechanism same as UDP in regards to the payloads of the
+CRYPTO chunk, and have its own key management capability. SCTP is
+capable of providing reliable transport of key-management messages.<a href="#section-2.2-1" class="pilcrow">¶</a></p>
+<p id="section-2.2-2">SCTP CRYPTO chunk directly exploits the protection engine by
+requesting protection and unprotection of a buffer, in particular the
+protection buffer should never exceed the possible SCTP packet size
+thus protection engine needs to be aware of the PMTU (see <a href="#pmtu" class="auto internal xref">Section 2.4</a>).<a href="#section-2.2-2" class="pilcrow">¶</a></p>
+<p id="section-2.2-3">The key management part of the protection engine is the set of data
+and procedures that take care of key distribution, verification, and
+update. SCTP CRYPTO provides support for in-band key management, on
+those cases the Protection Engines uses SCTP DATA chunks identified
+with a dedicated Payload Protocol Identifier. The protection engine
+can specify if the transmission of any key-managment messages are
+non-reliable or reliable transmitted by SCTP.<a href="#section-2.2-3" class="pilcrow">¶</a></p>
+<p id="section-2.2-4">During protection engine initialization, that is after the SCTP
+association reaches the ESTABLISHED state (see <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> Section 4),
+but before protection engine key-management has completed and the
+Protected Assocation Parameter Validation is completed, the in-band
+Key Management MAY use DATA chunks that SHALL use the Protection
+Engine PPID (see <a href="#iana-payload-protection-id" class="auto internal xref">Table 9</a>). These DATA chunks
+SHALL be sent unprotected by the protection engine as no keys have
+been established yet. As soon as the protection engine has been
+intialized and the validation has occured, any protection engine that
+uses in-band key management, i.e. sent using SCTP DATA chunks with the
+Protection Engine PPID, will have their message protected inside SCTP
+CRYPTO chunk protected with the currently established key.
+SCTP CRYPTO chunk state evolution is described in <a href="#init-state-machine" class="auto internal xref">Section 7.3</a>.<a href="#section-2.2-4" class="pilcrow">¶</a></p>
+<p id="section-2.2-5">Key management MAY use other mechanism than what provided by SCTP CRYPTO
+chunks, in any case the mechanism for key management MUST be detailed
+in the specification for that protection engine.<a href="#section-2.2-5" class="pilcrow">¶</a></p>
+<p id="section-2.2-6">The protection engines MAY exploit the Flags byte provided by the
+CRYPTO chunk header (see <a href="#sctp-Crypto-chunk-newchunk-crypt-struct" class="auto internal xref">Figure 3</a>)
+for its needs. Details of the use of Flags, if different from what
+described in the current document, MUST be specified in the Protection
+Engine Specification document for that specific protection engine.<a href="#section-2.2-6" class="pilcrow">¶</a></p>
+<p id="section-2.2-7">The SCTP common header is assumed to be implicitly protected by the
+protection engine. This protection is based on the assumption that
+there will be a one-to-one mapping between SCTP association and
+individually established security contexts. If the protection engine
+does not meet that assumption further protection of the common header
+is likely required.<a href="#section-2.2-7" class="pilcrow">¶</a></p>
+<p id="section-2.2-8">An example of protection engine can be DTLS as specified in
+<span>[<a href="#I-D.westerlund-tsvwg-sctp-crypto-dtls" class="cite xref">I-D.westerlund-tsvwg-sctp-crypto-dtls</a>]</span>.<a href="#section-2.2-8" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="buffering">
+<section id="section-2.3">
+        <h3 id="name-sctp-crypto-chunk-buffering">
+<a href="#section-2.3" class="section-number selfRef">2.3. </a><a href="#name-sctp-crypto-chunk-buffering" class="section-name selfRef">SCTP CRYPTO Chunk Buffering and Flow Control</a>
+        </h3>
+<p id="section-2.3-1">Protection engine and SCTP are asynchronous, meaning that the
+protection engine may deliver the decrypted SCTP Payload to the SCTP
+endpoint without respecting the reception order.  It's up to SCTP
+endpoint to reorder the chunks in the reception buffer and to take
+care of the flow control according to what specified in
+<span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>. From SCTP perspective the CRYPTO chunk processing is part
+of the transport network.<a href="#section-2.3-1" class="pilcrow">¶</a></p>
+<p id="section-2.3-2">Even though the above allows the implementors to adopt a
+multithreading design of the protection engines, the actual
+implementation should consider that out-of-order handling of SCTP
+chunks is not desired and may cause false congestions and
+retransmissions.<a href="#section-2.3-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="pmtu">
+<section id="section-2.4">
+        <h3 id="name-pmtu-considerations">
+<a href="#section-2.4" class="section-number selfRef">2.4. </a><a href="#name-pmtu-considerations" class="section-name selfRef">PMTU Considerations</a>
+        </h3>
+<p id="section-2.4-1">The addition of the CRYPTO chunk to SCTP reduces the room for payload,
+due to the size of the CRYPTO chunk header and plain text expansion
+due to ciphering algorithm and any authentication tag.  Thus, the SCTP
+layer creating the plain text payload needs to know about the overhead
+to adjust its target payload size appropriately.<a href="#section-2.4-1" class="pilcrow">¶</a></p>
+<p id="section-2.4-2">On the other hand, the protection engine needs to be informed about
+the PMTU by removing from the value the sum of the common SCTP header
+and the CRYPTO chunk header. This implies that SCTP can propagate
+the computed PMTU at run time specifically. The way protection engine
+provides the primitive for PMTU communication shall be part of the
+protection engine specification.<a href="#section-2.4-2" class="pilcrow">¶</a></p>
+<p id="section-2.4-3">From SCTP perspective, if there is a maximum size of plain text data
+that can be protected by the protection engine that must be
+communicated to SCTP. As such a limit will limit the PMTU for SCTP to
+the maximum plain text plus CRYPTO chunk and algorithm overhead plus
+the SCTP common header.<a href="#section-2.4-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="congestion">
+<section id="section-2.5">
+        <h3 id="name-congestion-control-consider">
+<a href="#section-2.5" class="section-number selfRef">2.5. </a><a href="#name-congestion-control-consider" class="section-name selfRef">Congestion Control Considerations</a>
+        </h3>
+<p id="section-2.5-1">The SCTP mechanism for handling congestion control does depend on
+successful data transfer for enlarging or reducing the congestion
+window CWND (see <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> Section 7.2).<a href="#section-2.5-1" class="pilcrow">¶</a></p>
+<p id="section-2.5-2">It may happen that protection engine discards packets due to internal
+checks or because it has detected a malicious attempt. As those
+packets do not represent what the peer sent, it is acceptable to
+ignore them, although in-situ modification on the path of a packet
+resulting in discarding due to integrity failure will leave a gap, but
+has to be accepted as part of the path behavior.<a href="#section-2.5-2" class="pilcrow">¶</a></p>
+<p id="section-2.5-3">The protection engine shall not interfere with the SCTP congestion
+control mechanism, this basically means that from SCTP perspective
+the congestion control is exactly the same as how specified
+in <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>.<a href="#section-2.5-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="icmp">
+<section id="section-2.6">
+        <h3 id="name-icmp-considerations">
+<a href="#section-2.6" class="section-number selfRef">2.6. </a><a href="#name-icmp-considerations" class="section-name selfRef">ICMP Considerations</a>
+        </h3>
+<p id="section-2.6-1">The SCTP implementation will be responsible for handling ICMP messages
+and their validation as specified in <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> Section 10. This
+means that the ICMP validation needs to be done in relation to the
+actual sent SCTP packets with the CRYPTO chunk and not the unprotected
+payload. However, valid ICMP errors or information may indirectly be
+provided to the protection engine, such as an update to PMTU values
+based on packet to big ICMP messages.<a href="#section-2.6-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="multipath">
+<section id="section-2.7">
+        <h3 id="name-path-selection-consideratio">
+<a href="#section-2.7" class="section-number selfRef">2.7. </a><a href="#name-path-selection-consideratio" class="section-name selfRef">Path Selection Considerations</a>
+        </h3>
+<p id="section-2.7-1">When an Association is multihomed there are multiple paths between Endpoints.
+The selection of the specific path to be used at a certain time belongs
+to SCTP protocol that will decide according to <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>.
+The Protection Engine shall not influence the path selection algorithm,
+actually the Protection Engine will not even know what path is being used.<a href="#section-2.7-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="sec-asconf">
+<section id="section-2.8">
+        <h3 id="name-dynamic-address-reconfigura">
+<a href="#section-2.8" class="section-number selfRef">2.8. </a><a href="#name-dynamic-address-reconfigura" class="section-name selfRef">Dynamic Address Reconfiguration Considerations</a>
+        </h3>
+<p id="section-2.8-1">When using Dynamic Address Reconfiguration <span>[<a href="#RFC5061" class="cite xref">RFC5061</a>]</span> in an SCTP
+association using CRYPTO Chunk the ASCONF chunk is protected, thus it
+needs to be unprotected first, furthermore it MAY come from an unknown
+IP Address.  In order to properly address the ASCONF chunk to the
+relevant Association for being unprotected, Destination Address,
+Source and Destination ports and VTag shall be exploited. If the
+combination of those parameters is not unique the implementor MAY
+choose to send the Crypto Chunk to all Associations that fit with the
+parameters in order to find the right one. The association will
+attempt de-protection operations on the crypto chunk, and if that is
+successful the ASCONF chunk can be processed.<a href="#section-2.8-1" class="pilcrow">¶</a></p>
+<p id="section-2.8-2">The recommendation <span>[<a href="#RFC5061" class="cite xref">RFC5061</a>]</span> specifies (section 4.1.1 of
+<span>[<a href="#RFC5061" class="cite xref">RFC5061</a>]</span>) that ASCONF message are required to be sent authenticated
+with SCTP-AUTH <span>[<a href="#RFC4895" class="cite xref">RFC4895</a>]</span>. For SCTP associations using Crypto Chunks,
+when the Protection Engine provides strong Authentication such for
+instance in case of DTLS, results in the use of redundant mechanism
+for Authentication with both SCTP-AUTH and the Crypto Chunk. We
+recommend to amend <span>[<a href="#RFC5061" class="cite xref">RFC5061</a>]</span> for including Crypto Chunks as
+Authentication mechanism for ASCONF chunks.<a href="#section-2.8-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="sec-restart">
+<section id="section-2.9">
+        <h3 id="name-sctp-restart-considerations">
+<a href="#section-2.9" class="section-number selfRef">2.9. </a><a href="#name-sctp-restart-considerations" class="section-name selfRef">SCTP Restart Considerations</a>
+        </h3>
+<p id="section-2.9-1">SCTP Restart procedure allows an endpoint to recover an association
+when the remote endpoint still has the state for the association.
+However, an SCTP association that has an established protection engine
+will not accept a unprotected INIT to restart it, instead it would
+discard it. Thus, an endpoint attempting to restart an SCTP
+association which was using Crypto Chunks MUST have the security
+context for this association, and use it to encapsulate the INIT in a
+CRYPTO chunk. Note, the SCTP common header will contain a verification
+tag equal to 0, combined with CRYPTO chunk when carrying an INIT to
+restart.<a href="#section-2.9-1" class="pilcrow">¶</a></p>
+<p id="section-2.9-2">An endpoint implementing Crypto Chunk MUST accept receiving SCTP
+packets with a verification tag with value 0 and containing a Crypto
+Chunk. The endpoit will attempt to map the packet to an association
+based on source IP address, destination address and port. If the
+combination of those parameters is not unique the implementor MAY
+choose to send the Crypto Chunk to all Associations that fit with the
+parameters in order to find the right one. The association will
+attempt de-protection operations on the crypto chunk, and if that is
+successful the INIT chunk can be processed as a restart attempt. Note
+that this will update the verification tags for both this endpoint and
+the peer. Failure to authenticate the crypto chunk payload will result
+in it being discarded.<a href="#section-2.9-2" class="pilcrow">¶</a></p>
+<p id="section-2.9-3">Association restart when using crypto chunks has increased
+requirements on the endpoint maintaining state across the restart. In
+cases this is not possible or failed to be done successfully the
+endpoint will be need to fall back to initiating a new SCTP association.<a href="#section-2.9-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="conventions">
+<section id="section-3">
+      <h2 id="name-conventions">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-conventions" class="section-name selfRef">Conventions</a>
+      </h2>
+<p id="section-3-1">The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
+NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED",
+"MAY", and "OPTIONAL" in this document are to be interpreted as
+described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they
+appear in all capitals, as shown here.<a href="#section-3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="new-parameter-type">
+<section id="section-4">
+      <h2 id="name-new-parameter-type">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-new-parameter-type" class="section-name selfRef">New Parameter Type</a>
+      </h2>
+<p id="section-4-1">This section defines the new parameter type that will be used to
+negotiate the use of the CRYPTO chunk and protection engines during
+association setup. <a href="#sctp-Crypto-chunk-init-parameter" class="auto internal xref">Table 1</a> illustrates
+the new parameter type.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<span id="name-new-init-init-ack-parameter"></span><div id="sctp-Crypto-chunk-init-parameter">
+<table class="center" id="table-1">
+        <caption>
+<a href="#table-1" class="selfRef">Table 1</a>:
+<a href="#name-new-init-init-ack-parameter" class="selfRef">New INIT/INIT-ACK Parameter</a>
+        </caption>
+<thead>
+          <tr>
+            <th class="text-right" rowspan="1" colspan="1">Parameter Type</th>
+            <th class="text-left" rowspan="1" colspan="1">Parameter Name</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-right" rowspan="1" colspan="1">0x80xx</td>
+            <td class="text-left" rowspan="1" colspan="1">Protected Association</td>
+          </tr>
+        </tbody>
+      </table>
+</div>
+<p id="section-4-3">Note that the parameter format requires the receiver to ignore the
+parameter and continue processing if the parameter is not understood.
+This is accomplished (as described in <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>, Section 3.2.1.)  by
+the use of the upper bits of the parameter type.<a href="#section-4-3" class="pilcrow">¶</a></p>
+<div id="protectedassoc-parameter">
+<section id="section-4.1">
+        <h3 id="name-protected-association-param">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-protected-association-param" class="section-name selfRef">Protected Association Parameter</a>
+        </h3>
+<p id="section-4.1-1">This parameter is used to carry the list of proposed protection
+engines and the chosen protection engine during INIT/INIT-ACK
+handshake.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<span id="name-protected-association-parame"></span><div id="sctp-Crypto-chunk-init-options">
+<figure id="figure-2">
+          <div id="section-4.1-2.1">
+            <div class="alignCenter art-svg artwork" id="section-4.1-2.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="208" width="528" viewBox="0 0 528 208" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 8,64 L 8,192" fill="none" stroke="black"></path>
+                <path d="M 264,64 L 264,96" fill="none" stroke="black"></path>
+                <path d="M 264,160 L 264,192" fill="none" stroke="black"></path>
+                <path d="M 520,64 L 520,192" fill="none" stroke="black"></path>
+                <path d="M 8,64 L 520,64" fill="none" stroke="black"></path>
+                <path d="M 8,96 L 520,96" fill="none" stroke="black"></path>
+                <path d="M 264,160 L 520,160" fill="none" stroke="black"></path>
+                <path d="M 8,192 L 520,192" fill="none" stroke="black"></path>
+                <g class="text">
+                  <text x="16" y="36">0</text>
+                  <text x="176" y="36">1</text>
+                  <text x="336" y="36">2</text>
+                  <text x="496" y="36">3</text>
+                  <text x="16" y="52">0</text>
+                  <text x="32" y="52">1</text>
+                  <text x="48" y="52">2</text>
+                  <text x="64" y="52">3</text>
+                  <text x="80" y="52">4</text>
+                  <text x="96" y="52">5</text>
+                  <text x="112" y="52">6</text>
+                  <text x="128" y="52">7</text>
+                  <text x="144" y="52">8</text>
+                  <text x="160" y="52">9</text>
+                  <text x="176" y="52">0</text>
+                  <text x="192" y="52">1</text>
+                  <text x="208" y="52">2</text>
+                  <text x="224" y="52">3</text>
+                  <text x="240" y="52">4</text>
+                  <text x="256" y="52">5</text>
+                  <text x="272" y="52">6</text>
+                  <text x="288" y="52">7</text>
+                  <text x="304" y="52">8</text>
+                  <text x="320" y="52">9</text>
+                  <text x="336" y="52">0</text>
+                  <text x="352" y="52">1</text>
+                  <text x="368" y="52">2</text>
+                  <text x="384" y="52">3</text>
+                  <text x="400" y="52">4</text>
+                  <text x="416" y="52">5</text>
+                  <text x="432" y="52">6</text>
+                  <text x="448" y="52">7</text>
+                  <text x="464" y="52">8</text>
+                  <text x="480" y="52">9</text>
+                  <text x="496" y="52">0</text>
+                  <text x="512" y="52">1</text>
+                  <text x="80" y="84">Parameter</text>
+                  <text x="140" y="84">Type</text>
+                  <text x="168" y="84">=</text>
+                  <text x="204" y="84">0x80XX</text>
+                  <text x="360" y="84">Parameter</text>
+                  <text x="428" y="84">Length</text>
+                  <text x="228" y="132">Protection</text>
+                  <text x="304" y="132">Engines</text>
+                  <text x="392" y="180">Padding</text>
+                </g>
+              </svg><a href="#section-4.1-2.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
+<a href="#name-protected-association-parame" class="selfRef">Protected Association Parameter</a>
+          </figcaption></figure>
+</div>
+<span class="break"></span><dl class="dlNewline" id="section-4.1-3">
+          <dt id="section-4.1-3.1">Parameter Type: 16 bits (unsigned integer)</dt>
+          <dd style="margin-left: 1.5em" id="section-4.1-3.2">
+            <p id="section-4.1-3.2.1">This value MUST be set to 0x80XX.<a href="#section-4.1-3.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.1-3.3">Parameter Length: 16 bits (unsigned integer)</dt>
+          <dd style="margin-left: 1.5em" id="section-4.1-3.4">
+            <p id="section-4.1-3.4.1">This value holds the length of the Protection Engines field in
+bytes plus 4.<a href="#section-4.1-3.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.1-3.5">Protection Engines: variable length</dt>
+          <dd style="margin-left: 1.5em" id="section-4.1-3.6">
+            <p id="section-4.1-3.6.1">In the INIT chunk this holds the list of protection engines in descending order of preference,
+i.e. the most preferred comes first, and the least preferred last in
+this field. In the INIT-ACK chunk this holds a single chosen
+protection engine. Each protection engine is specified by a 16-bit
+unsigned integer.<a href="#section-4.1-3.6.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.1-3.7">Padding: 0 or 16 bits</dt>
+          <dd style="margin-left: 1.5em" id="section-4.1-3.8">
+            <p id="section-4.1-3.8.1">If the length of the Protection Engines field is not a multiple
+of 4 bytes, the sender MUST pad the chunk with all zero bytes
+to make the chunk 32-bit aligned. The Padding MUST NOT be longer
+than 2 bytes and it MUST be ignored by the receiver.<a href="#section-4.1-3.8.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+<p id="section-4.1-4">RFC-Editor Note: Please replace 0x08XX with the actual parameter type
+value assigned by IANA and then remove this note.<a href="#section-4.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="new-chunk-types">
+<section id="section-5">
+      <h2 id="name-new-chunk-types">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-new-chunk-types" class="section-name selfRef">New Chunk Types</a>
+      </h2>
+<div id="crypto-chunk">
+<section id="section-5.1">
+        <h3 id="name-crypto-chunk-crypto">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-crypto-chunk-crypto" class="section-name selfRef">Crypto Chunk (CRYPTO)</a>
+        </h3>
+<p id="section-5.1-1">This section defines the new chunk type that will be used to
+transport protected SCTP payload.
+<a href="#sctp-Crypto-chunk-newchunk-crypt" class="auto internal xref">Table 2</a> illustrates the new chunk type.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+<span id="name-crypto-chunk-type"></span><div id="sctp-Crypto-chunk-newchunk-crypt">
+<table class="center" id="table-2">
+          <caption>
+<a href="#table-2" class="selfRef">Table 2</a>:
+<a href="#name-crypto-chunk-type" class="selfRef">CRYPTO Chunk Type</a>
+          </caption>
+<thead>
+            <tr>
+              <th class="text-right" rowspan="1" colspan="1">Chunk Type</th>
+              <th class="text-left" rowspan="1" colspan="1">Chunk Name</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">0x4X</td>
+              <td class="text-left" rowspan="1" colspan="1">Crypto Chunk (CRYPTO)</td>
+            </tr>
+          </tbody>
+        </table>
+</div>
+<p id="section-5.1-3">RFC-Editor Note: Please replace 0x4x with the actual chunk type value
+assigned by IANA and then remove this note.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
+<p id="section-5.1-4">It should be noted that the CRYPTO chunk format requires the receiver
+stop processing this SCTP packet, discard the unrecognized chunk and
+all further chunks, and report the unrecognized chunk in an ERROR
+chunk using the 'Unrecognized Chunk Type' error cause.  This is
+accomplished (as described in <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> Section 3.2.) by the use of
+the upper bits of the chunk type.<a href="#section-5.1-4" class="pilcrow">¶</a></p>
+<p id="section-5.1-5">The CRYPTO chunk is used to hold the protected payload of a plain SCTP
+packet.<a href="#section-5.1-5" class="pilcrow">¶</a></p>
+<span id="name-crypto-chunk-structure"></span><div id="sctp-Crypto-chunk-newchunk-crypt-struct">
+<figure id="figure-3">
+          <div id="section-5.1-6.1">
+            <div class="alignCenter art-svg artwork" id="section-5.1-6.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="208" width="528" viewBox="0 0 528 208" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 8,64 L 8,192" fill="none" stroke="black"></path>
+                <path d="M 136,64 L 136,96" fill="none" stroke="black"></path>
+                <path d="M 264,64 L 264,96" fill="none" stroke="black"></path>
+                <path d="M 264,160 L 264,192" fill="none" stroke="black"></path>
+                <path d="M 520,64 L 520,192" fill="none" stroke="black"></path>
+                <path d="M 8,64 L 520,64" fill="none" stroke="black"></path>
+                <path d="M 8,96 L 520,96" fill="none" stroke="black"></path>
+                <path d="M 264,160 L 520,160" fill="none" stroke="black"></path>
+                <path d="M 8,192 L 520,192" fill="none" stroke="black"></path>
+                <g class="text">
+                  <text x="16" y="36">0</text>
+                  <text x="176" y="36">1</text>
+                  <text x="336" y="36">2</text>
+                  <text x="496" y="36">3</text>
+                  <text x="16" y="52">0</text>
+                  <text x="32" y="52">1</text>
+                  <text x="48" y="52">2</text>
+                  <text x="64" y="52">3</text>
+                  <text x="80" y="52">4</text>
+                  <text x="96" y="52">5</text>
+                  <text x="112" y="52">6</text>
+                  <text x="128" y="52">7</text>
+                  <text x="144" y="52">8</text>
+                  <text x="160" y="52">9</text>
+                  <text x="176" y="52">0</text>
+                  <text x="192" y="52">1</text>
+                  <text x="208" y="52">2</text>
+                  <text x="224" y="52">3</text>
+                  <text x="240" y="52">4</text>
+                  <text x="256" y="52">5</text>
+                  <text x="272" y="52">6</text>
+                  <text x="288" y="52">7</text>
+                  <text x="304" y="52">8</text>
+                  <text x="320" y="52">9</text>
+                  <text x="336" y="52">0</text>
+                  <text x="352" y="52">1</text>
+                  <text x="368" y="52">2</text>
+                  <text x="384" y="52">3</text>
+                  <text x="400" y="52">4</text>
+                  <text x="416" y="52">5</text>
+                  <text x="432" y="52">6</text>
+                  <text x="448" y="52">7</text>
+                  <text x="464" y="52">8</text>
+                  <text x="480" y="52">9</text>
+                  <text x="496" y="52">0</text>
+                  <text x="512" y="52">1</text>
+                  <text x="44" y="84">Type</text>
+                  <text x="72" y="84">=</text>
+                  <text x="100" y="84">0x4X</text>
+                  <text x="176" y="84">Chunk</text>
+                  <text x="224" y="84">Flags</text>
+                  <text x="360" y="84">Chunk</text>
+                  <text x="412" y="84">Length</text>
+                  <text x="264" y="132">Payload</text>
+                  <text x="384" y="180">Padding</text>
+                </g>
+              </svg><a href="#section-5.1-6.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
+<a href="#name-crypto-chunk-structure" class="selfRef">CRYPTO Chunk Structure</a>
+          </figcaption></figure>
+</div>
+<span class="break"></span><dl class="dlNewline" id="section-5.1-7">
+          <dt id="section-5.1-7.1">Chunk Type: 8 bits (unsigned integer)</dt>
+          <dd style="margin-left: 1.5em" id="section-5.1-7.2">
+            <p id="section-5.1-7.2.1">This value MUST be set to 0x4X for all CRYPTO chunks.<a href="#section-5.1-7.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.1-7.3">Chunk Flags: 8 bits</dt>
+          <dd style="margin-left: 1.5em" id="section-5.1-7.4">
+            <p id="section-5.1-7.4.1">This is used by the protection engine and ignored by SCTP.<a href="#section-5.1-7.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.1-7.5">Chunk Length: 16 bits (unsigned integer)</dt>
+          <dd style="margin-left: 1.5em" id="section-5.1-7.6">
+            <p id="section-5.1-7.6.1">This value holds the length of the Payload in bytes plus 4.<a href="#section-5.1-7.6.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.1-7.7">Payload: variable length</dt>
+          <dd style="margin-left: 1.5em" id="section-5.1-7.8">
+            <p id="section-5.1-7.8.1">This holds the encrypted data.<a href="#section-5.1-7.8.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.1-7.9">Padding: 0, 8, 16, or 24 bits</dt>
+          <dd style="margin-left: 1.5em" id="section-5.1-7.10">
+            <p id="section-5.1-7.10.1">If the length of the Payload is not a multiple of 4 bytes, the sender
+MUST pad the chunk with all zero bytes to make the chunk 32-bit
+aligned.  The Padding MUST NOT be longer than 3 bytes and it MUST
+be ignored by the receiver.<a href="#section-5.1-7.10.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="pvalid-chunk">
+<section id="section-5.2">
+        <h3 id="name-protected-association-paramet">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-protected-association-paramet" class="section-name selfRef">Protected Association Parameter Validation Chunk (PVALID)</a>
+        </h3>
+<p id="section-5.2-1">This section defines the new chunk types that will be used to validate
+the negotiation of the protection engine selected for CRYPTO chunk.
+This to prevent down grade attacks on the negotiation of protection
+engines. <a href="#sctp-Crypto-chunk-newchunk-pvalid-chunk" class="auto internal xref">Table 3</a> illustrates the
+new chunk type.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<span id="name-pvalid-chunk-type"></span><div id="sctp-Crypto-chunk-newchunk-pvalid-chunk">
+<table class="center" id="table-3">
+          <caption>
+<a href="#table-3" class="selfRef">Table 3</a>:
+<a href="#name-pvalid-chunk-type" class="selfRef">PVALID Chunk Type</a>
+          </caption>
+<thead>
+            <tr>
+              <th class="text-right" rowspan="1" colspan="1">Chunk Type</th>
+              <th class="text-left" rowspan="1" colspan="1">Chunk Name</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">0x4X</td>
+              <td class="text-left" rowspan="1" colspan="1">Protected Association Parameter Validation (PVALID)</td>
+            </tr>
+          </tbody>
+        </table>
+</div>
+<p id="section-5.2-3">It should be noted that the PVALID chunk format requires the receiver
+stop processing this SCTP packet, discard the unrecognized chunk and
+all further chunks, and report the unrecognized chunk in an ERROR
+chunk using the 'Unrecognized Chunk Type' error cause.  This is
+accomplished (as described in <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> Section 3.2.) by the use of
+the upper bits of the chunk type.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
+<p id="section-5.2-4">The PVALID chunk is used to hold the protection engines list.<a href="#section-5.2-4" class="pilcrow">¶</a></p>
+<span id="name-pvalid-chunk-structure"></span><div id="sctp-Crypto-chunk-newchunk-PVALID">
+<figure id="figure-4">
+          <div id="section-5.2-5.1">
+            <div class="alignCenter art-svg artwork" id="section-5.2-5.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="208" width="528" viewBox="0 0 528 208" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 8,64 L 8,192" fill="none" stroke="black"></path>
+                <path d="M 136,64 L 136,96" fill="none" stroke="black"></path>
+                <path d="M 264,64 L 264,96" fill="none" stroke="black"></path>
+                <path d="M 264,160 L 264,192" fill="none" stroke="black"></path>
+                <path d="M 520,64 L 520,192" fill="none" stroke="black"></path>
+                <path d="M 8,64 L 520,64" fill="none" stroke="black"></path>
+                <path d="M 8,96 L 520,96" fill="none" stroke="black"></path>
+                <path d="M 264,160 L 520,160" fill="none" stroke="black"></path>
+                <path d="M 8,192 L 520,192" fill="none" stroke="black"></path>
+                <g class="text">
+                  <text x="16" y="36">0</text>
+                  <text x="176" y="36">1</text>
+                  <text x="336" y="36">2</text>
+                  <text x="496" y="36">3</text>
+                  <text x="16" y="52">0</text>
+                  <text x="32" y="52">1</text>
+                  <text x="48" y="52">2</text>
+                  <text x="64" y="52">3</text>
+                  <text x="80" y="52">4</text>
+                  <text x="96" y="52">5</text>
+                  <text x="112" y="52">6</text>
+                  <text x="128" y="52">7</text>
+                  <text x="144" y="52">8</text>
+                  <text x="160" y="52">9</text>
+                  <text x="176" y="52">0</text>
+                  <text x="192" y="52">1</text>
+                  <text x="208" y="52">2</text>
+                  <text x="224" y="52">3</text>
+                  <text x="240" y="52">4</text>
+                  <text x="256" y="52">5</text>
+                  <text x="272" y="52">6</text>
+                  <text x="288" y="52">7</text>
+                  <text x="304" y="52">8</text>
+                  <text x="320" y="52">9</text>
+                  <text x="336" y="52">0</text>
+                  <text x="352" y="52">1</text>
+                  <text x="368" y="52">2</text>
+                  <text x="384" y="52">3</text>
+                  <text x="400" y="52">4</text>
+                  <text x="416" y="52">5</text>
+                  <text x="432" y="52">6</text>
+                  <text x="448" y="52">7</text>
+                  <text x="464" y="52">8</text>
+                  <text x="480" y="52">9</text>
+                  <text x="496" y="52">0</text>
+                  <text x="512" y="52">1</text>
+                  <text x="44" y="84">Type</text>
+                  <text x="72" y="84">=</text>
+                  <text x="100" y="84">0x4X</text>
+                  <text x="184" y="84">Flags</text>
+                  <text x="216" y="84">=</text>
+                  <text x="232" y="84">0</text>
+                  <text x="360" y="84">Chunk</text>
+                  <text x="412" y="84">Length</text>
+                  <text x="228" y="132">Protection</text>
+                  <text x="304" y="132">Engines</text>
+                  <text x="384" y="180">Padding</text>
+                </g>
+              </svg><a href="#section-5.2-5.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-4" class="selfRef">Figure 4</a>:
+<a href="#name-pvalid-chunk-structure" class="selfRef">PVALID Chunk Structure</a>
+          </figcaption></figure>
+</div>
+<span class="break"></span><dl class="dlNewline" id="section-5.2-6">
+          <dt id="section-5.2-6.1">Chunk Type: 8 bits (unsigned integer)</dt>
+          <dd style="margin-left: 1.5em" id="section-5.2-6.2">
+            <p id="section-5.2-6.2.1">This value MUST be set to 0x4X.<a href="#section-5.2-6.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.2-6.3">Chunk Flags: 8 bits</dt>
+          <dd style="margin-left: 1.5em" id="section-5.2-6.4">
+            <p id="section-5.2-6.4.1">MUST be set to zero on transmit and MUST be ignored on receipt.<a href="#section-5.2-6.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.2-6.5">Chunk Length: 16 bits (unsigned integer)</dt>
+          <dd style="margin-left: 1.5em" id="section-5.2-6.6">
+            <p id="section-5.2-6.6.1">This value holds the length of the Protection Engines field in bytes plus 4.<a href="#section-5.2-6.6.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.2-6.7">Protection Engines: variable length</dt>
+          <dd style="margin-left: 1.5em" id="section-5.2-6.8">
+            <p id="section-5.2-6.8.1">This holds the list of protection engines where each protection engine is
+specified by a 16-bit unsigned integer. The field MUST be identical to the
+content of the Protected Association Parameter (<a href="#protectedassoc-parameter" class="auto internal xref">Section 4.1</a>)
+Protection Engines field that the endpoint sent in the INIT or INIT-ACK chunk.<a href="#section-5.2-6.8.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.2-6.9">Padding: 0 or 16 bits</dt>
+          <dd style="margin-left: 1.5em" id="section-5.2-6.10">
+            <p id="section-5.2-6.10.1">If the length of the
+Protection Engines field is not a multiple of 4 bytes, the sender MUST
+pad the chunk with all zero bytes to make the chunk 32-bit
+aligned.  The Padding MUST NOT be longer than 2 bytes and it
+MUST be ignored by the receiver.<a href="#section-5.2-6.10.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+<p id="section-5.2-7">RFC-Editor Note: Please replace 0x4X with the actual chunk type value
+assigned by IANA and then remove this note.<a href="#section-5.2-7" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="error_handling">
+<section id="section-6">
+      <h2 id="name-error-handling">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-error-handling" class="section-name selfRef">Error Handling</a>
+      </h2>
+<p id="section-6-1">This specification introduces a new set of error causes that are to be
+used when SCTP endpoint detects a faulty condition. The special case is
+when the error is detected by the protection engine that may provide
+additional information.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<div id="enoprotected">
+<section id="section-6.1">
+        <h3 id="name-mandatory-protected-associa">
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-mandatory-protected-associa" class="section-name selfRef">Mandatory Protected Association Parameter Missing</a>
+        </h3>
+<p id="section-6.1-1">When an initiator SCTP endpoint sends an INIT chunk that doesn't
+contain the Protected Association parameter towards an SCTP endpoint
+that only accepts protected associations, the responder endpoint SHALL
+raise a Missing Mandatory Parameter error. The ERROR chunk will
+contain the cause code 'Missing Mandatory Parameter' (2) (see
+<span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span> Section 3.3.10.7) and the protected association parameter
+identifier <a href="#protectedassoc-parameter" class="auto internal xref">Section 4.1</a> in the missing param
+Information field.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+<span id="name-error-missing-protected-ass"></span><div id="sctp-Crypto-init-chunk-missing-protected">
+<figure id="figure-5">
+          <div id="section-6.1-2.1">
+            <div class="alignCenter art-svg artwork" id="section-6.1-2.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="208" width="528" viewBox="0 0 528 208" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 8,64 L 8,192" fill="none" stroke="black"></path>
+                <path d="M 264,64 L 264,96" fill="none" stroke="black"></path>
+                <path d="M 264,128 L 264,192" fill="none" stroke="black"></path>
+                <path d="M 520,64 L 520,192" fill="none" stroke="black"></path>
+                <path d="M 8,64 L 520,64" fill="none" stroke="black"></path>
+                <path d="M 8,96 L 520,96" fill="none" stroke="black"></path>
+                <path d="M 8,128 L 520,128" fill="none" stroke="black"></path>
+                <path d="M 8,160 L 520,160" fill="none" stroke="black"></path>
+                <path d="M 8,192 L 520,192" fill="none" stroke="black"></path>
+                <g class="text">
+                  <text x="16" y="36">0</text>
+                  <text x="176" y="36">1</text>
+                  <text x="336" y="36">2</text>
+                  <text x="496" y="36">3</text>
+                  <text x="16" y="52">0</text>
+                  <text x="32" y="52">1</text>
+                  <text x="48" y="52">2</text>
+                  <text x="64" y="52">3</text>
+                  <text x="80" y="52">4</text>
+                  <text x="96" y="52">5</text>
+                  <text x="112" y="52">6</text>
+                  <text x="128" y="52">7</text>
+                  <text x="144" y="52">8</text>
+                  <text x="160" y="52">9</text>
+                  <text x="176" y="52">0</text>
+                  <text x="192" y="52">1</text>
+                  <text x="208" y="52">2</text>
+                  <text x="224" y="52">3</text>
+                  <text x="240" y="52">4</text>
+                  <text x="256" y="52">5</text>
+                  <text x="272" y="52">6</text>
+                  <text x="288" y="52">7</text>
+                  <text x="304" y="52">8</text>
+                  <text x="320" y="52">9</text>
+                  <text x="336" y="52">0</text>
+                  <text x="352" y="52">1</text>
+                  <text x="368" y="52">2</text>
+                  <text x="384" y="52">3</text>
+                  <text x="400" y="52">4</text>
+                  <text x="416" y="52">5</text>
+                  <text x="432" y="52">6</text>
+                  <text x="448" y="52">7</text>
+                  <text x="464" y="52">8</text>
+                  <text x="480" y="52">9</text>
+                  <text x="496" y="52">0</text>
+                  <text x="512" y="52">1</text>
+                  <text x="96" y="84">Cause</text>
+                  <text x="140" y="84">Code</text>
+                  <text x="168" y="84">=</text>
+                  <text x="184" y="84">2</text>
+                  <text x="360" y="84">Cause</text>
+                  <text x="412" y="84">Length</text>
+                  <text x="172" y="116">Number</text>
+                  <text x="212" y="116">of</text>
+                  <text x="256" y="116">missing</text>
+                  <text x="316" y="116">params</text>
+                  <text x="352" y="116">=</text>
+                  <text x="368" y="116">N</text>
+                  <text x="72" y="148">Protected</text>
+                  <text x="160" y="148">Association</text>
+                  <text x="220" y="148">ID</text>
+                  <text x="336" y="148">Missing</text>
+                  <text x="392" y="148">Param</text>
+                  <text x="436" y="148">Type</text>
+                  <text x="468" y="148">#2</text>
+                  <text x="72" y="180">Missing</text>
+                  <text x="128" y="180">Param</text>
+                  <text x="172" y="180">Type</text>
+                  <text x="212" y="180">#N-1</text>
+                  <text x="336" y="180">Missing</text>
+                  <text x="392" y="180">Param</text>
+                  <text x="436" y="180">Type</text>
+                  <text x="468" y="180">#N</text>
+                </g>
+              </svg><a href="#section-6.1-2.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-5" class="selfRef">Figure 5</a>:
+<a href="#name-error-missing-protected-ass" class="selfRef">ERROR Missing Protected Association Paramater</a>
+          </figcaption></figure>
+</div>
+<p id="section-6.1-3">Note: Cause Length is equal to the number of missing parameters 8 + N
+* 2 according to <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>, section 3.3.10.2. Also the Protection
+Association ID may be present in any of the N missing params, no order
+implied by the example in
+<a href="#sctp-Crypto-init-chunk-missing-protected" class="auto internal xref">Figure 5</a>.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="eprotect">
+<section id="section-6.2">
+        <h3 id="name-error-in-protection">
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-error-in-protection" class="section-name selfRef">Error in Protection</a>
+        </h3>
+<p id="section-6.2-1">A new Error Type is defined for Crypto Chunk, it's used for any
+error related to the Protection mechanism described in this
+document and has a structure that allows detailed information
+to be added as extra causes.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+<p id="section-6.2-2">This specification describes some of the causes whilst the
+Protection Engine Specification MAY add further Causes related to the
+related Protection Engine.<a href="#section-6.2-2" class="pilcrow">¶</a></p>
+<p id="section-6.2-3">When detecting an error, SCTP will send an ABORT chunk containing
+the relevant Error Type and Causes.<a href="#section-6.2-3" class="pilcrow">¶</a></p>
+<span id="name-error-in-protection-cause-f"></span><div id="sctp-eprotect-error-structure">
+<figure id="figure-6">
+          <div id="section-6.2-4.1">
+            <div class="alignCenter art-svg artwork" id="section-6.2-4.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="176" width="528" viewBox="0 0 528 176" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 8,64 L 8,160" fill="none" stroke="black"></path>
+                <path d="M 264,64 L 264,160" fill="none" stroke="black"></path>
+                <path d="M 520,64 L 520,160" fill="none" stroke="black"></path>
+                <path d="M 8,64 L 520,64" fill="none" stroke="black"></path>
+                <path d="M 8,96 L 520,96" fill="none" stroke="black"></path>
+                <path d="M 8,128 L 520,128" fill="none" stroke="black"></path>
+                <path d="M 8,160 L 520,160" fill="none" stroke="black"></path>
+                <g class="text">
+                  <text x="16" y="36">0</text>
+                  <text x="176" y="36">1</text>
+                  <text x="336" y="36">2</text>
+                  <text x="496" y="36">3</text>
+                  <text x="16" y="52">0</text>
+                  <text x="32" y="52">1</text>
+                  <text x="48" y="52">2</text>
+                  <text x="64" y="52">3</text>
+                  <text x="80" y="52">4</text>
+                  <text x="96" y="52">5</text>
+                  <text x="112" y="52">6</text>
+                  <text x="128" y="52">7</text>
+                  <text x="144" y="52">8</text>
+                  <text x="160" y="52">9</text>
+                  <text x="176" y="52">0</text>
+                  <text x="192" y="52">1</text>
+                  <text x="208" y="52">2</text>
+                  <text x="224" y="52">3</text>
+                  <text x="240" y="52">4</text>
+                  <text x="256" y="52">5</text>
+                  <text x="272" y="52">6</text>
+                  <text x="288" y="52">7</text>
+                  <text x="304" y="52">8</text>
+                  <text x="320" y="52">9</text>
+                  <text x="336" y="52">0</text>
+                  <text x="352" y="52">1</text>
+                  <text x="368" y="52">2</text>
+                  <text x="384" y="52">3</text>
+                  <text x="400" y="52">4</text>
+                  <text x="416" y="52">5</text>
+                  <text x="432" y="52">6</text>
+                  <text x="448" y="52">7</text>
+                  <text x="464" y="52">8</text>
+                  <text x="480" y="52">9</text>
+                  <text x="496" y="52">0</text>
+                  <text x="512" y="52">1</text>
+                  <text x="72" y="84">Cause</text>
+                  <text x="116" y="84">Code</text>
+                  <text x="144" y="84">=</text>
+                  <text x="172" y="84">TBA9</text>
+                  <text x="360" y="84">Cause</text>
+                  <text x="412" y="84">Length</text>
+                  <text x="104" y="116">Extra</text>
+                  <text x="152" y="116">Cause</text>
+                  <text x="188" y="116">#1</text>
+                  <text x="360" y="116">Extra</text>
+                  <text x="408" y="116">Cause</text>
+                  <text x="444" y="116">#2</text>
+                  <text x="96" y="148">Extra</text>
+                  <text x="144" y="148">Cause</text>
+                  <text x="188" y="148">#N-1</text>
+                  <text x="360" y="148">Extra</text>
+                  <text x="408" y="148">Cause</text>
+                  <text x="444" y="148">#N</text>
+                </g>
+              </svg><a href="#section-6.2-4.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-6" class="selfRef">Figure 6</a>:
+<a href="#name-error-in-protection-cause-f" class="selfRef">Error in Protection Cause Format</a>
+          </figcaption></figure>
+</div>
+<span class="break"></span><dl class="dlNewline" id="section-6.2-5">
+          <dt id="section-6.2-5.1">Casuse Code: 16 bits (unsigned integer)</dt>
+          <dd style="margin-left: 1.5em" id="section-6.2-5.2">
+            <p id="section-6.2-5.2.1">The SCTP Error Chunk Cause Code indicating "Error in Protection" is TBA9.<a href="#section-6.2-5.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-6.2-5.3">Cause Length: 16 bits (unsigned integer)</dt>
+          <dd style="margin-left: 1.5em" id="section-6.2-5.4">
+            <p id="section-6.2-5.4.1">Is for N extra Causes equal to  4 + N * 2<a href="#section-6.2-5.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-6.2-5.5">Extra Cause: 16 bits (unsigned integer)</dt>
+          <dd style="margin-left: 1.5em" id="section-6.2-5.6">
+            <p id="section-6.2-5.6.1">Each Extra Cause indicate an additional piece of information as part
+of the error. There MAY be zero to as many as can fit in the extra
+cause field in the ERROR Chunk (A maximum of 32764).<a href="#section-6.2-5.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+<p id="section-6.2-6">Editor's Note: Please replace TBA9 above with what is assigned by IANA.<a href="#section-6.2-6" class="pilcrow">¶</a></p>
+<p id="section-6.2-7">Below a number of defined Error Causes are defined, additional causes
+can be registered with IANA following the rules in <a href="#IANA-Extra-Cause" class="auto internal xref">Section 9.2</a>.<a href="#section-6.2-7" class="pilcrow">¶</a></p>
+<div id="eprotlist">
+<section id="section-6.2.1">
+          <h4 id="name-no-supported-protection-eng">
+<a href="#section-6.2.1" class="section-number selfRef">6.2.1. </a><a href="#name-no-supported-protection-eng" class="section-name selfRef">No Supported Protection Engine</a>
+          </h4>
+<p id="section-6.2.1-1">If list of protection engines contained in the INIT signal doesn't
+contain at least an entry that fits the list of protection engines at
+the responder, the responder will reply with an ABORT chunk with error
+in protection cause code (specified in
+<a href="#eprotect" class="auto internal xref">Section 6.2</a>) and the "No Supported Protection
+Engine" extra cause code identifier 0x00.<a href="#section-6.2.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="ekeyhandshake">
+<section id="section-6.2.2">
+          <h4 id="name-error-during-protection-han">
+<a href="#section-6.2.2" class="section-number selfRef">6.2.2. </a><a href="#name-error-during-protection-han" class="section-name selfRef">Error During Protection Handshake</a>
+          </h4>
+<p id="section-6.2.2-1">If the protection engine specifies a handshake for example for
+authentication, and key management is implemented in-band, it may happen
+that the procedure has errors. In such case an ABORT chunk will be
+sent with error in protection cause code (specified in
+<a href="#eprotect" class="auto internal xref">Section 6.2</a>) and extra cause
+"Error During Protection Handshake" identifier 0x01.<a href="#section-6.2.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="evalidate">
+<section id="section-6.2.3">
+          <h4 id="name-failure-in-protection-engin">
+<a href="#section-6.2.3" class="section-number selfRef">6.2.3. </a><a href="#name-failure-in-protection-engin" class="section-name selfRef">Failure in Protection Engines Validation</a>
+          </h4>
+<p id="section-6.2.3-1">A Failure may occur during protection engine Validation, i.e. when the
+PVALID chunks <a href="#pvalid-chunk" class="auto internal xref">Section 5.2</a> are exchanged to validate the protection
+engine offered. In such case an ABORT chunk will be sent with error
+in protection cause code (specified in <a href="#eprotect" class="auto internal xref">Section 6.2</a>) and extra cause
+"Failure in Protection Engines Validation" identifier 0x02 to indicate
+this failure.<a href="#section-6.2.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="etmout">
+<section id="section-6.2.4">
+          <h4 id="name-timeout-during-protection-h">
+<a href="#section-6.2.4" class="section-number selfRef">6.2.4. </a><a href="#name-timeout-during-protection-h" class="section-name selfRef">Timeout During Protection Handshake or Validation</a>
+          </h4>
+<p id="section-6.2.4-1">Whenever a T-valid timeout occurs, the SCTP endpoint will send an
+ABORT chunk with "Error in Protection" cause (specified in
+<a href="#eprotect" class="auto internal xref">Section 6.2</a>) and extra cause "Timeout During
+Protection Handshake or Validation" identifier 0x03 to indicate this
+failure.  To indicate in which phase the timeout occurred an additional
+extra cause code is added. If the protection engine specifies that key
+management is implemented in-band and the T-valid timeout occurs during
+the handshake the Cause-Specific code to add is "Error During
+Protection Handshake" identifier 0x01.  If the T-valid timeout occurs
+during the protection association parameter validation, the extra
+cause code to use is "Failure in Protection Engines Validation"
+identifier 0x02.<a href="#section-6.2.4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="eengine">
+<section id="section-6.3">
+        <h3 id="name-critical-error-from-protect">
+<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-critical-error-from-protect" class="section-name selfRef">Critical Error from Protection Engine</a>
+        </h3>
+<p id="section-6.3-1">Protection engine MAY inform local SCTP endpoint about errors, in such
+case it's to be defined in the protection engine specification
+document.  When an Error in the protection engine compromises the
+protection mechanism, the protection engine may stop processing data
+altogether, thus the local SCTP endpoint will not be able to send or
+receive any chunk for the specified Association.  This will cause the
+Association to be closed by legacy timer-based mechanism. Since the
+Association protection is compromised no further data will be sent and
+the remote peer will also experience timeout on the Association.<a href="#section-6.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="non-critical-errors">
+<section id="section-6.4">
+        <h3 id="name-non-critical-error-in-the-p">
+<a href="#section-6.4" class="section-number selfRef">6.4. </a><a href="#name-non-critical-error-in-the-p" class="section-name selfRef">Non-critical Error in the Protection Engine</a>
+        </h3>
+<p id="section-6.4-1">A non-critical error in the protection engine means that the
+protection engine is capable of recovering without the need
+of the whole Association to be restarted.<a href="#section-6.4-1" class="pilcrow">¶</a></p>
+<p id="section-6.4-2">From SCTP perspective, a non-critical error will be perceived
+as a temporary problem in the transport and will be handled
+with retransmissions and SACKS according to <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>.<a href="#section-6.4-2" class="pilcrow">¶</a></p>
+<p id="section-6.4-3">When the protection engine will experience a non-critical error,
+an ABORT chunk SHALL NOT be sent. This way non-critical errors
+are handled and how the protection engine will recover from
+these errors is being described in the Protection Engine Specifications.<a href="#section-6.4-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="procedures">
+<section id="section-7">
+      <h2 id="name-procedures">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-procedures" class="section-name selfRef">Procedures</a>
+      </h2>
+<div id="establishment-procedure">
+<section id="section-7.1">
+        <h3 id="name-establishment-of-a-protecte">
+<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-establishment-of-a-protecte" class="section-name selfRef">Establishment of a Protected Association</a>
+        </h3>
+<p id="section-7.1-1">An SCTP Endpoint acting as initiator willing to create a protected
+association shall send to the remote peer an INIT chunk containing the
+Protected Association parameter (see <a href="#protectedassoc-parameter" class="auto internal xref">Section 4.1</a>)
+where all the supported Protection Engines are listed, given in
+descending order of preference (see
+<a href="#sctp-Crypto-chunk-init-options" class="auto internal xref">Figure 2</a>).<a href="#section-7.1-1" class="pilcrow">¶</a></p>
+<p id="section-7.1-2">An SCTP Endpoint acting as responder, when receiving an INIT chunk
+with protected association parameter, will search the list of
+protection engines for the most preferred commonly supported choice
+and will reply with INIT-ACK containing the protected association
+parameter with the chosen protection engine. When the responder cannot
+find a supported protection engine, it will reply with ABORT
+containing Error in Protection with the extra cause code for "No
+Supported Protection Engine" (<a href="#eprotlist" class="auto internal xref">Section 6.2.1</a>).<a href="#section-7.1-2" class="pilcrow">¶</a></p>
+<p id="section-7.1-3">As alternative, an SCTP Endpoint acting as responder willing to
+support only protected associations shall consider INIT chunk not
+containing the Protected Association parameter as an error, thus it
+will reply with an ABORT chunk according to what specified in
+<a href="#enoprotected" class="auto internal xref">Section 6.1</a> indicating that for this endpoint mandatory protected
+association parameter is missing.<a href="#section-7.1-3" class="pilcrow">¶</a></p>
+<p id="section-7.1-4">When initiator and responder have agreed on a protected association by
+means of handshaking INIT/INIT-ACK with a common protection engine the
+SCTP association establishment continue until it has reached the
+ESTABLISHED state. However before the SCTP assocation is protected by
+the Crypto Chunk and its protection engine some additional states
+needs to be passed. First the protection engine needs be initilizied
+in the PROTECTION INTILIZATION state. When that has been accomplished
+one enters the VALIDATION state where one validates the exchange of
+the Protected Association Parameter. If that is successful one enters
+the PROTECTED state. This state sequence is depicted in
+<a href="#init-state-machine" class="auto internal xref">Section 7.3</a>.<a href="#section-7.1-4" class="pilcrow">¶</a></p>
+<p id="section-7.1-5">Until the procedure has reached the PROTECTED state the only usage
+of DATA Chunks that is accepted is DATA Chunks with the Protection
+Engine PPID. Any other DATA chunk being sent on a Protected
+association SHALL be silently discarded.<a href="#section-7.1-5" class="pilcrow">¶</a></p>
+<p id="section-7.1-6">The Protection Engine may initialize itself by transferring its own
+messages as payload of the DATA chunk if necessary. The Crypto Chunk
+initialization SHOULD be supervised by a T-valid timer that depends on
+the protection engine and may also be further adjusted based on whether
+expected RTT values are outside of the ones commonly occurring on the
+general Internet, see <a href="#t-valid-considerations" class="auto internal xref">Section 7.5</a>. At completion of
+Protection Engine initialization the setup of the Protected
+association is complete and one enters the VALIDATION state, and from
+that time on only CRYPTO chunks will be exchanged. Any plain text
+chunk will be silently discarded.<a href="#section-7.1-6" class="pilcrow">¶</a></p>
+<p id="section-7.1-7">If protection engine key establishment is in-band, the protection
+engine will start the handshake with its peer and in case of failure
+or T-valid timeout, the endpoint will generate an ABORT chunk.
+The ERROR handling follows what specified in <a href="#ekeyhandshake" class="auto internal xref">Section 6.2.2</a>.<a href="#section-7.1-7" class="pilcrow">¶</a></p>
+<p id="section-7.1-8">The protection engine specification MUST specify when VALIDATION state
+can be entered for each endpoint. If key establishment is out-of-band,
+after starting T-valid timer the SCTP association will enter the
+VALIDATION state per protection engine specification when the
+necessary security context is in place.<a href="#section-7.1-8" class="pilcrow">¶</a></p>
+<p id="section-7.1-9">When entering the VALIDATION state, the initiator MUST send to the
+responder a PVALID chunk (see
+<a href="#sctp-Crypto-chunk-newchunk-pvalid-chunk" class="auto internal xref">Table 3</a>) containing the list of
+Protection Engines previously sent in the protected association
+parameter of the INIT chunk. The responder receiving the PVALID chunk
+will compare the Protection Engines list with the one previously
+received in the INIT chunk, if they are exactly the same, with the
+same Protection engine in the same position, it will reply to the
+initiator with a PVALID chunk containing the chosen Protection Engine,
+otherwise it will reply with an ABORT chunk. ERROR CAUSE will indicate
+"Failure in Protection Engines Validation" and the SCTP association
+will be terminated. If the association was not aborted the protected
+association is considered successfully established and the PROTECTED
+state is entered.<a href="#section-7.1-9" class="pilcrow">¶</a></p>
+<p id="section-7.1-10">When the initiator receives the PVALID chunk, it will compare with the
+previous chosen Protection Engine and in case of mismatch with the one
+received previously in the protected association parameter in the
+INIT-ACK chunk, it will reply with ABORT with the ERROR CAUSE "Failure
+in Protection Engines Validation", otherwise the protected association
+is successfully established and the initiator enters the PROTECTED
+state.<a href="#section-7.1-10" class="pilcrow">¶</a></p>
+<p id="section-7.1-11">If T-valid timer expires either at initiator or responder, it will generate
+an ABORT chunk.  The ERROR handling follows what
+specified in <a href="#etmout" class="auto internal xref">Section 6.2.4</a>.<a href="#section-7.1-11" class="pilcrow">¶</a></p>
+<p id="section-7.1-12">In the PROTECTED state any ULP SCTP messages for any PPID MAY be
+exchanged in the protected SCTP association.<a href="#section-7.1-12" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="termination-procedure">
+<section id="section-7.2">
+        <h3 id="name-termination-of-a-protected-">
+<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-termination-of-a-protected-" class="section-name selfRef">Termination of a Protected Association</a>
+        </h3>
+<p id="section-7.2-1">Besides the procedures for terminating an association explained in
+<span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>, the protection engine SHALL ask SCTP endpoint for
+terminating an association when having an internal error or by
+detecting a security violation, using the procedure described
+in <a href="#eengine" class="auto internal xref">Section 6.3</a>.  The internal design of Protection
+Engines and their capability is out of the scope of the current
+document.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="init-state-machine">
+<section id="section-7.3">
+        <h3 id="name-protection-initialization-s">
+<a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-protection-initialization-s" class="section-name selfRef">Protection Initialization State Machine</a>
+        </h3>
+<span id="name-crypto-chunk-state-diagram"></span><div id="sctp-Crypto-state-diagram">
+<figure id="figure-7">
+          <div id="section-7.3-1.1">
+            <div class="alignCenter art-svg artwork" id="section-7.3-1.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="528" width="368" viewBox="0 0 368 528" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 8,144 L 8,176" fill="none" stroke="black"></path>
+                <path d="M 16,320 L 16,352" fill="none" stroke="black"></path>
+                <path d="M 48,32 L 48,64" fill="none" stroke="black"></path>
+                <path d="M 48,480 L 48,512" fill="none" stroke="black"></path>
+                <path d="M 112,64 L 112,136" fill="none" stroke="black"></path>
+                <path d="M 112,176 L 112,312" fill="none" stroke="black"></path>
+                <path d="M 112,352 L 112,472" fill="none" stroke="black"></path>
+                <path d="M 176,32 L 176,64" fill="none" stroke="black"></path>
+                <path d="M 176,480 L 176,512" fill="none" stroke="black"></path>
+                <path d="M 200,320 L 200,352" fill="none" stroke="black"></path>
+                <path d="M 224,144 L 224,176" fill="none" stroke="black"></path>
+                <path d="M 48,32 L 176,32" fill="none" stroke="black"></path>
+                <path d="M 48,64 L 176,64" fill="none" stroke="black"></path>
+                <path d="M 8,144 L 224,144" fill="none" stroke="black"></path>
+                <path d="M 8,176 L 224,176" fill="none" stroke="black"></path>
+                <path d="M 120,256 L 248,256" fill="none" stroke="black"></path>
+                <path d="M 16,320 L 200,320" fill="none" stroke="black"></path>
+                <path d="M 16,352 L 200,352" fill="none" stroke="black"></path>
+                <path d="M 120,400 L 304,400" fill="none" stroke="black"></path>
+                <path d="M 48,480 L 176,480" fill="none" stroke="black"></path>
+                <path d="M 48,512 L 176,512" fill="none" stroke="black"></path>
+                <polygon class="arrowhead" points="120,472 108,466.4 108,477.6" fill="black" transform="rotate(90,112,472)"></polygon>
+                <polygon class="arrowhead" points="120,312 108,306.4 108,317.6" fill="black" transform="rotate(90,112,312)"></polygon>
+                <polygon class="arrowhead" points="120,136 108,130.4 108,141.6" fill="black" transform="rotate(90,112,136)"></polygon>
+                <g class="text">
+                  <text x="112" y="52">ESTABLISHED</text>
+                  <text x="132" y="100">If</text>
+                  <text x="200" y="100">INIT/INIT-ACK</text>
+                  <text x="272" y="100">has</text>
+                  <text x="328" y="100">Protected</text>
+                  <text x="168" y="116">Association</text>
+                  <text x="256" y="116">Parameter</text>
+                  <text x="60" y="164">PROTECTION</text>
+                  <text x="160" y="164">INITILIZATION</text>
+                  <text x="144" y="212">start</text>
+                  <text x="200" y="212">T-valid</text>
+                  <text x="260" y="212">timer.</text>
+                  <text x="152" y="244">[CRYPTO</text>
+                  <text x="212" y="244">SETUP]</text>
+                  <text x="140" y="276">send</text>
+                  <text x="176" y="276">and</text>
+                  <text x="224" y="276">receive</text>
+                  <text x="164" y="292">protection</text>
+                  <text x="236" y="292">engine</text>
+                  <text x="304" y="292">handshake</text>
+                  <text x="108" y="340">VALIDATION</text>
+                  <text x="160" y="388">[ENDPOINT</text>
+                  <text x="248" y="388">VALIDATION]</text>
+                  <text x="140" y="420">send</text>
+                  <text x="176" y="420">and</text>
+                  <text x="224" y="420">receive</text>
+                  <text x="148" y="436">PVALID</text>
+                  <text x="188" y="436">by</text>
+                  <text x="224" y="436">means</text>
+                  <text x="260" y="436">of</text>
+                  <text x="148" y="452">CRYPTO</text>
+                  <text x="204" y="452">chunk.</text>
+                  <text x="112" y="500">PROTECTED</text>
+                </g>
+              </svg><a href="#section-7.3-1.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-7" class="selfRef">Figure 7</a>:
+<a href="#name-crypto-chunk-state-diagram" class="selfRef">Crypto Chunk State Diagram</a>
+          </figcaption></figure>
+</div>
+</section>
+</div>
+<div id="key-management-considerations">
+<section id="section-7.4">
+        <h3 id="name-considerations-on-key-manag">
+<a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-considerations-on-key-manag" class="section-name selfRef">Considerations on Key Management</a>
+        </h3>
+<p id="section-7.4-1">When the Association is in PROTECTION INITILIZATION state, in-band key
+management shall exploit SCTP DATA chunk with the Protection Engine
+PPID (see <a href="#iana-payload-protection-id" class="auto internal xref">Table 9</a>) that will be sent
+unencrypted.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
+<p id="section-7.4-2">When the Association is in crypto chunk PROTECTED state and the SCTP
+assocation is in ESTABLISHED or any of the states that can be reached
+after ESTABLISHED state, in-band key management shall exploit SCTP
+DATA chunk that will be protected by the Protection Engine and
+encapsulated in CRYPTO chunks.<a href="#section-7.4-2" class="pilcrow">¶</a></p>
+<p id="section-7.4-3">In-band key management shall use a dedicated Payload Protocol
+Identifier assigned by IANA and defined in the specific Protection
+Engine Specification.<a href="#section-7.4-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="t-valid-considerations">
+<section id="section-7.5">
+        <h3 id="name-consideration-on-t-valid">
+<a href="#section-7.5" class="section-number selfRef">7.5. </a><a href="#name-consideration-on-t-valid" class="section-name selfRef">Consideration on T-valid</a>
+        </h3>
+<p id="section-7.5-1">The timer T-Valid supervises initializations that depend on how
+the handshake is specified for the Protection Engine and also on
+the characteristics of the transport network.<a href="#section-7.5-1" class="pilcrow">¶</a></p>
+<p id="section-7.5-2">This specification recommends a default value of 30 seconds for
+T-valid. This value is expected to be superseded by recommendations in
+the Protection Engine Specification for each Protection Engine.<a href="#section-7.5-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="protected-data-handling">
+<section id="section-8">
+      <h2 id="name-protected-data-chunk-handli">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-protected-data-chunk-handli" class="section-name selfRef">Protected Data Chunk Handling</a>
+      </h2>
+<p id="section-8-1">With reference to the Crypto Chunk states and the state Diagram as
+shown in Figure 3 of <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>, the handling of Control chunks, Data
+chunks and Crypto chunks follows the rules defined below:<a href="#section-8-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-8-2.1">When the association is in states CLOSED, COOKIE-WAIT, and
+COOKIE-ECHOED, any Control chunk is sent unprotected (i.e. plain
+text). No DATA chunks shall be sent in these states and DATA chunks
+received shall be silently discarded.<a href="#section-8-2.1" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-8-2.2">When the Crypto Chunk is in state PROTECTED and the SCTP association
+is in states ESTABLISHED or in the states for association shutdown,
+i.e. SHUTDOWN-PENDING, SHUTDOWN-SENT, SHUTDOWN-RECEIVED,
+SHUTDOWN-ACK-SENT as defined by <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>, any SCTP chunk including
+DATA chunks, but excluding CRYPTO chunk, will be used to create an
+SCTP payload that will be encrypted by the Protection Engine and the
+result from that encryption will be the used as payload for a CRYPTO
+chunk that will be the only chunk in the SCTP packet to be sent. DATA
+chunks are accepted and handled according to section 4 of <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>.<a href="#section-8-2.2" class="pilcrow">¶</a>
+</li>
+      </ul>
+<span id="name-plain-text-sctp-packet"></span><div id="sctp-Crypto-encrypt-chunk-states-1">
+<figure id="figure-8">
+        <div id="section-8-3.1">
+          <div class="alignCenter art-svg artwork" id="section-8-3.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="208" width="528" viewBox="0 0 528 208" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+              <path d="M 8,64 L 8,192" fill="none" stroke="black"></path>
+              <path d="M 520,64 L 520,192" fill="none" stroke="black"></path>
+              <path d="M 8,64 L 520,64" fill="none" stroke="black"></path>
+              <path d="M 8,96 L 520,96" fill="none" stroke="black"></path>
+              <path d="M 8,128 L 520,128" fill="none" stroke="black"></path>
+              <path d="M 8,160 L 520,160" fill="none" stroke="black"></path>
+              <path d="M 8,192 L 520,192" fill="none" stroke="black"></path>
+              <g class="text">
+                <text x="16" y="36">0</text>
+                <text x="176" y="36">1</text>
+                <text x="336" y="36">2</text>
+                <text x="496" y="36">3</text>
+                <text x="16" y="52">0</text>
+                <text x="32" y="52">1</text>
+                <text x="48" y="52">2</text>
+                <text x="64" y="52">3</text>
+                <text x="80" y="52">4</text>
+                <text x="96" y="52">5</text>
+                <text x="112" y="52">6</text>
+                <text x="128" y="52">7</text>
+                <text x="144" y="52">8</text>
+                <text x="160" y="52">9</text>
+                <text x="176" y="52">0</text>
+                <text x="192" y="52">1</text>
+                <text x="208" y="52">2</text>
+                <text x="224" y="52">3</text>
+                <text x="240" y="52">4</text>
+                <text x="256" y="52">5</text>
+                <text x="272" y="52">6</text>
+                <text x="288" y="52">7</text>
+                <text x="304" y="52">8</text>
+                <text x="320" y="52">9</text>
+                <text x="336" y="52">0</text>
+                <text x="352" y="52">1</text>
+                <text x="368" y="52">2</text>
+                <text x="384" y="52">3</text>
+                <text x="400" y="52">4</text>
+                <text x="416" y="52">5</text>
+                <text x="432" y="52">6</text>
+                <text x="448" y="52">7</text>
+                <text x="464" y="52">8</text>
+                <text x="480" y="52">9</text>
+                <text x="496" y="52">0</text>
+                <text x="512" y="52">1</text>
+                <text x="236" y="84">Common</text>
+                <text x="292" y="84">Header</text>
+                <text x="248" y="116">Chunk</text>
+                <text x="284" y="116">#1</text>
+                <text x="240" y="148">.</text>
+                <text x="256" y="148">.</text>
+                <text x="272" y="148">.</text>
+                <text x="248" y="180">Chunk</text>
+                <text x="284" y="180">#n</text>
+              </g>
+            </svg><a href="#section-8-3.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-8" class="selfRef">Figure 8</a>:
+<a href="#name-plain-text-sctp-packet" class="selfRef">Plain Text SCTP Packet</a>
+        </figcaption></figure>
+</div>
+<p id="section-8-4">The diagram shown in <a href="#sctp-Crypto-encrypt-chunk-states-1" class="auto internal xref">Figure 8</a> describes
+the structure of any plain text SCTP packet being sent or received
+when the Crypto Chunk is not in VALIDATION or PROTECTED state.<a href="#section-8-4" class="pilcrow">¶</a></p>
+<span id="name-protected-sctp-packets"></span><div id="sctp-Crypto-encrypt-chunk-states-2">
+<figure id="figure-9">
+        <div id="section-8-5.1">
+          <div class="alignCenter art-svg artwork" id="section-8-5.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="144" width="528" viewBox="0 0 528 144" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+              <path d="M 8,64 L 8,128" fill="none" stroke="black"></path>
+              <path d="M 520,64 L 520,128" fill="none" stroke="black"></path>
+              <path d="M 8,64 L 520,64" fill="none" stroke="black"></path>
+              <path d="M 8,96 L 520,96" fill="none" stroke="black"></path>
+              <path d="M 8,128 L 520,128" fill="none" stroke="black"></path>
+              <g class="text">
+                <text x="16" y="36">0</text>
+                <text x="176" y="36">1</text>
+                <text x="336" y="36">2</text>
+                <text x="496" y="36">3</text>
+                <text x="16" y="52">0</text>
+                <text x="32" y="52">1</text>
+                <text x="48" y="52">2</text>
+                <text x="64" y="52">3</text>
+                <text x="80" y="52">4</text>
+                <text x="96" y="52">5</text>
+                <text x="112" y="52">6</text>
+                <text x="128" y="52">7</text>
+                <text x="144" y="52">8</text>
+                <text x="160" y="52">9</text>
+                <text x="176" y="52">0</text>
+                <text x="192" y="52">1</text>
+                <text x="208" y="52">2</text>
+                <text x="224" y="52">3</text>
+                <text x="240" y="52">4</text>
+                <text x="256" y="52">5</text>
+                <text x="272" y="52">6</text>
+                <text x="288" y="52">7</text>
+                <text x="304" y="52">8</text>
+                <text x="320" y="52">9</text>
+                <text x="336" y="52">0</text>
+                <text x="352" y="52">1</text>
+                <text x="368" y="52">2</text>
+                <text x="384" y="52">3</text>
+                <text x="400" y="52">4</text>
+                <text x="416" y="52">5</text>
+                <text x="432" y="52">6</text>
+                <text x="448" y="52">7</text>
+                <text x="464" y="52">8</text>
+                <text x="480" y="52">9</text>
+                <text x="496" y="52">0</text>
+                <text x="512" y="52">1</text>
+                <text x="236" y="84">Common</text>
+                <text x="292" y="84">Header</text>
+                <text x="236" y="116">CRYPTO</text>
+                <text x="288" y="116">Chunk</text>
+              </g>
+            </svg><a href="#section-8-5.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-9" class="selfRef">Figure 9</a>:
+<a href="#name-protected-sctp-packets" class="selfRef">Protected SCTP Packets</a>
+        </figcaption></figure>
+</div>
+<p id="section-8-6">The diagram shown in <a href="#sctp-Crypto-encrypt-chunk-states-2" class="auto internal xref">Figure 9</a> describes
+the structure of an SCTP packet being sent after the Crypto Chunk
+VALIDATION or PROTECTED state has been reached. Such packets are built
+with the SCTP common header. Only one CRYPTO chunk can be sent in
+a SCTP packet.<a href="#section-8-6" class="pilcrow">¶</a></p>
+<div id="data-sending">
+<section id="section-8.1">
+        <h3 id="name-protected-data-chunk-transm">
+<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-protected-data-chunk-transm" class="section-name selfRef">Protected Data Chunk Transmission</a>
+        </h3>
+<p id="section-8.1-1">When the Crypto Chunk state machine hasn't reached the VALIDATION state, the
+protection enigne MAY perform protection engine key management in-band
+depending on how the specification for the chosen Protection Engine
+has been defined.  In such case, the CRYPTO chunk Handler will receive
+plain control and DATA chunks from the SCTP chunk handler.<a href="#section-8.1-1" class="pilcrow">¶</a></p>
+<p id="section-8.1-2">When the Crypto Chunk has reached the VALIDATION and PROTECTED state,
+the CRYPTO chunk handler will receive control chunks and DATA chunks
+from the SCTP chunk handler as a complete SCTP payload with maximum
+size limited by PMTU reduced by the size of the SCTP common header and
+the CRYPTO chunk overhead.<a href="#section-8.1-2" class="pilcrow">¶</a></p>
+<p id="section-8.1-3">That plain payload will be sent to the protection engine in use for
+that specific association, the protection engine will return an
+encrypted payload.<a href="#section-8.1-3" class="pilcrow">¶</a></p>
+<p id="section-8.1-4">Depending on the specification for the chosen protection engine, when
+forming the CRYPTO chunk header the CRYPTO chunk handler MAY set the
+chunk header flags (see <a href="#sctp-Crypto-chunk-newchunk-crypt-struct" class="auto internal xref">Figure 3</a>).<a href="#section-8.1-4" class="pilcrow">¶</a></p>
+<p id="section-8.1-5">An SCTP packet containing an SCTP CRYPTO chunk SHALL be delivered
+without delay and SCTP bundling SHALL NOT be performed.<a href="#section-8.1-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="data-receiving">
+<section id="section-8.2">
+        <h3 id="name-protected-data-chunk-recept">
+<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-protected-data-chunk-recept" class="section-name selfRef">Protected Data Chunk Reception</a>
+        </h3>
+<p id="section-8.2-1">When the Crypto Chunk state machine hasn't reached the VALIDATION
+state, it MAY handle key management in-band depending on how the
+specification for the chosen protection engine has been defined.  In
+such case, the CRYPTO chunk handler will receive plain control chunks
+and DATA chunks with Protection Engine PPID from the SCTP Header
+Handler. Those plain control chunks will be forwarded to SCTP chunk
+handler.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
+<p id="section-8.2-2">When the Crypto Chunk state machine has reached the VALIDATION or
+PROTECTED state, the CRYPTO chunk handler will receive CRYPTO chunks
+from the SCTP Header Handler.  Payload from CRYPTO chunks will be
+forwarded to the protection engine in use for that specific
+association for decryption, the protection engine will return a plain
+SCTP Payload.  The plain SCTP payload will be forwarded to SCTP Chunk
+Handler that will split it in separated chunks and will handle them
+according to <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>.<a href="#section-8.2-2" class="pilcrow">¶</a></p>
+<p id="section-8.2-3">Depending on the specification for the chosen protection engine, when
+receiving the CRYPTO chunk header the CRYPTO Chunk Handler MAY handle
+the Flags (see <a href="#sctp-Crypto-chunk-newchunk-crypt-struct" class="auto internal xref">Figure 3</a>) according
+to that specification.<a href="#section-8.2-3" class="pilcrow">¶</a></p>
+<p id="section-8.2-4">Meta data belonging to the SCTP packet received SHALL be tied to the
+relevant chunks and forwarded transparently to the SCTP endpoint.<a href="#section-8.2-4" class="pilcrow">¶</a></p>
+<div id="sctp-header-handler">
+<section id="section-8.2.1">
+          <h4 id="name-sctp-header-handler">
+<a href="#section-8.2.1" class="section-number selfRef">8.2.1. </a><a href="#name-sctp-header-handler" class="section-name selfRef">SCTP Header Handler</a>
+          </h4>
+<p id="section-8.2.1-1">The SCTP Header Handler is responsible for correctness of the SCTP
+common header, it receives the SCTP packet from the lower transport
+layer, discriminates among associations and forwards the payload and
+relevant data to the SCTP protection engine for handling.<a href="#section-8.2.1-1" class="pilcrow">¶</a></p>
+<p id="section-8.2.1-2">In the opposite direction it creates the SCTP common header and fills
+it with the relevant information for the specific association and
+delivers it towards the lower transport layer.<a href="#section-8.2.1-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="IANA-Consideration">
+<section id="section-9">
+      <h2 id="name-iana-considerations">
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+      </h2>
+<p id="section-9-1">This document defines two new registries in the Stream Control
+Transmission Protocol (SCTP) Parameters group that IANA
+maintains. Theses registries are for the protection engine identifiers
+and extra cause codes for protection related errors. It also adds
+registry entries into several other registries in the Stream Control
+Transmission Protocol (SCTP) Parameters group:<a href="#section-9-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-9-2.1">Two new SCTP Chunk Types<a href="#section-9-2.1" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-9-2.2">One new SCTP Chunk Parameter Type<a href="#section-9-2.2" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-9-2.3">One new SCTP Error Cause Codes<a href="#section-9-2.3" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-9-2.4">One new SCTP Payload Protocol Identifier<a href="#section-9-2.4" class="pilcrow">¶</a>
+</li>
+      </ul>
+<div id="iana-protection-engines">
+<section id="section-9.1">
+        <h3 id="name-protection-engine-identifie">
+<a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-protection-engine-identifie" class="section-name selfRef">Protection Engine Identifier Registry</a>
+        </h3>
+<p id="section-9.1-1">IANA is requested to create a new registry called "CRYPTO Chunk
+Protection Engine Identifiers". This registry is part of the Stream
+Control Transmission Protocol (SCTP) Parameters grouping.<a href="#section-9.1-1" class="pilcrow">¶</a></p>
+<p id="section-9.1-2">The purpose of this registry is to enable identification of different
+protection engines used by the CRYPTO chunk when performing the SCTP
+handshake and negotiating support. Entries in the registry requires a
+protection engine name, a reference to the specification for the
+protection engine, and a contact. Each entry will be assigned by IANA
+a unique 16-bit unsigned integer identifier for their protection
+engine. Values 0-65534 are available for assignment. Value 65535 is
+reserved for future extension. The proposed general form of the
+registry is depicted below in <a href="#iana-protection-engine-identifier" class="auto internal xref">Table 4</a>.<a href="#section-9.1-2" class="pilcrow">¶</a></p>
+<span id="name-protection-engine-identifier"></span><div id="iana-protection-engine-identifier">
+<table class="center" id="table-4">
+          <caption>
+<a href="#table-4" class="selfRef">Table 4</a>:
+<a href="#name-protection-engine-identifier" class="selfRef">Protection Engine Identifier Registry</a>
+          </caption>
+<thead>
+            <tr>
+              <th class="text-right" rowspan="1" colspan="1">ID Value</th>
+              <th class="text-left" rowspan="1" colspan="1">Name</th>
+              <th class="text-left" rowspan="1" colspan="1">Reference</th>
+              <th class="text-left" rowspan="1" colspan="1">Contact</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">0-65534</td>
+              <td class="text-left" rowspan="1" colspan="1">Available for Assignment</td>
+              <td class="text-left" rowspan="1" colspan="1">RFC-To-Be</td>
+              <td class="text-left" rowspan="1" colspan="1"> </td>
+            </tr>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">65535</td>
+              <td class="text-left" rowspan="1" colspan="1">Reserved</td>
+              <td class="text-left" rowspan="1" colspan="1">RFC-To-Be</td>
+              <td class="text-left" rowspan="1" colspan="1">Authors</td>
+            </tr>
+          </tbody>
+        </table>
+</div>
+<p id="section-9.1-4">New entries are registered following the Specification Required policy
+as defined by <span>[<a href="#RFC8126" class="cite xref">RFC8126</a>]</span>.<a href="#section-9.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="IANA-Extra-Cause">
+<section id="section-9.2">
+        <h3 id="name-protection-error-cause-code">
+<a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-protection-error-cause-code" class="section-name selfRef">Protection Error Cause Codes Registry</a>
+        </h3>
+<p id="section-9.2-1">IANA is requested to create a new registry called "Protection Error
+Cause Codes". This registry is part of the Stream Control Transmission
+Protocol (SCTP) Parameters grouping.<a href="#section-9.2-1" class="pilcrow">¶</a></p>
+<p id="section-9.2-2">The purpose of this registry is to enable identification of different
+protection related errors when using CRYPTO chunk and a protection
+engine.  Entries in the registry requires a Meaning, a reference to
+the specification defining the error, and a contact. Each entry will
+be assigned by IANA a unique 16-bit unsigned integer identifier for
+their protection engine. Values 0-65534 are available for
+assignment. Value 65535 is reserved for future extension. The proposed
+general form of the registry is depicted below in
+<a href="#iana-protection-error-cause" class="auto internal xref">Table 5</a>.<a href="#section-9.2-2" class="pilcrow">¶</a></p>
+<span id="name-protection-error-cause-code-2"></span><div id="iana-protection-error-cause">
+<table class="center" id="table-5">
+          <caption>
+<a href="#table-5" class="selfRef">Table 5</a>:
+<a href="#name-protection-error-cause-code-2" class="selfRef">Protection Error Cause Code</a>
+          </caption>
+<thead>
+            <tr>
+              <th class="text-right" rowspan="1" colspan="1">Cause Code</th>
+              <th class="text-left" rowspan="1" colspan="1">Meaning</th>
+              <th class="text-left" rowspan="1" colspan="1">Reference</th>
+              <th class="text-left" rowspan="1" colspan="1">Contact</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">0</td>
+              <td class="text-left" rowspan="1" colspan="1">Error in the Protection Engine List</td>
+              <td class="text-left" rowspan="1" colspan="1">RFC-To-Be</td>
+              <td class="text-left" rowspan="1" colspan="1">Authors</td>
+            </tr>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">1</td>
+              <td class="text-left" rowspan="1" colspan="1">Error During Protection Handshake</td>
+              <td class="text-left" rowspan="1" colspan="1">RFC-To-Be</td>
+              <td class="text-left" rowspan="1" colspan="1">Authors</td>
+            </tr>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">2</td>
+              <td class="text-left" rowspan="1" colspan="1">Failure in Protection Engines Validation</td>
+              <td class="text-left" rowspan="1" colspan="1">RFC-To-Be</td>
+              <td class="text-left" rowspan="1" colspan="1">Authors</td>
+            </tr>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">3</td>
+              <td class="text-left" rowspan="1" colspan="1">Timeout During KEY Handshake or Validation</td>
+              <td class="text-left" rowspan="1" colspan="1">RFC-To-Be</td>
+              <td class="text-left" rowspan="1" colspan="1">Authors</td>
+            </tr>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">4-65534</td>
+              <td class="text-left" rowspan="1" colspan="1">Available for Assignment</td>
+              <td class="text-left" rowspan="1" colspan="1">RFC-To-Be</td>
+              <td class="text-left" rowspan="1" colspan="1">Authors</td>
+            </tr>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">65535</td>
+              <td class="text-left" rowspan="1" colspan="1">Reserved</td>
+              <td class="text-left" rowspan="1" colspan="1">RFC-To-Be</td>
+              <td class="text-left" rowspan="1" colspan="1">Authors</td>
+            </tr>
+          </tbody>
+        </table>
+</div>
+<p id="section-9.2-4">New entries are registered following the Specification Required policy
+as defined by <span>[<a href="#RFC8126" class="cite xref">RFC8126</a>]</span>.<a href="#section-9.2-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="sctp-chunk-types">
+<section id="section-9.3">
+        <h3 id="name-sctp-chunk-types">
+<a href="#section-9.3" class="section-number selfRef">9.3. </a><a href="#name-sctp-chunk-types" class="section-name selfRef">SCTP Chunk Types</a>
+        </h3>
+<p id="section-9.3-1">In the Stream Control Transmission Protocol (SCTP) Parameters group's
+"Chunk Types" registry, IANA is requested to add the two new entries
+depicted below in in <a href="#iana-chunk-types" class="auto internal xref">Table 6</a> with a reference to this
+document. The registry at time of writing was available at:
+https://www.iana.org/assignments/sctp-parameters/sctp-parameters.xhtml#sctp-parameters-1<a href="#section-9.3-1" class="pilcrow">¶</a></p>
+<span id="name-new-chunk-types-registered"></span><div id="iana-chunk-types">
+<table class="center" id="table-6">
+          <caption>
+<a href="#table-6" class="selfRef">Table 6</a>:
+<a href="#name-new-chunk-types-registered" class="selfRef">New Chunk Types Registered</a>
+          </caption>
+<thead>
+            <tr>
+              <th class="text-right" rowspan="1" colspan="1">ID Value</th>
+              <th class="text-left" rowspan="1" colspan="1">Chunk Type</th>
+              <th class="text-left" rowspan="1" colspan="1">Reference</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">TBA6</td>
+              <td class="text-left" rowspan="1" colspan="1">Crypto Chunk (CRYPTO)</td>
+              <td class="text-left" rowspan="1" colspan="1">RFC-To-Be</td>
+            </tr>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">TBA7</td>
+              <td class="text-left" rowspan="1" colspan="1">Protected Association Parameter Validation (PVALID)</td>
+              <td class="text-left" rowspan="1" colspan="1">RFC-To-Be</td>
+            </tr>
+          </tbody>
+        </table>
+</div>
+</section>
+</div>
+<div id="sctp-chunk-parameter-types">
+<section id="section-9.4">
+        <h3 id="name-sctp-chunk-parameter-types">
+<a href="#section-9.4" class="section-number selfRef">9.4. </a><a href="#name-sctp-chunk-parameter-types" class="section-name selfRef">SCTP Chunk Parameter Types</a>
+        </h3>
+<p id="section-9.4-1">In the Stream Control Transmission Protocol (SCTP) Parameters group's
+"Chunk Parameter Types" registry, IANA is requested to add the new
+entry depicted below in in <a href="#iana-chunk-parameter-types" class="auto internal xref">Table 7</a> with a
+reference to this document. The registry at time of writing was
+available at:
+https://www.iana.org/assignments/sctp-parameters/sctp-parameters.xhtml#sctp-parameters-2<a href="#section-9.4-1" class="pilcrow">¶</a></p>
+<span id="name-new-chunk-type-parameters-r"></span><div id="iana-chunk-parameter-types">
+<table class="center" id="table-7">
+          <caption>
+<a href="#table-7" class="selfRef">Table 7</a>:
+<a href="#name-new-chunk-type-parameters-r" class="selfRef">New Chunk Type Parameters Registered</a>
+          </caption>
+<thead>
+            <tr>
+              <th class="text-right" rowspan="1" colspan="1">ID Value</th>
+              <th class="text-left" rowspan="1" colspan="1">Chunk Parameter Type</th>
+              <th class="text-left" rowspan="1" colspan="1">Reference</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">TBA8</td>
+              <td class="text-left" rowspan="1" colspan="1">Protected Association</td>
+              <td class="text-left" rowspan="1" colspan="1">RFC-To-Be</td>
+            </tr>
+          </tbody>
+        </table>
+</div>
+</section>
+</div>
+<div id="sctp-error-cause-codes">
+<section id="section-9.5">
+        <h3 id="name-sctp-error-cause-codes">
+<a href="#section-9.5" class="section-number selfRef">9.5. </a><a href="#name-sctp-error-cause-codes" class="section-name selfRef">SCTP Error Cause Codes</a>
+        </h3>
+<p id="section-9.5-1">In the Stream Control Transmission Protocol (SCTP) Parameters group's
+"Error Cause Codes" registry, IANA is requested to add the new
+entry depicted below in in <a href="#iana-error-cause-codes" class="auto internal xref">Table 8</a> with a
+reference to this document. The registry at time of writing was
+available at:
+https://www.iana.org/assignments/sctp-parameters/sctp-parameters.xhtml#sctp-parameters-24<a href="#section-9.5-1" class="pilcrow">¶</a></p>
+<span id="name-error-cause-codes-parameter"></span><div id="iana-error-cause-codes">
+<table class="center" id="table-8">
+          <caption>
+<a href="#table-8" class="selfRef">Table 8</a>:
+<a href="#name-error-cause-codes-parameter" class="selfRef">Error Cause Codes Parameters Registered</a>
+          </caption>
+<thead>
+            <tr>
+              <th class="text-right" rowspan="1" colspan="1">ID Value</th>
+              <th class="text-left" rowspan="1" colspan="1">Error Cause Codes</th>
+              <th class="text-left" rowspan="1" colspan="1">Reference</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">TBA9</td>
+              <td class="text-left" rowspan="1" colspan="1">Protection Engine Error</td>
+              <td class="text-left" rowspan="1" colspan="1">RFC-To-Be</td>
+            </tr>
+          </tbody>
+        </table>
+</div>
+</section>
+</div>
+<div id="sctp-payload-protocol-identifier">
+<section id="section-9.6">
+        <h3 id="name-sctp-payload-protocol-ident">
+<a href="#section-9.6" class="section-number selfRef">9.6. </a><a href="#name-sctp-payload-protocol-ident" class="section-name selfRef">SCTP Payload Protocol Identifier</a>
+        </h3>
+<p id="section-9.6-1">In the Stream Control Transmission Protocol (SCTP) Parameters group's
+"Payload Protocol Identifiers" registry, IANA is requested to add the new
+entry depicted below in in <a href="#iana-payload-protection-id" class="auto internal xref">Table 9</a> with a
+reference to this document. The registry at time of writing was
+available at:
+https://www.iana.org/assignments/sctp-parameters/sctp-parameters.xhtml#sctp-parameters-25<a href="#section-9.6-1" class="pilcrow">¶</a></p>
+<span id="name-protection-engine-protocol-"></span><div id="iana-payload-protection-id">
+<table class="center" id="table-9">
+          <caption>
+<a href="#table-9" class="selfRef">Table 9</a>:
+<a href="#name-protection-engine-protocol-" class="selfRef">Protection Engine Protocol Identifier Registered</a>
+          </caption>
+<thead>
+            <tr>
+              <th class="text-right" rowspan="1" colspan="1">ID Value</th>
+              <th class="text-left" rowspan="1" colspan="1">SCTP Payload Protocol Identifier</th>
+              <th class="text-left" rowspan="1" colspan="1">Reference</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-right" rowspan="1" colspan="1">TBA10</td>
+              <td class="text-left" rowspan="1" colspan="1">Protection Engine Protocol Identifier</td>
+              <td class="text-left" rowspan="1" colspan="1">RFC-To-Be</td>
+            </tr>
+          </tbody>
+        </table>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="Security-Considerations">
+<section id="section-10">
+      <h2 id="name-security-considerations">
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+      </h2>
+<p id="section-10-1">All the security and privacy considerations of the security protocol
+used as the protection engine applies.<a href="#section-10-1" class="pilcrow">¶</a></p>
+<div id="privacy-considerations">
+<section id="section-10.1">
+        <h3 id="name-privacy-considerations">
+<a href="#section-10.1" class="section-number selfRef">10.1. </a><a href="#name-privacy-considerations" class="section-name selfRef">Privacy Considerations</a>
+        </h3>
+<p id="section-10.1-1">Using a security protocol in the SCTP CRYPTO chunk might lower the
+privacy properties of the security protocol as the SCTP Verification
+Tag is an unique identifier for the association.<a href="#section-10.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="Downgrade-Attacks">
+<section id="section-10.2">
+        <h3 id="name-downgrade-attacks">
+<a href="#section-10.2" class="section-number selfRef">10.2. </a><a href="#name-downgrade-attacks" class="section-name selfRef">Downgrade Attacks</a>
+        </h3>
+<p id="section-10.2-1">The CRYPTO chunk provides a mechanism for preventing downgrade attacks
+that detects downgrading attempts between protection engines and
+terminates the association. The chosen protection engine is the same
+as if the peers had been communicating in the absence of an attacker.<a href="#section-10.2-1" class="pilcrow">¶</a></p>
+<p id="section-10.2-2">The protection engine initial handshake is verified before the
+Crypto Chunk is considered protected, thus no user data are sent before
+validation.<a href="#section-10.2-2" class="pilcrow">¶</a></p>
+<p id="section-10.2-3">The downgrade protection is only as strong as the weakest of the
+supported protection engines as an active attacker can trick the
+endpoints to negotiate the weakest protection engine and then
+modify the weakly protected CRYPTO chunks to deceive the endpoints
+that the negotiation of the protection engines is validated. This
+is similar to the downgrade protection in TLS 1.3 specified in
+Section 4.1.3. of <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span> where downgrade protection is not
+provided when TLS 1.2 with static RSA is used. It is RECOMMENDED
+to only support a limited set of strongly profiled protection
+engines.<a href="#section-10.2-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="requirements">
+<section id="section-11">
+      <h2 id="name-requirements-towards-the-pr">
+<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-requirements-towards-the-pr" class="section-name selfRef">Requirements Towards the Protection Engines</a>
+      </h2>
+<p id="section-11-1">This section specifies what is to be specified in the description
+of a protection engine.<a href="#section-11-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-11-2.1">Define how to protect the plain text set of chunks and encapsulate
+them in the CRYPTO Chunk payload.<a href="#section-11-2.1" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-11-2.2">Can define its usage of the 8-bit chunk Flags field in the CRYPTO
+chunk<a href="#section-11-2.2" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-11-2.3">Is required to register the defined protection engine(s) with IANA
+per <a href="#iana-protection-engines" class="auto internal xref">Section 9.1</a>.<a href="#section-11-2.3" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-11-2.4">Detail the state transition between PROTECTION INITILIZATION and
+VALIDATION.<a href="#section-11-2.4" class="pilcrow">¶</a>
+</li>
+      </ul>
+</section>
+</div>
+<div id="acknowledgments">
+<section id="section-12">
+      <h2 id="name-acknowledgments">
+<a href="#section-12" class="section-number selfRef">12. </a><a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
+      </h2>
+<p id="section-12-1">The authors thank Michael Tüxen for his invaluable comments
+   helping to cope with Association Restart, ASCONF handling and
+   restructuring the Protection Engine architecture.<a href="#section-12-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<section id="section-13">
+      <h2 id="name-references">
+<a href="#section-13" class="section-number selfRef">13. </a><a href="#name-references" class="section-name selfRef">References</a>
+      </h2>
+<section id="section-13.1">
+        <h3 id="name-normative-references">
+<a href="#section-13.1" class="section-number selfRef">13.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
+<dl class="references">
+<dt id="RFC2119">[RFC2119]</dt>
+        <dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc2119">https://www.rfc-editor.org/info/rfc2119</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC4895">[RFC4895]</dt>
+        <dd>
+<span class="refAuthor">Tuexen, M.</span>, <span class="refAuthor">Stewart, R.</span>, <span class="refAuthor">Lei, P.</span>, and <span class="refAuthor">E. Rescorla</span>, <span class="refTitle">"Authenticated Chunks for the Stream Control Transmission Protocol (SCTP)"</span>, <span class="seriesInfo">RFC 4895</span>, <span class="seriesInfo">DOI 10.17487/RFC4895</span>, <time datetime="2007-08" class="refDate">August 2007</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc4895">https://www.rfc-editor.org/info/rfc4895</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC5061">[RFC5061]</dt>
+        <dd>
+<span class="refAuthor">Stewart, R.</span>, <span class="refAuthor">Xie, Q.</span>, <span class="refAuthor">Tuexen, M.</span>, <span class="refAuthor">Maruyama, S.</span>, and <span class="refAuthor">M. Kozuka</span>, <span class="refTitle">"Stream Control Transmission Protocol (SCTP) Dynamic Address Reconfiguration"</span>, <span class="seriesInfo">RFC 5061</span>, <span class="seriesInfo">DOI 10.17487/RFC5061</span>, <time datetime="2007-09" class="refDate">September 2007</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc5061">https://www.rfc-editor.org/info/rfc5061</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8126">[RFC8126]</dt>
+        <dd>
+<span class="refAuthor">Cotton, M.</span>, <span class="refAuthor">Leiba, B.</span>, and <span class="refAuthor">T. Narten</span>, <span class="refTitle">"Guidelines for Writing an IANA Considerations Section in RFCs"</span>, <span class="seriesInfo">BCP 26</span>, <span class="seriesInfo">RFC 8126</span>, <span class="seriesInfo">DOI 10.17487/RFC8126</span>, <time datetime="2017-06" class="refDate">June 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8126">https://www.rfc-editor.org/info/rfc8126</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8174">[RFC8174]</dt>
+        <dd>
+<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8174">https://www.rfc-editor.org/info/rfc8174</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9260">[RFC9260]</dt>
+      <dd>
+<span class="refAuthor">Stewart, R.</span>, <span class="refAuthor">Tüxen, M.</span>, and <span class="refAuthor">K. Nielsen</span>, <span class="refTitle">"Stream Control Transmission Protocol"</span>, <span class="seriesInfo">RFC 9260</span>, <span class="seriesInfo">DOI 10.17487/RFC9260</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc9260">https://www.rfc-editor.org/info/rfc9260</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+<section id="section-13.2">
+        <h3 id="name-informative-references">
+<a href="#section-13.2" class="section-number selfRef">13.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="RFC8446">[RFC8446]</dt>
+        <dd>
+<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"The Transport Layer Security (TLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 8446</span>, <span class="seriesInfo">DOI 10.17487/RFC8446</span>, <time datetime="2018-08" class="refDate">August 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8446">https://www.rfc-editor.org/info/rfc8446</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="I-D.westerlund-tsvwg-sctp-crypto-dtls">[I-D.westerlund-tsvwg-sctp-crypto-dtls]</dt>
+      <dd>
+<span class="refAuthor">Westerlund, M.</span>, <span class="refAuthor">Preuß Mattsson, J.</span>, and <span class="refAuthor">C. Porfiri</span>, <span class="refTitle">"Datagram Transport Layer Security (DTLS) in the Stream Control Transmission Protocol (SCTP) CRYPTO Chunk"</span>, <time datetime="2023-06" class="refDate">June 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/draft-westerlund-tsvwg-sctp-crypto-dtls/">https://datatracker.ietf.org/doc/draft-westerlund-tsvwg-sctp-crypto-dtls/</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</section>
+<div id="authors-addresses">
+<section id="appendix-A">
+      <h2 id="name-authors-addresses">
+<a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Magnus Westerlund</span></div>
+<div dir="auto" class="left"><span class="org">Ericsson</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:magnus.westerlund@ericsson.com" class="email">magnus.westerlund@ericsson.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">John Preuß Mattsson</span></div>
+<div dir="auto" class="left"><span class="org">Ericsson</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:john.mattsson@ericsson.com" class="email">john.mattsson@ericsson.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Claudio Porfiri</span></div>
+<div dir="auto" class="left"><span class="org">Ericsson</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:claudio.porfiri@ericsson.com" class="email">claudio.porfiri@ericsson.com</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+</body>
+</html>

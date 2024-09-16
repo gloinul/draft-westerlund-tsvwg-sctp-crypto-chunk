@@ -17,7 +17,7 @@ BCP 78, 79, the TLP, and the TLP rules regarding code components (e.g. being
 subject to a Simplified BSD License) in Contributions.
 ## Working Group Information
 
-Discussion of this work occurs on the [Transport Area Working Group
+Discussion of this work occurs on the [Transport and Services Working Group
 Working Group mailing list](mailto:tsvwg@ietf.org)
 ([archive](https://mailarchive.ietf.org/arch/browse/tsvwg/),
 [subscribe](https://www.ietf.org/mailman/listinfo/tsvwg)).

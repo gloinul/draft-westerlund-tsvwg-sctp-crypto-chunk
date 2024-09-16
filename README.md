@@ -1,6 +1,6 @@
-# Stream Control Transmission Protocol (SCTP) Encryption Chunk
+# Stream Control Transmission Protocol (SCTP) CRYPTO Chunk
 
-This is the working area for the individual Internet-Draft, "Stream Control Transmission Protocol (SCTP) Encryption Chunk".
+This is the working area for the individual Internet-Draft, "Stream Control Transmission Protocol (SCTP) CRYPTO Chunk".
 
 * [Editor's Copy](https://gloinul.github.io/draft-westerlund-tsvwg-sctp-crypto-chunk/#go.draft-westerlund-tsvwg-sctp-crypto-chunk.html)
 * [Datatracker Page](https://datatracker.ietf.org/doc/draft-westerlund-tsvwg-sctp-crypto-chunk)

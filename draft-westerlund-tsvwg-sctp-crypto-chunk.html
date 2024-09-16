@@ -23,23 +23,22 @@ accomplished.
        Applications using SCTP CRYPTO chunk can use all transport
 features provided by SCTP and its extensions but with some limitations. 
     " name="description">
-<meta content="xml2rfc 3.18.0" name="generator">
+<meta content="xml2rfc 3.23.0" name="generator">
 <meta content="draft-westerlund-tsvwg-sctp-crypto-chunk-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.18.0
-    Python 3.11.5
-    ConfigArgParse 1.5.3
+  xml2rfc 3.23.0
+    Python 3.12.3
+    ConfigArgParse 1.7
     google-i18n-address 3.1.0
     intervaltree 3.1.0
-    Jinja2 3.1.2
-    lxml 4.9.3
-    platformdirs 3.10.0
+    Jinja2 3.1.4
+    lxml 4.9.4
+    platformdirs 4.2.2
     pycountry 22.3.5
-    PyYAML 6.0
-    requests 2.31.0
-    setuptools 67.7.2
-    six 1.16.0
-    wcwidth 0.2.6
+    PyYAML 6.0.1
+    requests 2.32.3
+    setuptools 70.3.0
+    wcwidth 0.2.13
 -->
 <link href="draft-westerlund-tsvwg-sctp-crypto-chunk.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -662,7 +661,7 @@ sub, sup {
 }
 #toc nav li {
   line-height: 1.3em;
-  margin: 0.75em 0;
+  margin: 2px 0;
   padding-left: 1.2em;
   text-indent: -1.2em;
 }
@@ -755,7 +754,7 @@ hr.addr {
     z-index: 2;
     top: 0;
     right: 0;
-    padding: 0;
+    padding: 1px 0 0 0;
     margin: 0;
     border-bottom: 1px solid #ccc;
     opacity: 0.6;
@@ -879,16 +878,13 @@ hr.addr {
     border-top: none;
     padding-top: 0;
   }
-  figure, pre {
+  figure, pre, .vcard {
     page-break-inside: avoid;
-  }
-  figure {
-    overflow: scroll;
   }
   h1, h2, h3, h4, h5, h6 {
     page-break-after: avoid;
   }
-  h2+*, h3+*, h4+*, h5+*, h6+* {
+  :is(h2, h3, h4, h5, h6)+*, dd {
     page-break-before: avoid;
   }
   pre {
@@ -901,6 +897,9 @@ hr.addr {
   }
   td {
     border-top: 1px solid #ddd;
+  }
+  .toplink {
+    display: none;
   }
 }
 
@@ -1002,28 +1001,6 @@ address div.right {
   text-align: right;
 }
 
-/* Give the table caption label the same styling as the figcaption */
-
-@media print {
-  .toplink {
-    display: none;
-  }
-
-  /* avoid overwriting the top border line with the ToC header */
-  #toc {
-    padding-top: 1px;
-  }
-
-  /* Avoid page breaks inside dl and author address entries */
-  dd {
-    page-break-before: avoid;
-  }
-  .vcard {
-    page-break-inside: avoid;
-  }
-
-}
-
 /* Dark mode. */
 @media (prefers-color-scheme: dark) {
 :root {
@@ -1060,11 +1037,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">SCTP CRYPTO Chunk</td>
-<td class="right">September 2023</td>
+<td class="right">September 2024</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Westerlund, et al.</td>
-<td class="center">Expires 11 March 2024</td>
+<td class="center">Expires 20 March 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1077,12 +1054,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-westerlund-tsvwg-sctp-crypto-chunk-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2023-09-08" class="published">8 September 2023</time>
+<time datetime="2024-09-16" class="published">16 September 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2024-03-11">11 March 2024</time></dd>
+<dd class="expires"><time datetime="2025-03-20">20 March 2025</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1151,7 +1128,7 @@ features provided by SCTP and its extensions but with some limitations.<a href="
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 11 March 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 20 March 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1160,7 +1137,7 @@ features provided by SCTP and its extensions but with some limitations.<a href="
 <a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
         </h2>
 <p id="section-boilerplate.2-1">
-            Copyright (c) 2023 IETF Trust and the persons identified as the
+            Copyright (c) 2024 IETF Trust and the persons identified as the
             document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.2-2">
             This document is subject to BCP 78 and the IETF Trust's Legal
@@ -2778,12 +2755,14 @@ the Protection Engine Specification for each Protection Engine.<a href="#section
 shown in Figure 3 of <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>, the handling of Control chunks, Data
 chunks and Crypto chunks follows the rules defined below:<a href="#section-8-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-8-2.1">When the association is in states CLOSED, COOKIE-WAIT, and
+<li class="normal" id="section-8-2.1">
+          <p id="section-8-2.1.1">When the association is in states CLOSED, COOKIE-WAIT, and
 COOKIE-ECHOED, any Control chunk is sent unprotected (i.e. plain
 text). No DATA chunks shall be sent in these states and DATA chunks
-received shall be silently discarded.<a href="#section-8-2.1" class="pilcrow">¶</a>
+received shall be silently discarded.<a href="#section-8-2.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-8-2.2">When the Crypto Chunk is in state PROTECTED and the SCTP association
+        <li class="normal" id="section-8-2.2">
+          <p id="section-8-2.2.1">When the Crypto Chunk is in state PROTECTED and the SCTP association
 is in states ESTABLISHED or in the states for association shutdown,
 i.e. SHUTDOWN-PENDING, SHUTDOWN-SENT, SHUTDOWN-RECEIVED,
 SHUTDOWN-ACK-SENT as defined by <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>, any SCTP chunk including
@@ -2791,7 +2770,7 @@ DATA chunks, but excluding CRYPTO chunk, will be used to create an
 SCTP payload that will be encrypted by the Protection Engine and the
 result from that encryption will be the used as payload for a CRYPTO
 chunk that will be the only chunk in the SCTP packet to be sent. DATA
-chunks are accepted and handled according to section 4 of <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>.<a href="#section-8-2.2" class="pilcrow">¶</a>
+chunks are accepted and handled according to section 4 of <span>[<a href="#RFC9260" class="cite xref">RFC9260</a>]</span>.<a href="#section-8-2.2.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <span id="name-plain-text-sctp-packet"></span><div id="sctp-Crypto-encrypt-chunk-states-1">
@@ -3008,13 +2987,17 @@ and extra cause codes for protection related errors. It also adds
 registry entries into several other registries in the Stream Control
 Transmission Protocol (SCTP) Parameters group:<a href="#section-9-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-9-2.1">Two new SCTP Chunk Types<a href="#section-9-2.1" class="pilcrow">¶</a>
+<li class="normal" id="section-9-2.1">
+          <p id="section-9-2.1.1">Two new SCTP Chunk Types<a href="#section-9-2.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-9-2.2">One new SCTP Chunk Parameter Type<a href="#section-9-2.2" class="pilcrow">¶</a>
+        <li class="normal" id="section-9-2.2">
+          <p id="section-9-2.2.1">One new SCTP Chunk Parameter Type<a href="#section-9-2.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-9-2.3">One new SCTP Error Cause Codes<a href="#section-9-2.3" class="pilcrow">¶</a>
+        <li class="normal" id="section-9-2.3">
+          <p id="section-9-2.3.1">One new SCTP Error Cause Codes<a href="#section-9-2.3.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-9-2.4">One new SCTP Payload Protocol Identifier<a href="#section-9-2.4" class="pilcrow">¶</a>
+        <li class="normal" id="section-9-2.4">
+          <p id="section-9-2.4.1">One new SCTP Payload Protocol Identifier<a href="#section-9-2.4.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <div id="iana-protection-engines">
@@ -3340,17 +3323,21 @@ engines.<a href="#section-10.2-3" class="pilcrow">¶</a></p>
 <p id="section-11-1">This section specifies what is to be specified in the description
 of a protection engine.<a href="#section-11-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-11-2.1">Define how to protect the plain text set of chunks and encapsulate
-them in the CRYPTO Chunk payload.<a href="#section-11-2.1" class="pilcrow">¶</a>
+<li class="normal" id="section-11-2.1">
+          <p id="section-11-2.1.1">Define how to protect the plain text set of chunks and encapsulate
+them in the CRYPTO Chunk payload.<a href="#section-11-2.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-11-2.2">Can define its usage of the 8-bit chunk Flags field in the CRYPTO
-chunk<a href="#section-11-2.2" class="pilcrow">¶</a>
+        <li class="normal" id="section-11-2.2">
+          <p id="section-11-2.2.1">Can define its usage of the 8-bit chunk Flags field in the CRYPTO
+chunk<a href="#section-11-2.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-11-2.3">Is required to register the defined protection engine(s) with IANA
-per <a href="#iana-protection-engines" class="auto internal xref">Section 9.1</a>.<a href="#section-11-2.3" class="pilcrow">¶</a>
+        <li class="normal" id="section-11-2.3">
+          <p id="section-11-2.3.1">Is required to register the defined protection engine(s) with IANA
+per <a href="#iana-protection-engines" class="auto internal xref">Section 9.1</a>.<a href="#section-11-2.3.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-11-2.4">Detail the state transition between PROTECTION INITILIZATION and
-VALIDATION.<a href="#section-11-2.4" class="pilcrow">¶</a>
+        <li class="normal" id="section-11-2.4">
+          <p id="section-11-2.4.1">Detail the state transition between PROTECTION INITILIZATION and
+VALIDATION.<a href="#section-11-2.4.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 </section>
@@ -3365,10 +3352,12 @@ VALIDATION.<a href="#section-11-2.4" class="pilcrow">¶</a>
    restructuring the Protection Engine architecture.<a href="#section-12-1" class="pilcrow">¶</a></p>
 </section>
 </div>
+<div id="sec-combined-references">
 <section id="section-13">
       <h2 id="name-references">
 <a href="#section-13" class="section-number selfRef">13. </a><a href="#name-references" class="section-name selfRef">References</a>
       </h2>
+<div id="sec-normative-references">
 <section id="section-13.1">
         <h3 id="name-normative-references">
 <a href="#section-13.1" class="section-number selfRef">13.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
@@ -3400,6 +3389,8 @@ VALIDATION.<a href="#section-11-2.4" class="pilcrow">¶</a>
 <dd class="break"></dd>
 </dl>
 </section>
+</div>
+<div id="sec-informative-references">
 <section id="section-13.2">
         <h3 id="name-informative-references">
 <a href="#section-13.2" class="section-number selfRef">13.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
@@ -3415,7 +3406,9 @@ VALIDATION.<a href="#section-11-2.4" class="pilcrow">¶</a>
 <dd class="break"></dd>
 </dl>
 </section>
+</div>
 </section>
+</div>
 <div id="authors-addresses">
 <section id="appendix-A">
       <h2 id="name-authors-addresses">
